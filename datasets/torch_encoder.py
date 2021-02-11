@@ -1,5 +1,6 @@
 """
-https://github.com/sksq96/pytorch-vae
+This file is a slight modification of Shubham Chandel's implementation of a
+variational autoencoder -> https://github.com/sksq96/pytorch-vae
 """
 import copy
 import glob
