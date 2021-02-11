@@ -1,6 +1,6 @@
 # Learn-to-Race
 
-Learn-to-Race is an (OpenAI gym)[https://gym.openai.com/] compliant, multimodal reinforcement learning environment where agents learn how to race. Unlike many simplistic learning environments, ours is built around Arrival’s CARLA-based software-in-the-loop racing simulator which was built specifically to accurately model race cars. This simulator is used in practice in Roborace, the world’s first extreme competition of teams developing self-driving AI.
+Learn-to-Race is an [OpenAI gym](https://gym.openai.com/) compliant, multimodal reinforcement learning environment where agents learn how to race. Unlike many simplistic learning environments, ours is built around Arrival’s CARLA-based software-in-the-loop racing simulator which was built specifically to accurately model race cars. This simulator is used in practice in Roborace, the world’s first extreme competition of teams developing self-driving AI.
 
 
 ## Requirements
@@ -9,9 +9,9 @@ Learn-to-Race is an (OpenAI gym)[https://gym.openai.com/] compliant, multimodal 
 
 **Graphics Hardware:** The racing simulator runs in a container, but it requires a GPU with Nvidia drivers installed. A Nvidia 870 GTX graphics card is minimally sufficient to simply run the simulator.
 
-**Docker:** The racing simulator runs in a (Docker)[https://www.docker.com/get-started] container.
+**Docker:** The racing simulator runs in a [Docker](https://www.docker.com/get-started) container.
 
-**Container GPU Access:** The container needs access to the GPU, so (nvidia-container-runtime)[https://github.com/NVIDIA/nvidia-container-runtime] is also required.
+**Container GPU Access:** The container needs access to the GPU, so [nvidia-container-runtime](https://github.com/NVIDIA/nvidia-container-runtime) is also required.
 
 ## Installation
 
