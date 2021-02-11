@@ -1,0 +1,58 @@
+{
+	"simulators": [
+		{
+			"version": "RoboraceMaps-linux-0.0.5.107278-roborace2",
+			"levels": {
+				"RaceTrack": "RaceTrack",
+				"VegasNorthRoad": "VegasNorthRoad",
+				"Flat": "Flat",
+				"GroundScanerTest": "GroundScanerTest",
+				"LidarFeatures": "LidarFeatures",
+				"SimpleTown": "SimpleTown"
+			}
+		},
+		{
+			"version": "ArrivalSim-linux-0.3.0.130538-roborace4",
+			"levels": {
+				"VegasNorthRoad": "../../../ArrivalSim/Content/Ribbon/Maps/VegasNorthRoad.umap",
+				"anglesey_national": "../../../ArrivalSim/Content/Ribbon/Maps/anglesey_national.umap",
+				"Arr_UPP_UDRV": "../../../ArrivalSim/Content/GeneratedTracks/Maps/Arr_UPP_UDRV.umap",
+				"IntrinsicCalib": "../../../ArrivalSim/Content/SimpleMaps/Maps/IntrinsicCalib.umap",
+				"SimpleTown": "../../../ArrivalSim/Content/SimpleMaps/Maps/SimpleTown.umap",
+				"HeadingCalib": "../../../ArrivalSim/Content/SimpleMaps/Maps/HeadingCalib.umap",
+				"BanberyTest": "../../../ArrivalSim/Content/SimpleMaps/Maps/BanberyTest.umap",
+				"Flat": "../../../ArrivalSim/Content/SimpleMaps/Maps/Flat.umap",
+				"GroundScanerTest": "../../../ArrivalSim/Content/SimpleMaps/Maps/GroundScanerTest.umap",
+				"EMirrorViewB12": "../../../ArrivalSim/Content/SimpleMaps/Maps/EMirrorViewB12.umap",
+				"LidarFeatures": "../../../ArrivalSim/Content/SimpleMaps/Maps/LidarFeatures.umap",
+				"TopViewCalibT4": "../../../ArrivalSim/Content/SimpleMaps/Maps/TopViewCalibT4.umap",
+				"EMirrorViewT4": "../../../ArrivalSim/Content/SimpleMaps/Maps/EMirrorViewT4.umap",
+				"Parking": "../../../ArrivalSim/Content/SimpleMaps/Maps/Parking.umap",
+				"RaceTrack": "../../../ArrivalSim/Content/RaceTrack_Kit_Pack_1/Maps/RaceTrack.umap",
+				"TernoisTrack": "../../../ArrivalSim/Content/RaceTrack_Kit_Pack_1/Maps/TernoisTrack.umap",
+				"WinterTrack": "../../../ArrivalSim/Content/racing_track/Maps/WinterTrack.umap"
+			}
+		},
+		{
+			"version": "ArrivalSim-linux-0.3.0.137341-roborace",
+			"levels": {
+				"VegasNorthRoad": "../../../ArrivalSim/Content/Ribbon/VegasNorthRoad/VegasNorthRoad.umap",
+				"Thruxton": "../../../ArrivalSim/Content/Ribbon/thruxton/thruxton.umap"
+			}
+		}
+	],
+	"racetracks": [
+		{
+			"level": "VegasNorthRoad",
+			"trackmap": "racetracks/lvms/LVM_ORN3.json_full"
+		},
+		{
+			"level": "anglesey_national",
+			"trackmap": "racetracks/anglesey/UPP-UDRV-200806.json"
+		},
+		{
+			"level": "Thruxton",
+			"trackmap": "racetracks/thruxton/ThruxtonOfficial.json"
+		}
+	]
+}

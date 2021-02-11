@@ -1,0 +1,63 @@
+sac_kwargs:
+  ac_kwargs:
+    hidden_sizes: [64, 64]
+  seed: 0
+  total_steps: 2_000_000
+  replay_size: 100_000
+  batch_size: 256
+  start_steps: 0
+  update_after: 5000
+  num_updates: 5
+  max_ep_len: 4000
+  encoder_path: './baselines/models/vae-144hw-32l-lvms.pt'
+  latent_dims: 32
+  im_w: 144
+  im_h: 144
+  save_path: './results/sac_run/'
+  save_episodes: [1, 10, 100, 250, 500, 750, 1000]
+  checkpoint: './baselines/checkpoints/lvms/sac_episode_1000.pt'
+  inference_only: True
+
+env_kwargs:
+  multimodal: False
+  max_timesteps: 4000
+  obs_delay: 0.1
+  not_moving_timeout: 100
+  reward_pol: 'custom'
+  reward_kwargs:
+    oob_penalty: 5.0
+    min_oob_penalty: 25.0
+  controller_kwargs:
+    sim_version: 'ArrivalSim-linux-0.3.0.137341-roborace'
+    quiet: True
+    start_container: True
+  action_if_kwargs:
+    max_accel: 4.
+    min_accel: -1.
+    max_steer: .3
+    min_steer: -.3
+    ip: '0.0.0.0'
+    port: 7077
+  pose_if_kwargs:
+    ip: '0.0.0.0'
+    port: 7078
+  camera_if_kwargs:
+    ip: 'tcp://127.0.0.1'
+    port: 8008
+  logger_kwargs:
+    default: True
+
+sim_kwargs:
+  racetrack: 'VegasNorthRoad' # ['VegasNorthRoad', 'Thruxton']
+  active_sensors:
+    - ImuOxtsSensor
+    - CameraFrontRGB
+  driver_params:
+    DriverAPIClass: 'VApiUdp'
+    DriverAPI_UDP_SendAddress: '0.0.0.0'
+  camera_params:
+    Format: ColorBGR8
+    FOVAngle: 90
+    Width: 192
+    Height: 144
+    bAutoAdvertise: True

@@ -1,0 +1,48 @@
+# parameters for the baseline RandomActionAgent
+
+training_kwargs:
+  num_episodes: 10
+
+env_kwargs:
+  multimodal: True
+  max_timesteps: 5000
+  obs_delay: 0.075
+  not_moving_timeout: 100
+  reward_pol: 'default'
+  reward_kwargs:
+    oob_penalty: 5.0
+    min_oob_penalty: 25.0
+  controller_kwargs:
+    sim_version: 'ArrivalSim-linux-0.3.0.137341-roborace'
+    quiet: True
+    start_container: True
+  action_if_kwargs:
+    max_accel: 6.
+    min_accel: 0.
+    max_steer: 1.0
+    min_steer: -1.0
+    ip: '0.0.0.0'
+    port: 7077
+  pose_if_kwargs:
+    ip: '0.0.0.0'
+    port: 7078
+  camera_if_kwargs:
+    ip: 'tcp://127.0.0.1'
+    port: 8008
+  logger_kwargs:
+    default: True
+
+sim_kwargs:
+  racetrack: 'VegasNorthRoad' # ['VegasNorthRoad', 'Thruxton']
+  active_sensors:
+    - ImuOxtsSensor
+    - CameraFrontRGB
+  driver_params:
+    DriverAPIClass: 'VApiUdp'
+    DriverAPI_UDP_SendAddress: '0.0.0.0'
+  camera_params:
+    Format: ColorBGR8
+    FOVAngle: 90
+    Width: 512
+    Height: 384
+    bAutoAdvertise: True
