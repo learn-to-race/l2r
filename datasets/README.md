@@ -14,7 +14,7 @@ These datasets may be useful for a variety of purposes such as:
 
 <div style="text-align: center;">
   <figure style="display:inline-block; width:42%;">
-    <img src='../assets/static/sample_image_lvms.png' alt='missing'/ width=92%>
+    <img src='../assets/sample_image_lvms.png' alt='missing'/ width=92%>
     <figcaption style="padding: 10px 15px 15px;"><i>Sample image from the Las Vegas track dataset</i></figcaption>
   </figure>
   <figure style="display:inline-block; width:42%;">
