@@ -1,0 +1,2 @@
+*.npz filter=lfs diff=lfs merge=lfs -text
+vae*.pt filter=lfs diff=lfs merge=lfs -text
