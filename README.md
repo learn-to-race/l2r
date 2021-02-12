@@ -8,7 +8,7 @@ Please visit our [official docs](https://learn2race.com/) for a comprehensive gu
 
 ## Baseline Agents
 
-We provide multiple baseline agents to demonstrate how to use Learn-to-Race. One is a ``RandomActionAgent`` and the other is a [Soft Actor-Critic](https://arxiv.org/abs/1801.01290v1) which we trained for 1000 epsiodes. On the Las Vegas track, it is able to consistently complete laps in under 2 minutes each using only virtual camera images as input.
+We provide multiple baseline agents to demonstrate how to use Learn-to-Race. The first is a ``RandomActionAgent`` to show basic functionality. We also include a [Soft Actor-Critic](https://arxiv.org/abs/1801.01290v1) agent, *tabula rasa*, trained for 1000 epsiodes. On the Las Vegas track, it is able to consistently complete laps in under 2 minutes each using only visual features from the virtual camera as input.
 
 <div align="center">
   <br>
@@ -36,7 +36,7 @@ We provide multiple baseline agents to demonstrate how to use Learn-to-Race. One
 
 ## Installation
 
-While not technically required, this installation assumes a Debian-based operating system.
+Due to the container GPU access requirement, this installation assumes a Linux operating system. If you do not have a Linux OS, we recommend running Learn-to-Race on a public cloud instance that has a sufficient GPU.
 
 1. Request access to the Racing simulator. Once obtained, you can load the docker image:
 
