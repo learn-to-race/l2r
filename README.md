@@ -2,24 +2,15 @@
 
 Learn-to-Race is an [OpenAI gym](https://gym.openai.com/) compliant, multimodal reinforcement learning environment where agents learn how to race. Unlike many simplistic learning environments, ours is built around Arrival’s CARLA-based software-in-the-loop racing simulator which was built specifically to accurately model race cars. This simulator is used in practice in [Roborace](https://roborace.com/), the world’s first extreme competition of teams developing self-driving AI.
 
-<div style="text-align: center;">
-  <h4>Las Vegas Track</h4>
-  <span style="display:inline-block; text-align: center; width: 50%">
-    <p>Our agent is able to consistently, but not always, complete laps in under
-    2 minutes each.</p>
-  </span>
-  <figure style="display:inline-block; width:60%;">
-    <img src='./asset/imgs/lvms_1.gif' alt='missing'/ width=92%>
-    <figcaption style="padding: 10px 15px 15px;"><i>Episode 1</i></figcaption>
-  </figure>
-  <figure style="display:inline-block; width:60%;">
-    <img src='./assets/imgs/lvms_100.gif' alt='missing' width=92%/>
-    <figcaption style="padding: 10px 15px 15px;"><i>Episode 100</i></figcaption>
-  </figure>
-  <figure style="display:inline-block; width:60%;">
-    <img src='./assets/imgs/lvms_1000.gif' alt='missing' width=92%/>
-    <figcaption style="padding: 10px 15px 15px;"><i>Episode 1000</i></figcaption>
-  </figure>
+<div align="center">
+  <img src='./assets/imgs/lvms_1.gif' alt='missing'/ width=42%>
+  <p style="padding: 10px 15px 15px;"><i>Episode 1</i></p>
+  
+  <img src='./assets/imgs/lvms_100.gif' alt='missing' width=42%/>
+  <p style="padding: 10px 15px 15px;"><i>Episode 100</i></p>
+  
+  <img src='./assets/imgs/lvms_1000.gif' alt='missing' width=42%/>
+  <p style="padding: 10px 15px 15px;"><i>Episode 1000</i></p>
 </div>
 
 ## Documentation
