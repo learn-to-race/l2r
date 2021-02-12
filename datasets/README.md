@@ -13,13 +13,15 @@ These datasets may be useful for a variety of purposes such as:
 
 ## Sample Images
 
+
+
 <div align="center">
   <br>
-  <img src='../assets/imgs/sample_image_lvms.png' alt='missing'/ width=42%>
-  <p style="padding: 10px 15px 15px;"><i>Las Vegas Track</i></p>
+  <img src='../assets/imgs/sample_image_lvms.png' alt='missing'/ width=32%>
+  <p style="padding: 10px 15px 15px;"><i>Sample image from the Las Vegas track dataset</i></p>
 
-  <img src='../assets/imgs/sample_image_thruxton.png' alt='missing' width=42%/>
-  <p style="padding: 10px 15px 15px;"><i>Thruxton Circuit Track</i></p>
+  <img src='../assets/imgs/sample_image_thruxton.png' alt='missing' width=32%/>
+  <p style="padding: 10px 15px 15px;"><i>Sample image from the Thruxton Circuit track dataset</i></p>
   <br>
 </div>
 
