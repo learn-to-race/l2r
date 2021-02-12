@@ -11,6 +11,18 @@ These datasets may be useful for a variety of purposes such as:
 - Projecting the track boundaries onto the raw images
 - etc.
 
+## Sample Images
+
+<div align="center">
+  <br>
+  <img src='../assets/imgs/sample_image_lvms.png' alt='missing'/ width=42%>
+  <p style="padding: 10px 15px 15px;"><i>Las Vegas Track</i></p>
+
+  <img src='../assets/imgs/sample_image_thruxton.png' alt='missing' width=42%/>
+  <p style="padding: 10px 15px 15px;"><i>Thruxton Circuit Track</i></p>
+  <br>
+</div>
+
 ## Format
 
 Images were saved using ```numpy.savez_compressed()``` with arrays ``pose_data`` and ``image``. The images are in RGB format with a width of 448 pixels, height of 256 pixels, and a field of view of 90 degrees.
