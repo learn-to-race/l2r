@@ -9,15 +9,15 @@ Learn-to-Race is an [OpenAI gym](https://gym.openai.com/) compliant, multimodal 
     2 minutes each.</p>
   </span>
   <figure style="display:inline-block; width:60%;">
-    <img src='./assets/lvms_1.gif' alt='missing'/ width=92%>
+    <img src='./asset/imgs/lvms_1.gif' alt='missing'/ width=92%>
     <figcaption style="padding: 10px 15px 15px;"><i>Episode 1</i></figcaption>
   </figure>
   <figure style="display:inline-block; width:60%;">
-    <img src='./assets/lvms_100.gif' alt='missing' width=92%/>
+    <img src='./assets/imgs/lvms_100.gif' alt='missing' width=92%/>
     <figcaption style="padding: 10px 15px 15px;"><i>Episode 100</i></figcaption>
   </figure>
   <figure style="display:inline-block; width:60%;">
-    <img src='./assets/lvms_1000.gif' alt='missing' width=92%/>
+    <img src='./assets/imgs/lvms_1000.gif' alt='missing' width=92%/>
     <figcaption style="padding: 10px 15px 15px;"><i>Episode 1000</i></figcaption>
   </figure>
 </div>
