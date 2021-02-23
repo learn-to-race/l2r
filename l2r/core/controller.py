@@ -112,20 +112,23 @@ class SimulatorController(object):
 					params={'level_name':level_name}
 				)
 
-	def set_location(self, coords, veh_id=0):
+	def set_location(self, coords, rot, veh_id=0):
 		"""Sets a vehicle to a specific location on track.
 
 		:param coords: desired ENU coordinates
-		:type coords: numpy array or list of floats [East, North, Up]
+		:type coords: dict of cordinates with keys x, y, z
+		:param rot: rotation of the vehicle in degrees
+		:type rot: dict of coordinates with keys yaw, pitch, roll
 		:param veh_id: identifier of the vehicle, defaults to 0
 		:type veh_id: int, optional
 		"""
-		e, n, u = coords[0], coords[1], coords[2]
-		return self._send_msg(
-			method='set_vehicle_inputs',
-			params={'veh_id': veh_id,
-					'pos_xyz': [e, n, u],
-					}
+		_ = self._send_msg(
+			method='set_vehicle_position',
+			params={
+				'veh_id': veh_id,
+				'location': coords,
+				'rotation': rot
+			}
 		)
 
 	def reset_level(self):
@@ -164,7 +167,7 @@ class SimulatorController(object):
 			method='get_vehicle_state',
 			params={'veh_id': veh_id}
 		)
-		return result['pos_xyz']
+		return result['pos_xyz'], result['yaw']
 
 	def get_vehicle_params(self, veh_id=0):
 		"""Get the active parameters of a vehicle.
@@ -376,7 +379,7 @@ class SimulatorController(object):
 		)
 
 	def set_api_udp(self, veh_id=0):
-		"""Set a specified vehicle API class to VApiUdp for to allow the RL
+		"""Set a specified vehicle API class to VApiUdp to allow the RL
 		agent to control it.
 
 		:param veh_id: identifier of the vehicle, defaults to 0
