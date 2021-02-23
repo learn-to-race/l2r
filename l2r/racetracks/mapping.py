@@ -18,15 +18,16 @@ def level_2_trackmap(level):
 
 	:param level: name of the racetrack, must be in [...]
 	:type level: string
-	:returns: the filepath of the racetrack's map
-	:rtype: string
+	:returns: the filepath of the racetrack's map, random start positions in
+	  the form [x,y,z,yaw]
+	:rtype: string, list of lists
 	"""
 	with open('racetracks/racetracks.json', 'r') as f:
 		data = json.load(f)
 		racetracks = data['racetracks']
 		for track in racetracks:
 			if level == track['level']:
-				return track['trackmap']
+				return track['trackmap'], track['random_pos']
 
 	raise LevelNotFoundError(f'Map of track not found for level: {level}')
 
