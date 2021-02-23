@@ -5,22 +5,22 @@ training_kwargs:
 
 env_kwargs:
   multimodal: True
-  max_timesteps: 5000
-  obs_delay: 0.075
-  not_moving_timeout: 100
+  max_timesteps: 500
+  obs_delay: 0.1
+  not_moving_timeout: 50
   reward_pol: 'default'
   reward_kwargs:
     oob_penalty: 5.0
     min_oob_penalty: 25.0
   controller_kwargs:
     sim_version: 'ArrivalSim-linux-0.3.0.137341-roborace'
-    quiet: True
+    quiet: False
     start_container: True
   action_if_kwargs:
     max_accel: 6.
-    min_accel: 0.
-    max_steer: 1.0
-    min_steer: -1.0
+    min_accel: 3.
+    max_steer: 0.2
+    min_steer: -0.2
     ip: '0.0.0.0'
     port: 7077
   pose_if_kwargs:

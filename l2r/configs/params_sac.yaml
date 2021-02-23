@@ -5,20 +5,21 @@ sac_kwargs:
   total_steps: 2_000_000
   replay_size: 100_000
   batch_size: 256
-  start_steps: 0
-  update_after: 5000
+  start_steps: 1000
+  update_after: 3000
   num_updates: 5
-  max_ep_len: 4000
+  max_ep_len: 5000
   encoder_path: './baselines/models/vae-144hw-32l-lvms.pt'
   latent_dims: 32
   im_w: 144
   im_h: 144
   checkpoint: './baselines/checkpoints/lvms/sac_episode_1000.pt'
   inference_only: True
+  save_path: './results/sac/'
 
 env_kwargs:
   multimodal: False
-  max_timesteps: 4000
+  max_timesteps: 5000
   obs_delay: 0.1
   not_moving_timeout: 100
   reward_pol: 'custom'
@@ -28,7 +29,7 @@ env_kwargs:
   controller_kwargs:
     sim_version: 'ArrivalSim-linux-0.3.0.137341-roborace'
     quiet: True
-    start_container: True
+    start_container: True # False 
   action_if_kwargs:
     max_accel: 4.
     min_accel: -1.
