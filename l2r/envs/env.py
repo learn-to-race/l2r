@@ -25,7 +25,7 @@ from core.tracker import ProgressTracker
 from racetracks.mapping import level_2_trackmap
 
 # Simulator Lag Delay
-MEDIUM_DELAY = 2
+MEDIUM_DELAY = 3
 TIMEOUT_DELAY = 30
 LAUNCHING_DELAY = 15
 
@@ -73,7 +73,6 @@ MAX_OBS_ARR = [
     1., 1., 2., 2.,              # brake (per wheel)
     1., 1., 1300., 1300.         # torq (per wheel)
 ]
-
 
 class RacingEnv(gym.Env):
     """A reinforcement learning environment for autonomous racing.
@@ -250,6 +249,13 @@ class RacingEnv(gym.Env):
         # give the simulator time to reset
         time.sleep(MEDIUM_DELAY)
 
+        # randomly initialize starting location
+        if random_pos:
+            raise NotImplementedError('This feature causes unknown instability.')
+            coords, rot = self.random_start_location()
+            self.controller.set_location(coords, rot)
+            time.sleep(MEDIUM_DELAY)
+
         # reset simulator sensors
         self.controller.set_mode_ai()
         self.controller.enable_sensor('CameraFrontRGB')
@@ -266,11 +272,6 @@ class RacingEnv(gym.Env):
 
         if not self.multi_agent:
             self.controller.disable_sensor('V2VHub')
-
-        # randomly initialize starting location
-        if random_pos:
-            random_coor = self.random_start_location()
-            self.controller.set_location(random_coor)
 
         self.reward.reset()
         self.pose_if.reset()
@@ -373,7 +374,7 @@ class RacingEnv(gym.Env):
         :param level: the racetrack name. must be in [...]
         :type level: str
         """
-        map_file = level_2_trackmap(level)
+        map_file, self.random_poses = level_2_trackmap(level)
 
         with open(os.path.join(pathlib.Path().absolute(), map_file), 'r') as f:
             self.original_map = json.load(f)
@@ -466,5 +467,9 @@ class RacingEnv(gym.Env):
         :returns: coordinates of a random index on centerline, yaw
         :rtype: np array, float
         """
-        idx = np.random.randint(low=0, high=len(self.centerline_arr))
-        return self.centerline_arr[idx]
+        rand_idx = np.random.randint(0, len(self.random_poses))
+        pos = self.random_poses[rand_idx]
+        print(f'setting random location to: {pos}')
+        coords = {'x': pos[0], 'y': pos[1], 'z': pos[2]}
+        rot = {'yaw': pos[3], 'pitch': 0.0, 'roll': 0.0}
+        return coords, rot
