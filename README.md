@@ -1,10 +1,10 @@
-# learn-to-race
+# Learn-to-Race
 
 Learn-to-Race is an [OpenAI gym](https://gym.openai.com/) compliant, multimodal reinforcement learning environment where agents learn how to race. Unlike many simplistic learning environments, ours is built around Arrival’s CARLA-based software-in-the-loop racing simulator which was built specifically to accurately model race cars. This simulator is used in practice in [Roborace](https://roborace.com/), the world’s first extreme competition of teams developing self-driving AI.
 
 ## Documentation
 
-Please visit our [official docs](https://learn2race.com/) for a comprehensive guide on getting started with the environment. Happy racing!
+Please visit our [official docs](https://learn-to-race.com/) for a comprehensive guide on getting started with the environment. Happy racing!
 
 ## Baseline Agents
 
@@ -52,3 +52,11 @@ $ virtualenv venv                           # create new virtual environment
 $ source venv/bin/activate                  # activate the environment
 (venv) $ pip install -r requirements.txt 
 ```
+
+## Research
+
+To cite this repository in publications: 
+
+```
+TBD
+``` 
