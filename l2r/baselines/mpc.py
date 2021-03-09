@@ -44,7 +44,7 @@ class MPCAgent(AbstractAgent):
 		vx, vy, vz = state[4], state[3], state[5] # directional velocity
 		v = (vx**2 + vy**2 + vz**2)**0.5          # magnitude of velocity
 		e, n = state[16], state[15]               # current (x,y)
-		waypoints = info['waypoints']             # 
+		waypoints = info['waypoints']             # list of 3 future waypoints -> (x,y) pairs
 		yaw = state[12]
 
 		if waypoints:
