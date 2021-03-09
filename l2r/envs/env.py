@@ -95,15 +95,16 @@ class RacingEnv(gym.Env):
     :type reward_pol: str, optional
     :param not_moving_timeout: terminate if not moving for this many timesteps
     :type not_moving_timeout: int, optional
+    :param provide_waypoints: flag to provide ground-truth, future waypoints
+      on the track
+    :type provide_waypoints: bool, optional
     :param obs_delay: time delay between action and observation
     :type obs_delay: float, optional
-    :param history_len: number of timesteps to keep history of car pose
-    :type history_len: int, optional
    """
     def __init__(self, max_timesteps, controller_kwargs, reward_kwargs,
                  action_if_kwargs, camera_if_kwargs, pose_if_kwargs,
                  logger_kwargs, reward_pol='default', not_moving_timeout=20,
-                 obs_delay=0.05):
+                 provide_waypoints=False, obs_delay=0.05):
         self.controller = SimulatorController(**controller_kwargs)
         self.action_if = utils.ActionInterface(**action_if_kwargs)
         self.camera_if = utils.CameraInterface(**camera_if_kwargs)
@@ -113,7 +114,7 @@ class RacingEnv(gym.Env):
         self.max_timesteps = max_timesteps
         self.not_moving_timeout = not_moving_timeout
         self.observation_delay = obs_delay
-        self.history_length = not_moving_timeout
+        self.provide_waypoints = provide_waypoints
         self.last_restart = time.time()
 
         # openAI gym compliance - action space
@@ -231,6 +232,10 @@ class RacingEnv(gym.Env):
             oob_flag=info['oob']
         )
         _ = self._check_restart(done)
+
+        if self.provide_waypoints:
+            info['waypoints'] = self._waypoints()
+            
         return observation, reward, done, info
 
     def reset(self, random_pos=False):
@@ -417,8 +422,6 @@ class RacingEnv(gym.Env):
     def _record_history(self, x, y, z):
         """Records the coordinates of the car in location_history.
         """
-        #if len(self.location_history) >= self.history_length:
-        #    self.location_history.popleft()
         self.location_history.append((x, y, z))
 
     def record_manually(self, output_dir, fname='thruxton', num_imgs=5000,
@@ -473,3 +476,13 @@ class RacingEnv(gym.Env):
         coords = {'x': pos[0], 'y': pos[1], 'z': pos[2]}
         rot = {'yaw': pos[3], 'pitch': 0.0, 'roll': 0.0}
         return coords, rot
+
+    def _waypoints(self, goal='center', ct=3, step=5):
+        """Return position of goal
+        """
+        idxs = [self.nearest_idx+i*step for i in range(ct)]
+        if goal=='center':
+            return [self.centerline_arr[idx] for idx in idxs]
+        else:
+            raise NotImplementedError
+
