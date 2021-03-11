@@ -234,6 +234,7 @@ class RacingEnv(gym.Env):
         _ = self._check_restart(done)
 
         if self.provide_waypoints:
+            info['track_idx'] = self.nearest_idx
             info['waypoints'] = self._waypoints()
             
         return observation, reward, done, info
@@ -282,12 +283,17 @@ class RacingEnv(gym.Env):
         self.pose_if.reset()
         self.camera_if.reset()
         self.location_history = []
+
         _observation = self._observe()
         _data, _img = _observation
         observation = _observation if self.multimodal else _img
         self.tracker.reset(start_idx=self.nearest_idx)
 
-        return observation
+        if self.provide_waypoints:
+            info = {'waypoints': self._waypoints()}
+            info['track_idx'] = self.nearest_idx
+
+        return observation, info
 
     def render(self):
         """Not implmeneted. The simulator, by default, provides a graphical
@@ -477,12 +483,12 @@ class RacingEnv(gym.Env):
         rot = {'yaw': pos[3], 'pitch': 0.0, 'roll': 0.0}
         return coords, rot
 
-    def _waypoints(self, goal='center', ct=3, step=5):
+    def _waypoints(self, goal='center', ct=3, step=8):
         """Return position of goal
         """
         idxs = [self.nearest_idx+i*step for i in range(ct)]
         if goal=='center':
-            return [self.centerline_arr[idx] for idx in idxs]
+            return np.asarray([self.centerline_arr[idx] for idx in idxs])
         else:
             raise NotImplementedError
 
