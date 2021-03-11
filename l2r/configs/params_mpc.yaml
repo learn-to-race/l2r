@@ -1,7 +1,8 @@
-# parameters for the baseline RandomActionAgent
+# parameters for the baseline mpc agent
 
-training_kwargs:
+mpc_kwargs:
   num_episodes: 10
+  save_path: './results/mpc/'
 
 env_kwargs:
   multimodal: True
