@@ -250,7 +250,7 @@ class RacingEnv(gym.Env):
         :rtype: see *step* method
         """
         self.controller.reset_level()
-        self.nearest_idx = None
+        self.nearest_idx, info = None, {}
 
         # give the simulator time to reset
         time.sleep(MEDIUM_DELAY)
@@ -282,7 +282,6 @@ class RacingEnv(gym.Env):
         self.reward.reset()
         self.pose_if.reset()
         self.camera_if.reset()
-        self.location_history = []
 
         _observation = self._observe()
         _data, _img = _observation
@@ -290,7 +289,7 @@ class RacingEnv(gym.Env):
         self.tracker.reset(start_idx=self.nearest_idx)
 
         if self.provide_waypoints:
-            info = {'waypoints': self._waypoints()}
+            info['waypoints'] = self._waypoints()
             info['track_idx'] = self.nearest_idx
 
         return observation, info
@@ -354,28 +353,25 @@ class RacingEnv(gym.Env):
         pose = self.pose_if.get_data()
         imgs = self.camera_if.get_data()
 
+        yaw = pose[12]
+        bp = pose[22:25]
+
         # convert to local coordinate system
         x, y, z = pose[16], pose[15], pose[17]
         enu_x, enu_y, enu_z = self.geo_location.convert_to_ENU((x, y, z))
         pose[16], pose[15], pose[17] = enu_x, enu_y, enu_z
 
         self.nearest_idx = self.kdtree.query(np.asarray([enu_x, enu_y]))[1]
-        self.tracker.update(self.nearest_idx)
-        self._record_history(enu_x, enu_y, enu_z)
+        self.tracker.update(self.nearest_idx, enu_x, enu_y, enu_z, yaw, bp)
 
         return (pose, imgs)
 
     def _is_complete(self, observation):
         """Determine if the episode is complete. Termination conditions include
         car out-of-bounds, 3-laps successfully complete, not-moving-timeout,
-        and max timesteps reached.
-
-        :param observation: an observation that includes the pose of the vehicle
-        :type observation: tuple
+        and max timesteps reached
         """
-        (pose_data, _img) = observation
-        yaw = pose_data[12]
-        return self.tracker.is_complete(self.location_history, yaw)
+        return self.tracker.is_complete()
 
     def _load_map(self, level):
         """Loads the racetrack map from a data file. The map is parsed into
@@ -415,6 +411,7 @@ class RacingEnv(gym.Env):
             inner_track=self.inside_path,
             outer_track=self.outside_path,
             not_moving_ct=self.not_moving_timeout,
+            centerline=self.centerline_arr,
             car_dims=CAR_DIMS
         )
 
@@ -424,11 +421,6 @@ class RacingEnv(gym.Env):
             centre_path=self.centre_path, 
             car_dims=CAR_DIMS
         )
-
-    def _record_history(self, x, y, z):
-        """Records the coordinates of the car in location_history.
-        """
-        self.location_history.append((x, y, z))
 
     def record_manually(self, output_dir, fname='thruxton', num_imgs=5000,
                         sleep_time=0.03):

@@ -79,7 +79,7 @@ class ProgressTracker(object):
 		self.ep_step_ct = 0
 		self.transitions = []
 
-	def update(self, idx, d, e, n, u, yaw, bp):
+	def update(self, idx, e, n, u, yaw, bp):
 		"""Update the tracker based on current position. The tracker also keeps
 		track of the yaw, brake pressure, centerline displacement, and
 		calculates the offical metrics for the environment.
@@ -87,9 +87,6 @@ class ProgressTracker(object):
 		:param idx: index on the track's centerline which the vehicle is
 		  nearest to
 		:type idx: int
-		:param d: displacement from centerline, defined at distance to the
-		  nearest point on the centerline
-		:type d: float
 		:param e: east coordinate
 		:type e: float
 		:param n: north coordinate
@@ -112,6 +109,9 @@ class ProgressTracker(object):
 		if idx >= self.n_indices:
 			raise Exception('Index out of bounds')
 
+		n_out = self._count_wheels_oob(e, n, yaw)
+		d = self._dist_to_segment([e,n], idx)
+
 		# shift idx such that the start index is at 0
 		idx -= self.start_idx
 		idx += self.n_indices if idx < 0 else 0
@@ -120,7 +120,6 @@ class ProgressTracker(object):
 		if self.last_idx <= self.halfway_idx and idx >= self.halfway_idx:
 			self.halfway_flag = True
 
-		n_out = self._count_wheels_oob(e, n, yaw)
 		self._store(e, n, u, idx, yaw, d, bp, n_out)
 
 		# set halfway flag, if necessary
@@ -138,9 +137,9 @@ class ProgressTracker(object):
 		:type n: float
 		:param u: up coordinate
 		:type u: float
-		:param idx: nearest centerline index to current position
+		:param idx: nearest centerline index to current position (shifted)
 		:type idx: int
-		:param d: distance to centerline[idx]
+		:param d: distance to centerline
 		:type d: float
 		:param bp: brake pressure, per wheel
 		:type bp: array of shape (4,)
@@ -199,7 +198,7 @@ class ProgressTracker(object):
 		return False, info
 
 	def append_metrics(self, info):
-		"""Environment metrics
+		"""Append episode metrics to info
 		"""
 		transitions = np.asarray(self.transitions).T
 		path = transitions[0:2]
@@ -211,18 +210,23 @@ class ProgressTracker(object):
 		track_curvature = ProgressTracker._path_curvature(self.centerline.T)
 		brake_pressure = transitions[-2]
 
-		info['total_distance'] = round(total_distance, 2)
-		info['total_time'] = round(total_time, 2)
-		info['average_speed_kph'] = round(avg_speed, 2)
-		info['average_centerline_displacement'] = round(avg_cline_displacement, 2)
-		info['average_curvature'] = avg_curvature
-		info['trajectory_smoothness'] = round(track_curvature / avg_curvature, 3)
-		info['n_unsafe_steps'] = np.sum(transitions[-1])
+		metrics = {}
+		metrics['total_distance'] = round(total_distance, 2)
+		metrics['total_time'] = round(total_time, 2)
+		metrics['average_speed_kph'] = round(avg_speed, 2)
+		metrics['average_centerline_displacement'] = round(avg_cline_displacement, 2)
+		metrics['average_curvature'] = avg_curvature
+		metrics['trajectory_smoothness'] = round(track_curvature / avg_curvature, 3)
+		metrics['n_unsafe_steps'] = np.sum(transitions[-1])
+		info['metrics'] = metrics
 		return info
 
 	@staticmethod
 	def _path_length(path):
 		"""Calculate length of a path
+
+		:param path: set of (x,y) pairs
+		:type path: numpy array of shape (2, N)
 		"""
 		x, y = path[0], path[1]
 		_x = np.square(x[:-1]-x[1:])
@@ -233,6 +237,9 @@ class ProgressTracker(object):
 	def _path_curvature(path):
 		"""Returns the average absolute curvature (numberical estimate) of the
 		path
+
+		:param path: set of (x,y) pairs
+		:type path: numpy array of shape (2, N)
 		"""
 		x, y = path[0], path[1]
 
@@ -243,6 +250,20 @@ class ProgressTracker(object):
 		k = (dx*d2y-dy*d2x) / (np.square(dx)+np.square(dy)+EPSILON)**(3.0/2.0)
 
 		return np.average(np.abs(k))
+
+	def _dist_to_segment(self, p, idx):
+		"""Returns the shortest distance between point p a line segment
+		between the two nearest points on the centerline of the track.
+
+		:param p: (x,y) reference point
+		:type p: list or numpy array
+		:param idx: centerline index to compare to
+		:type idx: int
+		"""
+		p = np.array(p) if isinstance(p, list) else p
+		l1 = self.centerline[idx]
+		l2 = self.centerline[(idx+1)%len(self.centerline)]
+		return abs(np.cross(l2-l1, p-l1)/np.linalg.norm(l2-l1))
 
 	def _is_terminal(self):
 		"""Determine if the environment is in a terminal state
