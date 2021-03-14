@@ -355,6 +355,7 @@ class RacingEnv(gym.Env):
 
         yaw = pose[12]
         bp = pose[22:25]
+        a = pose[6:9]
 
         # convert to local coordinate system
         x, y, z = pose[16], pose[15], pose[17]
@@ -362,7 +363,7 @@ class RacingEnv(gym.Env):
         pose[16], pose[15], pose[17] = enu_x, enu_y, enu_z
 
         self.nearest_idx = self.kdtree.query(np.asarray([enu_x, enu_y]))[1]
-        self.tracker.update(self.nearest_idx, enu_x, enu_y, enu_z, yaw, bp)
+        self.tracker.update(self.nearest_idx, enu_x, enu_y, enu_z, yaw, a, bp)
 
         return (pose, imgs)
 

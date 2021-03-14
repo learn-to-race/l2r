@@ -22,6 +22,7 @@ CHECK_PROGRESS_AT = 299
 # constants
 MPS_TO_KPH = 3.6
 EPSILON = 1e-6
+GRAVITY = 9.81
 
 class ProgressTracker(object):
 	"""Progress tracker for the vehicle. This class serves to track the number
@@ -79,7 +80,7 @@ class ProgressTracker(object):
 		self.ep_step_ct = 0
 		self.transitions = []
 
-	def update(self, idx, e, n, u, yaw, bp):
+	def update(self, idx, e, n, u, yaw, ac, bp):
 		"""Update the tracker based on current position. The tracker also keeps
 		track of the yaw, brake pressure, centerline displacement, and
 		calculates the offical metrics for the environment.
@@ -95,6 +96,8 @@ class ProgressTracker(object):
 		:type u: float
 		:param yaw: vehicle heading, in radians
 		:type yaw: float
+		:param ac: directional acceleration
+		:type ac: numpy array of shape (4,)
 		:param bp: brake pressure, per wheel
 		:type bp: array of shape (4,)
 		"""
@@ -110,7 +113,8 @@ class ProgressTracker(object):
 			raise Exception('Index out of bounds')
 
 		n_out = self._count_wheels_oob(e, n, yaw)
-		d = self._dist_to_segment([e,n], idx)
+		c_dist = self._dist_to_segment([e,n], idx)
+		dt = now - self.last_update_time
 
 		# shift idx such that the start index is at 0
 		idx -= self.start_idx
@@ -120,7 +124,7 @@ class ProgressTracker(object):
 		if self.last_idx <= self.halfway_idx and idx >= self.halfway_idx:
 			self.halfway_flag = True
 
-		self._store(e, n, u, idx, yaw, d, bp, n_out)
+		self._store(e, n, u, idx, yaw, c_dist, dt, ac, bp, n_out)
 
 		# set halfway flag, if necessary
 		_ = self.check_lap_completion(idx, now)
@@ -128,7 +132,7 @@ class ProgressTracker(object):
 		self.last_update_time = now
 		self.last_idx = idx
 
-	def _store(self, e, n, u, idx, yaw, d, bp, n_out):
+	def _store(self, e, n, u, idx, yaw, c_dist, dt, ac, bp, n_out):
 		"""Transitions are stored as a list of lists
 
 		:param e: east coordinate
@@ -139,15 +143,18 @@ class ProgressTracker(object):
 		:type u: float
 		:param idx: nearest centerline index to current position (shifted)
 		:type idx: int
-		:param d: distance to centerline
-		:type d: float
+		:param c_dist: distance to centerline
+		:type c_dist: float
 		:param bp: brake pressure, per wheel
 		:type bp: array of shape (4,)
+		:param a: magnitude of the vehicles acceleration, adjusted for gravity
+		:type a: float
 		:param n_out: number of wheels out-of-bounds
 		:type n_out: int
 		"""
 		b = np.average(bp)
-		self.transitions.append([e, n, u, idx, d, yaw, b, n_out])
+		a = np.linalg.norm(ac) - GRAVITY
+		self.transitions.append([e, n, u, idx, c_dist, yaw, dt, a, b, n_out])
 
 	def check_lap_completion(self, shifted_idx, now):
 		"""Check if we completed a lap. To prevent vehicles from oscillating
@@ -198,35 +205,48 @@ class ProgressTracker(object):
 		return False, info
 
 	def append_metrics(self, info):
-		"""Append episode metrics to info
+		"""Calculate metrics and append to info
+
+		:param info: episode information
+		:type info: dict
+		:return: info with appended metrics
+		:rtype: dict
 		"""
 		transitions = np.asarray(self.transitions).T
 		path = transitions[0:2]
 		total_distance = ProgressTracker._path_length(path)
 		total_time = self.last_update_time - self.start_time
+		total_idxs = self.last_idx + self.n_indices*len(self.lap_times)
 		avg_speed = total_distance / total_time * MPS_TO_KPH
 		avg_cline_displacement = np.average(transitions[4])
 		avg_curvature = ProgressTracker._path_curvature(path)
 		track_curvature = ProgressTracker._path_curvature(self.centerline.T)
 		brake_pressure = transitions[-2]
+		accel = transitions[-3]
+		sampling_freq = len(self.transitions) / total_time
+		ms = ProgressTracker._log_dimensionless_jerk(accel, sampling_freq)
+		proportion_unsafe = np.dot(transitions[-4], transitions[-1]) / total_time
 
-		metrics = {}
-		metrics['total_distance'] = round(total_distance, 2)
+		metrics = dict()
+		metrics['pct_complete'] = round(100*total_idxs/(3*self.n_indices), 1)
 		metrics['total_time'] = round(total_time, 2)
+		metrics['total_distance'] = round(total_distance, 2)
 		metrics['average_speed_kph'] = round(avg_speed, 2)
-		metrics['average_centerline_displacement'] = round(avg_cline_displacement, 2)
-		metrics['average_curvature'] = avg_curvature
-		metrics['trajectory_smoothness'] = round(track_curvature / avg_curvature, 3)
-		metrics['n_unsafe_steps'] = np.sum(transitions[-1])
+		metrics['average_displacement_error'] = round(avg_cline_displacement, 2)
+		metrics['trajectory_efficiency'] = round(track_curvature / avg_curvature, 3)
+		metrics['trajectory_admissibility'] = round(1 - (proportion_unsafe**0.5), 3)
+		metrics['movement_smoothness'] = ms
 		info['metrics'] = metrics
 		return info
 
 	@staticmethod
 	def _path_length(path):
-		"""Calculate length of a path
+		"""Calculate length of a path.
 
 		:param path: set of (x,y) pairs
 		:type path: numpy array of shape (2, N)
+		:return: path length in meters
+		:rtype: float
 		"""
 		x, y = path[0], path[1]
 		_x = np.square(x[:-1]-x[1:])
@@ -235,11 +255,13 @@ class ProgressTracker(object):
 
 	@staticmethod
 	def _path_curvature(path):
-		"""Returns the average absolute curvature (numberical estimate) of the
-		path
+		"""Returns the root mean square of the curvature of the path where
+		curvature is calculate parametrically using finite differences.
 
 		:param path: set of (x,y) pairs
 		:type path: numpy array of shape (2, N)
+		:return: RMS of the path's curvature
+		:rtype: float
 		"""
 		x, y = path[0], path[1]
 
@@ -248,9 +270,54 @@ class ProgressTracker(object):
 		d2x = x[2:]-2*x[1:-1] + x[0:-2]
 		d2y = y[2:]-2*y[1:-1] + y[0:-2]
 		k = (dx*d2y-dy*d2x) / (np.square(dx)+np.square(dy)+EPSILON)**(3.0/2.0)
+		k_rms = np.sqrt(np.mean(np.square(k)))
 
-		return np.average(np.abs(k))
+		return k_rms
 
+	@staticmethod
+	def _log_dimensionless_jerk(movement, freq, data_type='accl'):
+		"""Sivakumar Balasubramanian's implmentation of log dimensionless
+		jerk.
+
+		Source: https://github.com/siva82kb/SPARC/blob/master/scripts/smoothness.py
+
+		:param movement: movement speed profile of t data points
+		:type movement: np.array of shape (t,)
+		:param freq: the sampling frequency of the data
+		:type freq: float
+		:param data_type: type of movement data provided. must be in ['speed','accl','jerk']
+		:type data_type: str
+		:return: dimensionless jerk, a smoothness metric
+		:rtype: float
+		"""
+		if data_type not in ('speed', 'accl', 'jerk'):
+			raise ValueError('\n'.join(("The argument data_type must be either",
+			                            "'speed', 'accl' or 'jerk'.")))
+
+		movement = np.array(movement)
+		movement_peak = max(abs(movement))
+		dt = 1. / freq
+		movement_dur = len(movement) * dt
+		_p = {
+			'speed': 3,
+			'accl': 1,
+			'jerk': -1
+		}
+		p = _p[data_type]
+		scale = pow(movement_dur, p) / pow(movement_peak, 2)
+
+        # estimate jerk
+		if data_type == 'speed':
+			jerk = np.diff(movement, 2) / pow(dt, 2)
+		elif data_type == 'accl':
+			jerk = np.diff(movement, 1) / pow(dt, 1)
+		else:
+			jerk = movement
+
+		# estimate dj
+		dim_jerk = - scale * sum(pow(jerk, 2)) * dt
+		return np.log(abs(dim_jerk))
+		
 	def _dist_to_segment(self, p, idx):
 		"""Returns the shortest distance between point p a line segment
 		between the two nearest points on the centerline of the track.
@@ -282,12 +349,11 @@ class ProgressTracker(object):
 			info['total_time'] = round(sum(self.lap_times), 2)
 			info['pct_complete'] = 100.00
 
-		total_idxs = self.last_idx + self.n_indices*len(self.lap_times)
-		info['pct_complete'] = round(100*total_idxs/(3*self.n_indices), 1)
-
 		if len(self.transitions) > self.not_moving_ct:
 			if self.transitions[-1] == self.transitions[-self.not_moving_ct]:
 				info['stuck'] = True
+
+		total_idxs = self.last_idx + self.n_indices*len(self.lap_times)
 
 		if self.ep_step_ct == CHECK_PROGRESS_AT and total_idxs < PROGRESS_THRESHOLD:
 			info['not_progressing'] = True
