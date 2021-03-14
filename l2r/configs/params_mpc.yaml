@@ -1,13 +1,13 @@
 # parameters for the baseline mpc agent
 
 mpc_kwargs:
-  num_episodes: 10
+  num_episodes: 1
   save_path: './results/mpc/'
 
 env_kwargs:
   multimodal: True
-  max_timesteps: 500
-  obs_delay: 0.1
+  max_timesteps: 2000
+  obs_delay: 0
   not_moving_timeout: 50
   reward_pol: 'default'
   provide_waypoints: True
@@ -35,7 +35,7 @@ env_kwargs:
     default: True
 
 sim_kwargs:
-  racetrack: 'VegasNorthRoad' # ['VegasNorthRoad', 'Thruxton']
+  racetrack: 'Thruxton' # ['VegasNorthRoad', 'Thruxton']
   active_sensors:
     - ImuOxtsSensor
     - CameraFrontRGB
