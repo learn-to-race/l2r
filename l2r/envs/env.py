@@ -479,9 +479,10 @@ class RacingEnv(gym.Env):
     def _waypoints(self, goal='center', ct=3, step=8):
         """Return position of goal
         """
+        l = len(self.centerline_arr)
         idxs = [self.nearest_idx+i*step for i in range(ct)]
         if goal=='center':
-            return np.asarray([self.centerline_arr[idx] for idx in idxs])
+            return np.asarray([self.centerline_arr[idx % l] for idx in idxs])
         else:
             raise NotImplementedError
 

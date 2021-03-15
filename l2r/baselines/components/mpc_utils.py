@@ -17,7 +17,9 @@ from torch.nn.parameter import Parameter
 from mpc import mpc
 from mpc.mpc import QuadCost, LinDx, GradMethods
 
-import ipdb as pdb
+import pdb as pdb
+
+import warnings
 
 class BikeModel(nn.Module):
     def __init__(self, dt = 1/20, 
@@ -28,8 +30,8 @@ class BikeModel(nn.Module):
         self.dt = dt
         self.n_state = n_state
         self.n_ctrl = n_ctrl
-        self.u_lower = -1
-        self.u_upper = 1
+        self.u_lower = torch.tensor([-1, -0.2]).float()
+        self.u_upper = torch.tensor([1, 0.2]).float()
 
         ## Learnable parameters related to the properties of the car
         if init_params is None:
@@ -42,10 +44,21 @@ class BikeModel(nn.Module):
         l, k1, k2 = torch.unbind(self.params)
         n = x_init.shape[0]
         x, y, v, phi = torch.unbind(x_init, dim = -1)
+        #pdb.set_trace()
         a = u[:, 0]*k1
         delta = u[:, 1]*k2
         
         x_dot = torch.zeros(n, self.n_state)
+        '''
+        ## w.r.t. center
+        beta = torch.atan(0.5 * torch.tan(delta))
+        x_dot[:, 0] = v*torch.cos(phi+beta)
+        x_dot[:, 1] = v*torch.sin(phi+beta)
+        x_dot[:, 2] = a
+        x_dot[:, 3] = v*torch.sin(beta) / (l/2)
+        
+        '''
+        ## w.r.t. the back axle
         x_dot[:, 0] = v*torch.cos(phi)
         x_dot[:, 1] = v*torch.sin(phi)
         x_dot[:, 2] = a
@@ -55,9 +68,6 @@ class BikeModel(nn.Module):
 
     def grad_input(self, x, u):
         '''
-        Dynamics follows https://pythonrobotics.readthedocs.io/en/latest/modules/path_tracking.html
-            Reference: Back Axle
-            Frame: Global
         Input: 
             x, u: (T-1, dim)
         Output: 
@@ -74,7 +84,27 @@ class BikeModel(nn.Module):
     
         a = u[:, 0]*k1
         delta = u[:, 1]*k2
+        '''
+        ## Reference: Center of Mass
+        beta = torch.atan(0.5 * torch.tan(delta))
+
+        A = torch.eye(self.n_state).repeat(T, 1, 1) # T x m x m
+        A[:, 0, 2] = self.dt * torch.cos(phi+beta)
+        A[:, 0, 3] = - self.dt * v * torch.sin(phi+beta)
+        A[:, 1, 2] = self.dt * torch.sin(phi+beta)
+        A[:, 1, 3] = self.dt * v * torch.cos(phi+beta)
+        A[:, 3, 2] = self.dt * torch.sin(beta) / (l/2)
         
+        B = torch.zeros(T, self.n_state, self.n_ctrl)
+        partial_beta_delta = 0.5/(1+(0.5 * torch.tan(delta))**2)/(torch.cos(delta))**2
+        B[:, 0, 1] = - self.dt * v * torch.sin(phi+beta) * partial_beta_delta 
+        B[:, 1, 1] = self.dt * v * torch.cos(phi+beta) * partial_beta_delta
+        B[:, 2, 0] = self.dt
+        B[:, 3, 1] = self.dt * v * torch.cos(beta)/(l/2) * partial_beta_delta
+        
+        
+        '''
+        ## Reference: Back Axle
         A = torch.eye(self.n_state).repeat(T, 1, 1) # T x m x m
         A[:, 0, 2] = self.dt * torch.cos(phi)
         A[:, 0, 3] = - self.dt * v * torch.sin(phi)
@@ -86,7 +116,7 @@ class BikeModel(nn.Module):
         B = torch.zeros(T, self.n_state, self.n_ctrl)
         B[:, 2, 0] = self.dt
         B[:, 3, 1] = self.dt * v / (l * torch.cos(delta) ** 2)
-
+        
         #F = torch.cat([A, B], dim = -1) # T-1 x n_batch x m x (m+n)
         #pdb.set_trace()
         return A.squeeze(1), B.squeeze(1)
@@ -134,22 +164,25 @@ class MPC(nn.Module):
         '''
         #pdb.set_trace()
         n_batch = x_init.shape[0]
-        C, c = self._cost_fn(x_target.float())
-
+        _C, _c = self._cost_fn(x_target.float())
+        #pdb.set_trace()
         # The MPC iteratively linearize the dynamics at each iteration
-        x_lqr, u_lqr, objs_lqr = mpc.MPC(n_state=self.n_state,
+        
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            x_lqr, u_lqr, objs_lqr = mpc.MPC(n_state=self.n_state,
                                         n_ctrl=self.n_ctrl,
                                         T=self.T,
-                                        u_lower= dx.u_lower*torch.ones((self.T, n_batch, self.n_ctrl)),
-                                        u_upper= dx.u_upper*torch.ones((self.T, n_batch, self.n_ctrl)),
+                                        u_lower= dx.u_lower.repeat(self.T, n_batch, 1),
+                                        u_upper= dx.u_upper.repeat(self.T, n_batch, 1),
                                         lqr_iter=20,
-                                        backprop=True,
-                                        verbose=0,
+                                        backprop=False,
+                                        verbose=-1,
                                         n_batch=n_batch,
-                                        grad_method = GradMethods.FINITE_DIFF, 
+                                        grad_method = GradMethods.ANALYTIC, 
                                         exit_unconverged=False,
                                         )(x_init.float(),
-                                        QuadCost(C, c),
+                                        QuadCost(_C, _c),
                                         dx)  
         return x_lqr, u_lqr
 

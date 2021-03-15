@@ -10,10 +10,13 @@ import json
 import os
 import sys
 
+sys.path.insert(0, "../")
+
 from ruamel.yaml import YAML
 
 from baselines.mpc import MPCAgent
 
+    
 if __name__ == "__main__":
 
     # load configuration file
