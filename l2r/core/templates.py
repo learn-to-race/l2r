@@ -22,12 +22,6 @@ class AbstractAgent(abc.ABC):
 		pass
 
 	@abc.abstractmethod
-	def train(self):
-		"""Train the agent.
-		"""
-		pass
-
-	@abc.abstractmethod
 	def select_action(self):
 		"""Select an action to take.
 		"""
