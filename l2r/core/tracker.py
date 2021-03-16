@@ -53,7 +53,6 @@ class ProgressTracker(object):
 		         car_dims, obs_delay, max_timesteps, not_moving_ct,
 		         debug=False):
 		self.n_indices = n_indices
-		self.halfway_idx = n_indices//2
 		self.inner_track = inner_track
 		self.outer_track = outer_track
 		self.centerline = centerline
@@ -72,13 +71,15 @@ class ProgressTracker(object):
 		:type start_idx: int
 		"""
 		self.start_idx = start_idx
-		self.last_idx = start_idx
 		self.lap_start = None
 		self.last_update_time = None
 		self.lap_times = []
 		self.halfway_flag = False
 		self.ep_step_ct = 0
 		self.transitions = []
+		if start_idx is not None:
+			self.last_idx = 0
+			self.halfway_idx = self.n_indices // 2
 
 	def update(self, idx, e, n, u, yaw, ac, bp):
 		"""Update the tracker based on current position. The tracker also keeps
@@ -347,7 +348,6 @@ class ProgressTracker(object):
 		if len(self.lap_times) >= 3:
 			info['success'] = True
 			info['total_time'] = round(sum(self.lap_times), 2)
-			info['pct_complete'] = 100.00
 
 		if len(self.transitions) > self.not_moving_ct:
 			if self.transitions[-1] == self.transitions[-self.not_moving_ct]:
