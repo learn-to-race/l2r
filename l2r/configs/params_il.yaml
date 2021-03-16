@@ -1,7 +1,35 @@
 # parameters for the baseline RandomActionAgent
 
-training_kwargs:
+il_kwargs:
+  ac_kwargs:
+    hidden_sizes: [64, 64]
+  seed: 0
+  total_steps: 2_000_000
+  replay_size: 100_000
+  batch_size: 256
+  start_steps: 1000
+  update_after: 3000
+  num_updates: 5
   num_episodes: 10
+  max_ep_len: 5000
+  encoder_path: './baselines/models/vae-144hw-32l-lvms.pt'
+  latent_dims: 32
+  im_w: 144
+  im_h: 144
+  checkpoint: './baselines/checkpoints/lvms/il_episode_1000.pt'
+  inference_only: True
+  save_path: './results/il/'
+  TRAIN_BS: 64
+  VAL_BS: 128
+  CPU: 8
+  GPU: 1
+  PIN: TRUE
+  DATASET:
+      LOCATION: "/home/bingqinc"
+      NAME: "l2r_expert_dem_thruxton"
+      SPLIT:
+          TRAIN: "train"
+          VAL: "val"
 
 env_kwargs:
   multimodal: True

@@ -14,6 +14,8 @@ elif [ "$1" = "sac" ]; then
 	python3 scripts/runner_sac.py configs/params_sac.yaml
 elif [ "$1" = "mpc" ]; then
 	python3 scripts/runner_mpc.py configs/params_mpc.yaml
+elif [ "$1" = "il" ]; then
+	python3 scripts/runner_il.py configs/params_il.yaml
 else
 	python3 scripts/runner.py configs/params.yaml
 fi
