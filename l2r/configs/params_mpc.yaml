@@ -6,8 +6,8 @@ mpc_kwargs:
 
 env_kwargs:
   multimodal: True
-  max_timesteps: 2000
-  obs_delay: 0
+  max_timesteps: 9000
+  obs_delay: 0.
   not_moving_timeout: 50
   reward_pol: 'default'
   provide_waypoints: True
@@ -19,8 +19,8 @@ env_kwargs:
     quiet: False
     start_container: False
   action_if_kwargs:
-    max_accel: 6.
-    min_accel: 0.
+    max_accel: 4.
+    min_accel: -6.
     max_steer: 1.0
     min_steer: -1.0
     ip: '0.0.0.0'

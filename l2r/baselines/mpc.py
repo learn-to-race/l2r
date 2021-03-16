@@ -1,9 +1,9 @@
 # ========================================================================= #
 # Filename:                                                                 #
-#    MPC.py                                                                 #
+#    mpc.py                                                                 #
 #                                                                           #
 # Description:                                                              # 
-#    an agent used a MPC controller                                         #
+#    an agent using a MPC controller                                        #
 # ========================================================================= #
 
 import json
@@ -27,23 +27,26 @@ WB = 2.7  # [m]
 # State variables
 DT = 0.1  # [s] time tick
 N_STATE = 4 # [x, y, v, yaw]
-VELOCITY_TARGET = 10#15.0 # [m/s]
+VELOCITY_TARGET = 12.5 # 15.0 # [m/s]
 
 # Controller
 T = 6
-STEP_SIZE = 12
+STEP_SIZE = 10
 dl = 0.25
 
 class MPCAgent(AbstractAgent):
     """Agent that selects actions using an MPC controller
     """
-    def __init__(self, mpc_kwargs):
+    def __init__(self, mpc_kwargs, save_transitions=True, save_path=None, plot=False):
         self.num_episodes = mpc_kwargs["num_episodes"]
         self.car = BikeModel(dt=DT, 
                              init_params=np.array([WB, 10, 6]))
         self.controller = MPC(T = T,
                               cost_weight=torch.FloatTensor([1, 1, 1, 16, 0.1, 1]), 
                               cost_type='reference')
+        self.save_transitions = save_transitions
+        self.save_path = save_path
+        self.plot = plot
 
     def train(self):
         pass
@@ -52,47 +55,45 @@ class MPCAgent(AbstractAgent):
         """Race following the environment's step until completion framework
         """
         plt.plot(self.race_x, self.race_y, 'k--')
+        if self.save_transitions:
+            self._imgs = []
+            self._multimodal = []
+            self._actions = []
  
         for e in range(self.num_episodes):
             print('='*10+f' Episode {e+1} of {self.num_episodes} '+'='*10)
             ep_reward, ep_timestep = 0, 0
             obs, info = self.env.reset()
-            done = False
-            obs, reward, done, info = self.env.step([0, 1])
-            time.sleep(1)
             obs, reward, done, info = self.env.step([0, 1])
 
             while not done:
                 x, y, v, yaw = MPCAgent.unpack_state(obs) 
 
                 idx = info['track_idx']
-                xref, to2pi_flag = self.get_xref(idx)
+                xref, to2pi_flag = self.get_xref(idx, yaw)
                 
                 if to2pi_flag:
                     if yaw<0:
                         yaw += 2*np.pi
                 x0 = [x, y, v, yaw]  # current state
+
                 print(f'State: @{idx}, loc=({x}, {y}), v={v}, yaw={yaw*180/np.pi}')
                 print(f'Target: loc=({xref[0, 0]}, {xref[1, 0]}), v={xref[2, 0]}, yaw={xref[3, 0]*180/np.pi}')
 
-                plt.plot([x], [y], 'bo', markersize=4)
-                l_arr = 10
-                plt.arrow(x, y, l_arr*np.cos(yaw), l_arr*np.sin(yaw), 
-                            color = 'r',) #head_width = 0.5, 
-                #plt.plot(xref[0, 0], xref[1, 0], 'o')
-                plt.savefig('sanity_test.png')
-
-                #pdb.set_trace()
-                ## Using my model
+                if self.plot:
+                    plt.plot([x], [y], 'bo', markersize=4)
+                    l_arr = 10
+                    plt.arrow(x, y, l_arr*np.cos(yaw), l_arr*np.sin(yaw), 
+                              color='r',) #head_width = 0.5, 
+                    plt.plot(xref[0, 0], xref[1, 0], 'o')
+                
+                # action selection
                 _, u_opt = self.controller.forward(self.car,
                         torch.tensor(x0).unsqueeze(0), 
                         torch.tensor(xref).transpose(0, 1).unsqueeze(1))
 
                 u = u_opt[0].squeeze().detach().numpy()
                 ai, di = u
-                print(f'Action: acc={ai}, steer={di}')
-
-                #action = self.select_action(state, info)
 
                 # u_opt is a sequence of actions, along the predicted trajectory, 
                 # so we'll take the first one to give to the environment
@@ -100,10 +101,29 @@ class MPCAgent(AbstractAgent):
                 ep_reward += reward
                 ep_timestep += 1
 
+                if self.save_transitions:
+                    (data, img) = obs
+                    self._imgs.append(img)
+                    self._multimodal.append(data)
+                    self._actions.append(np.array([di, ai]))
+
+                    if done:
+                        for i in range(len(self._imgs)):
+                            filename = f'{self.save_path}/transitions_{i}'
+                            np.savez_compressed(
+                                filename,
+                                img=self._imgs[i],
+                                multimodal_data=self._multimodal[i],
+                                action=self._actions[i]
+                            )
+
+
             print(f'Completed episode with total reward: {ep_reward}')
             print(f'Episode info: {info}\n')
+            for k,v in info['metrics'].items():
+                print(f'{k}: {v}')
 
-    def get_xref(self, idx, step_size=STEP_SIZE, n_targets=T):
+    def get_xref(self, idx, yaw, step_size=STEP_SIZE, n_targets=T):
         """Get targets.
 
         :param idx: index of the raceline the agent is nearest to
@@ -123,6 +143,16 @@ class MPCAgent(AbstractAgent):
         else:
             to2pi_flag = False
 
+        # umm yeah
+        if abs(target_yaw[0]-target_yaw[-1]) > 0.1 or abs(target_yaw[-1]-yaw) > 0.1:
+            target_v = [VELOCITY_TARGET*0.9] * n_targets
+        if abs(target_yaw[0]-target_yaw[-1]) > 0.2 or abs(target_yaw[-1]-yaw) > 0.2:
+            target_v = [VELOCITY_TARGET*0.7] * n_targets
+        if abs(target_yaw[0]-target_yaw[-1]) > 0.4 or abs(target_yaw[-1]-yaw) > 0.4:
+            target_v = [VELOCITY_TARGET*0.5] * n_targets
+        if abs(target_yaw[0]-target_yaw[-1]) > 1.0 or abs(target_yaw[0]-target_yaw[-3]) > 1.0: 
+            target_v = [VELOCITY_TARGET*0.3] * n_targets
+
         return np.array([target_x, target_y, target_v, target_yaw], dtype=np.float32), to2pi_flag
 
     @staticmethod
@@ -138,7 +168,7 @@ class MPCAgent(AbstractAgent):
         return x, y, v, yaw
 
     def select_action(self):
-    	pass
+        pass
 
     def create_env(self, env_kwargs, sim_kwargs):
         """Instantiate a racing environment

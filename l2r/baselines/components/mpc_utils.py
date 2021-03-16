@@ -3,7 +3,7 @@
 #    mpc_utils.py                                                           #
 #                                                                           #
 # Description:                                                              # 
-#    an agent used a MPC controller                                         #
+#    contains BikeModel and an MPC controller                               #
 # ========================================================================= #
 
 import math
@@ -175,7 +175,7 @@ class MPC(nn.Module):
                                         T=self.T,
                                         u_lower= dx.u_lower.repeat(self.T, n_batch, 1),
                                         u_upper= dx.u_upper.repeat(self.T, n_batch, 1),
-                                        lqr_iter=20,
+                                        lqr_iter=10,
                                         backprop=False,
                                         verbose=-1,
                                         n_batch=n_batch,
