@@ -283,6 +283,9 @@ class RacingEnv(gym.Env):
         self.pose_if.reset()
         self.camera_if.reset()
 
+        # no delay is causing issues with the initial starting index
+        time.sleep(MEDIUM_DELAY)
+
         _observation = self._observe()
         _data, _img = _observation
         observation = _observation if self.multimodal else _img
@@ -364,7 +367,7 @@ class RacingEnv(gym.Env):
 
         self.nearest_idx = self.kdtree.query(np.asarray([enu_x, enu_y]))[1]
         self.tracker.update(self.nearest_idx, enu_x, enu_y, enu_z, yaw, a, bp)
-
+        
         return (pose, imgs)
 
     def _is_complete(self, observation):
