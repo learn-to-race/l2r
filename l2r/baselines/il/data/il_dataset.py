@@ -189,7 +189,7 @@ class ILDataset(Dataset):
                 }
 
 
-        return sample, target
+        return image, torch.FloatTensor(measurement['multimodal_data']), action
 
 
     def _preload_files(self, path):
