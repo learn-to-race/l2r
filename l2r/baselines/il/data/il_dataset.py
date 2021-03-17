@@ -2,14 +2,15 @@ import torch
 from torch.utils.data import Dataset
 from PIL import Image
 import numpy as np
+from numpy import load
 from torchvision import transforms
 import glob
 import json
 import copy
 import math
 import os
-from . import data_parser
 from .utils import sort_nicely
+import ipdb as pdb
 
 # Normalize speed to 0-1
 SPEED_FACTOR = 12.0
@@ -222,28 +223,24 @@ class ILDataset(Dataset):
             transitions_list = sorted(glob.glob(os.path.join(episode, 'transition*')))
             sort_nicely(transitions_list)
 
-            if len(measurements_list) == 0:
+            if len(transitions_list) == 0:
                 print("EMPTY EPISODE")
                 continue
 
             # A simple count to keep track how many measurements were added this episode.
             count_added_measurements = 0
 
+            sample = 0
             for transition in transitions_list:
 
-                sample = np.load(transition)
-
-                img = sample['img'] # 384 x 512 x 3
-                multimodal_data = sample['img'] # (30,)
-                action = sample['action'] # (2,)
-
+                with np.load(transition) as sample:
+                    float_dicts.append(sample)
+                
                 sensor_data_names.append(os.path.join(episode.split('/')[-1], transition))
-                float_dicts.append(sample)
-
                 count_added_measurements += 1
 
-            last_data_point_number = measurements_list[-1].split('_')[-1].split('.')[0]
-            number_of_hours_pre_loaded += (float(count_added_measurements / 10.0) / 3600.0)
+            last_data_point_number = transitions_list[-1].split('_')[-1].split('.')[0]
+            number_of_hours_pre_loaded += (float(count_added_measurements) / 3600.0)
             print(" Loaded ", number_of_hours_pre_loaded, " hours of data")
 
         # Make the path to save the pre loaded datasets
