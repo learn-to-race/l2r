@@ -10,7 +10,7 @@ import copy
 import math
 import os
 from .utils import sort_nicely
-import ipdb as pdb
+import pdb as pdb
 
 # Normalize speed to 0-1
 SPEED_FACTOR = 12.0

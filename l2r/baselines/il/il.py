@@ -9,7 +9,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 
-import ipdb as pdb
+import pdb as pdb
 
 from core.templates import AbstractAgent
 from envs.env import RacingEnv
@@ -27,10 +27,12 @@ class ILAgent(AbstractAgent):
     """
     def __init__(self, model_params, training_kwargs):
         self.num_episodes = training_kwargs['num_episodes']
+        
         self.model = CILModel(model_params)    
+        # self.model = self.model.to(DEVICE)
+
         self.optimizer = optim.Adam(self.model.parameters(), lr=training_kwargs['learning_rate'])
         self.mseLoss = nn.MSELoss()
-        self.model = self.model.to(DEVICE)
 
     def select_action(self, x, a):
         """Select an action
@@ -71,7 +73,6 @@ class ILAgent(AbstractAgent):
                 #self.eval()
                 self.save_model()
 
-
     def eval(self):
         """
         evaluate the agent
@@ -81,11 +82,17 @@ class ILAgent(AbstractAgent):
         for e in range(self.num_episodes):
             print('='*10+f' Episode {e+1} of {self.num_episodes} '+'='*10)
             ep_reward, ep_timestep, best_ep_reward = 0, 0, 0
-            state, done = self.env.reset(), False
+            obs = self.env.reset()
+            obs, reward, done, info = self.env.step([0, 1])
 
             while not done:
-                action = model_cpu(state, a)
-                state, reward, done, info = self.env.step(action)
+                #imgs, sensors = self.unpack_state(obs) 
+                (sensor, img) = obs
+                img = torch.FloatTensor(img).unsqueeze(0).transpose(1, 3) # 1 x 3 x 512 x 384 
+                action = model_cpu(img, torch.FloatTensor(sensor).unsqueeze(0))
+                #pdb.set_trace() 
+                action = torch.clamp(action, -1, 1)
+                obs, reward, done, info = self.env.step(action.squeeze(0).detach().numpy())
                 ep_reward += reward
                 ep_timestep += 1
             
@@ -101,9 +108,8 @@ class ILAgent(AbstractAgent):
 
 
     def save_model(self):
-
-            path_name = f'{save_path}il_episode_{e}.pt'
-            torch.save(self.model, path_name)
+        path_name = f'{save_path}il_episode_{e}.pt'
+        torch.save(self.model, path_name)
     
     def create_env(self, env_kwargs, sim_kwargs):
         """Instantiate a racing environment
