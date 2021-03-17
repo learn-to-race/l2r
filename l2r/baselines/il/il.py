@@ -10,8 +10,11 @@ import torch.optim as optim
 
 from core.templates import AbstractAgent
 from envs.env import RacingEnv
-from baselines.il.building_blocks import Conv, Branching, FC, Join
+
 from baselines.il.il_model import CILModel
+
+DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+DEVICE
 
 class ILAgent(AbstractAgent):
     """Reinforcement learning agent that simply chooses random actions.
@@ -24,46 +27,56 @@ class ILAgent(AbstractAgent):
         self.model = CILModel(model_params)    
         self.optimizer = optim.Adam(self.model.parameters(), lr=training_kwargs['learning_rate'])
         self.mseLoss = nn.MSELoss()
-    
+        self.model = self.model.to(DEVICE)
+
     def select_action(self, x, a):
         """Select an action
         """
         out = self.model(x, a)
         return out
 
-    ## Referencing: https://github.com/felipecode/coiltraine/blob/29060ab5fd2ea5531686e72c621aaaca3b23f4fb/coil_core/train.py
     def il_train(self, data_loader, n_epochs = 100, eval_every = 10):
         for i in range(n_epochs):
-            for data, target in data_loader:
+            for imgs, sensors, target in data_loader:
+                '''
+                Input for NN:
+                    imgs: n x 3 x H x W
+                    sensors: n x Dim 
+                Target: n x 2 
+                '''
+                imgs, sensors, target = imgs.to(DEVICE), sensors.to(DEVICE), target.to(DEVICE) 
                 # The output(branches) is a list of 5 branches results, each branch is with size [120,3]
                 self.model.zero_grad()
                 
                 ##TODO: Match I/O
-                out = self.model(torch.squeeze(data['rgb'].cuda()),
-                                dataset.extract_inputs(data).cuda())
+                out = self.model(imgs, sensors)
                 
                 loss = self.mseLoss(out, target)
                 loss.backward()
                 self.optimizer.step()
+            
             if (i+1)%eval_every == 0:
                 self.eval()
 
     def eval(self):
-		"""evaluate the agent
-		"""
-		for e in range(self.num_episodes):
-			print('='*10+f' Episode {e+1} of {self.num_episodes} '+'='*10)
-			ep_reward, ep_timestep = 0, 0
-			state, done = self.env.reset(), False
+        """
+        evaluate the agent
+        """
+        model_cpu = self.model.cpu()
 
-			while not done:
-				action = self.select_action()
-				state, reward, done, info = self.env.step(action)
-				ep_reward += reward
-				ep_timestep += 1
+        for e in range(self.num_episodes):
+            print('='*10+f' Episode {e+1} of {self.num_episodes} '+'='*10)
+            ep_reward, ep_timestep = 0, 0
+            state, done = self.env.reset(), False
 
-			print(f'Completed episode with total reward: {ep_reward}')
-			print(f'Episode info: {info}\n')
+            while not done:
+                action = model_cpu.select_action()
+                state, reward, done, info = self.env.step(action)
+                ep_reward += reward
+                ep_timestep += 1
+
+            print(f'Completed episode with total reward: {ep_reward}')
+            print(f'Episode info: {info}\n')
 
     
     def create_env(self, env_kwargs, sim_kwargs):
