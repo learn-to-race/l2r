@@ -1,12 +1,17 @@
 import torch.nn as nn
+import numpy as np
+import pdb
+
 from baselines.il.il_utils import AttributeDict
+from baselines.il.building_blocks import Conv, Branching, FC, Join
+
 
 g_conf = AttributeDict()
 g_conf.immutable(False)
 
 g_conf.SENSORS = {'rgb': (3, 384, 512)}
 g_conf.NUMBER_FRAMES_FUSION = 1
-g_conf.INPUTS = ['']
+g_conf.INPUTS = np.arange(30)
 g_conf.PRE_TRAINED = False
 g_conf.TARGETS = ['steer', 'acceleration']
 
@@ -27,7 +32,9 @@ class CILModel(nn.Module):
         """ Join measurements and perception"""
         j = self.join(x, m)
 
+        
         branch_outputs = self.branches(j)
+        ## We only have one branch now.
         out = branch_outputs[0]
         #speed_branch_output = self.speed_branch(x)
 
@@ -101,6 +108,7 @@ class CILModel(nn.Module):
 
         # Create the fc vector separatedely
         branch_fc_vector = []
+        #pdb.set_trace()
         for i in range(params['branches']['number_of_branches']):
             branch_fc_vector.append(FC(params={'neurons': [params['join']['fc']['neurons'][-1]] +
                                                          params['branches']['fc']['neurons'] +

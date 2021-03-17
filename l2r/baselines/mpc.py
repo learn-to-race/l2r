@@ -165,7 +165,18 @@ class MPCAgent(AbstractAgent):
         yaw = np.pi/2 - state[12]
         # Ensure the yaw is within [-pi, pi)
         yaw = (yaw + np.pi) % (2 * np.pi) - np.pi
-        #print(f'w_dot=({state[9]}, {state[10]}, {state[11]}')
+        '''
+        ## Checking output
+        print(f'steering_request=({state[0]}, gear={state[1]}, mode={state[2]}')
+        print(f'v=({state[3]}, {state[4]}, {state[5]}')
+        print(f'a=({state[6]}, {state[7]}, {state[8]}')
+        print(f'w_dot=({state[9]}, {state[10]}, {state[11]}')
+        print(f'yaw=({state[12]}, roll={state[13]}, pitch={state[14]}')
+        print(f'x=({state[15]}, y={state[16]}, z={state[17]}')
+        print(f'rpm=({state[18]}, {state[19]},{state[20]},{state[21]}')
+        print(f'wheel braking=({state[22]}, {state[23]},{state[24]},{state[25]}')
+        print(f'wheel torque=({state[26]}, {state[27]},{state[28]},{state[29]}')
+        '''
         return x, y, v, yaw
 
     def select_action(self):

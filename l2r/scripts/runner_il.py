@@ -9,6 +9,8 @@
 
 #import yaml
 import os, sys, argparse
+import pdb
+import torch
 from torch.utils.data import DataLoader
 from ruamel.yaml import YAML
 
@@ -24,7 +26,12 @@ def main(params):
 
     # instantiate agent
     agent = ILAgent(model_params, il_kwargs)
-    print("created the agent")
+    '''
+    imgs = torch.zeros(32, 3, 512, 384)
+    others = torch.zeros(32, 30)
+    out = agent.select_action(imgs, others)
+    pdb.set_trace()
+    '''
     agent.create_env(env_kwargs, sim_kwargs)
 
     train = ILDataset(il_kwargs['DATASET']['LOCATION'], 

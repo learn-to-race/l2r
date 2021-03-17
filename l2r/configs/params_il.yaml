@@ -101,7 +101,7 @@ MODEL_CONFIGURATION:  # Based on the MODEL_TYPE, we specify the structure
       neurons: [256, 256]
       dropouts: [0.0, 0.5]
   branches:  # The output branches for the different possible directions ( Straight, Left, Right, None)
-    number_of_branches: 1#4
+    number_of_branches: 1
     fc:
       neurons: [256, 256]
       dropouts: [0.0, 0.5]
