@@ -10,7 +10,7 @@ import torch.nn as nn
 from core.templates import AbstractAgent
 from envs.env import RacingEnv
 from baselines.il.building_blocks import Conv, Branching, FC, Join
-from baselines.il.il_utils import CILModel
+from baselines.il.il_model import CILModel
 
 class ILAgent(AbstractAgent):
     """Reinforcement learning agent that simply chooses random actions.
