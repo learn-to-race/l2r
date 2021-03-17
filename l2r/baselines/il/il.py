@@ -56,7 +56,7 @@ class ILAgent(AbstractAgent):
                 imgs, sensors, target = imgs.type(torch.FloatTensor).to(DEVICE), \
                         sensors.to(DEVICE), target.to(DEVICE) 
                 
-                imgs = imgs.transpose(1, 3) # B x 3 x 512 x 384 
+                #imgs = imgs.transpose(1, 3) # B x 3 x 512 x 384 
 
                 # The output(branches) is a list of 5 branches results, each branch is with size [120,3]
                 self.model.zero_grad()
@@ -71,7 +71,7 @@ class ILAgent(AbstractAgent):
             if (i+1)%eval_every == 0:
                 print("Eval / save")
                 #self.eval()
-                self.save_model()
+                self.save_model(episode)
 
 
     def eval(self):
@@ -102,8 +102,8 @@ class ILAgent(AbstractAgent):
             print(f'Episode info: {info}\n')
 
 
-    def save_model(self):
-            path_name = f'{self.save_path}/il_episode_{e}.pt'
+    def save_model(self, episode):
+            path_name = f'{self.save_path}/il_episode_{episode}.pt'
             torch.save(self.model.state_dict(), path_name)
     
     def create_env(self, env_kwargs, sim_kwargs):
