@@ -26,6 +26,8 @@ il_kwargs:
   DATASET:
       LOCATION: "/home/jmf1/data/l2r_expert_demonstrations"
       NAME: "thruxton"
+      LOOKAHEAD: 1
+      PRELOAD_NAME: "il_thruxton" 
       SPLIT:
           TRAIN: "train"
           VAL: "val"

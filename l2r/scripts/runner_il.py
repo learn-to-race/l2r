@@ -29,11 +29,15 @@ def main(params):
 
     train = ILDataset(il_kwargs['DATASET']['LOCATION'], 
             il_kwargs['DATASET']['NAME'], 
-            il_kwargs['DATASET']['SPLIT']['TRAIN'])
+            il_kwargs['DATASET']['SPLIT']['TRAIN'],
+            il_kwargs['DATASET']['LOOKAHEAD'],
+            il_kwargs['DATASET']['PRELOAD_NAME'])
 
     val = ILDataset(il_kwargs['DATASET']['LOCATION'], 
             il_kwargs['DATASET']['NAME'], 
-            il_kwargs['DATASET']['SPLIT']['VAL'])
+            il_kwargs['DATASET']['SPLIT']['VAL'],
+            il_kwargs['DATASET']['LOOKAHEAD'],
+            il_kwargs['DATASET']['PRELOAD_NAME'])
 
     train = DataLoader(train, params['il_kwargs']['TRAIN_BS'], 
                        num_workers=params['il_kwargs']['CPU'], 
