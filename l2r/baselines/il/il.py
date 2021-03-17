@@ -6,11 +6,12 @@
 #    an agent that randomly chooses actions                                 #
 # ========================================================================= #
 import torch.nn as nn
+import torch.optim as optim
 
 from core.templates import AbstractAgent
 from envs.env import RacingEnv
 from baselines.il.building_blocks import Conv, Branching, FC, Join
-from baselines.il.il_utils import CILModel
+from baselines.il.il_model import CILModel
 
 class ILAgent(AbstractAgent):
     """Reinforcement learning agent that simply chooses random actions.
@@ -21,32 +22,50 @@ class ILAgent(AbstractAgent):
     def __init__(self, model_params, training_kwargs):
         self.num_episodes = training_kwargs['num_episodes']
         self.model = CILModel(model_params)    
-
-    def train(self):
-        """Demonstrative training method. 
+        self.optimizer = optim.Adam(self.model.parameters(), lr=training_kwargs['learning_rate'])
+        self.mseLoss = nn.MSELoss()
+    
+    def select_action(self, x, a):
+        """Select an action
         """
-        for e in range(self.num_episodes):
-            print('='*10+f' Episode {e+1} of {self.num_episodes} '+'='*10)
-            ep_reward, ep_timestep = 0, 0
-            state, done = self.env.reset(), False
+        out = self.model(x, a)
+        return out
 
-            while not done:
-                action = self.select_action()
-                state, reward, done, info = self.env.step(action)
-                ep_reward += reward
-                ep_timestep += 1
+    ## Referencing: https://github.com/felipecode/coiltraine/blob/29060ab5fd2ea5531686e72c621aaaca3b23f4fb/coil_core/train.py
+    def il_train(self, data_loader, n_epochs = 100, eval_every = 10):
+        for i in range(n_epochs):
+            for data, target in data_loader:
+                # The output(branches) is a list of 5 branches results, each branch is with size [120,3]
+                self.model.zero_grad()
+                
+                ##TODO: Match I/O
+                out = self.model(torch.squeeze(data['rgb'].cuda()),
+                                dataset.extract_inputs(data).cuda())
+                
+                loss = self.mseLoss(out, target)
+                loss.backward()
+                self.optimizer.step()
+            if (i+1)%eval_every == 0:
+                self.eval()
 
-            print(f'Completed episode with total reward: {ep_reward}')
-            print(f'Episode info: {info}\n')
+    def eval(self):
+		"""evaluate the agent
+		"""
+		for e in range(self.num_episodes):
+			print('='*10+f' Episode {e+1} of {self.num_episodes} '+'='*10)
+			ep_reward, ep_timestep = 0, 0
+			state, done = self.env.reset(), False
 
-    def select_action(self):
-        """Select a random action from the action space.
+			while not done:
+				action = self.select_action()
+				state, reward, done, info = self.env.step(action)
+				ep_reward += reward
+				ep_timestep += 1
 
-        :return: random action to take
-        :rtype: numpy array
-        """
-        return self.env.action_space.sample()
+			print(f'Completed episode with total reward: {ep_reward}')
+			print(f'Episode info: {info}\n')
 
+    
     def create_env(self, env_kwargs, sim_kwargs):
         """Instantiate a racing environment
 

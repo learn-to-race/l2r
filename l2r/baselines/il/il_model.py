@@ -4,11 +4,11 @@ from baselines.il.il_utils import AttributeDict
 g_conf = AttributeDict()
 g_conf.immutable(False)
 
-g_conf.SENSORS = {'rgb': (3, 88, 200)}
+g_conf.SENSORS = {'rgb': (3, 384, 512)}
 g_conf.NUMBER_FRAMES_FUSION = 1
-g_conf.INPUTS = ['speed_module']
+g_conf.INPUTS = ['']
 g_conf.PRE_TRAINED = False
-g_conf.TARGETS = ['steer', 'throttle', 'brake']
+g_conf.TARGETS = ['steer', 'acceleration']
 
 # From: https://github.com/felipecode/coiltraine/blob/29060ab5fd2ea5531686e72c621aaaca3b23f4fb/network/models/coil_icra.py
 class CILModel(nn.Module):
@@ -28,11 +28,11 @@ class CILModel(nn.Module):
         j = self.join(x, m)
 
         branch_outputs = self.branches(j)
-
-        speed_branch_output = self.speed_branch(x)
+        out = branch_outputs[0]
+        #speed_branch_output = self.speed_branch(x)
 
         # We concatenate speed with the rest.
-        return branch_outputs + [speed_branch_output]
+        return out #+ [speed_branch_output]
 
     def _make_nn(self, params):
         self.params = params
