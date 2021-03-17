@@ -25,8 +25,8 @@ il_kwargs:
   GPU: 1
   PIN: TRUE
   DATASET:
-      LOCATION: "/home/bingqinc"
-      NAME: "l2r_expert_dem_thruxton"
+      LOCATION: "/home/bingqinc/l2r_expert_demonstrations"
+      NAME: "thruxton"
       SPLIT:
           TRAIN: "train"
           VAL: "val"
