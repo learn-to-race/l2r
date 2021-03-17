@@ -169,7 +169,10 @@ class ILDataset(Dataset):
                 'wheel_rpm': wheel_rpm,
                 'wheel_braking': wheel_braking,
                 'wheel_torque': wheel_torque,
-                'action': action,
+                'action': action
+                }
+        
+        target = {
                 'next_image': next_image, 
                 'next_steering': next_steering,
                 'next_gear': next_gear,
@@ -182,11 +185,11 @@ class ILDataset(Dataset):
                 'next_wheel_rpm': next_wheel_rpm,
                 'next_wheel_braking': next_wheel_braking,
                 'next_wheel_torque': next_wheel_torque,
-                'next_action': next_action,
+                'next_action': next_action
                 }
 
 
-        return sample
+        return image, torch.FloatTensor(measurement['multimodal_data']), action
 
 
     def _preload_files(self, path):
