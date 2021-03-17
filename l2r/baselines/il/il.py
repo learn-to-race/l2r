@@ -70,7 +70,7 @@ class ILAgent(AbstractAgent):
                 self.optimizer.step()
             
             if (i+1)%eval_every == 0:
-                #self.eval()
+                self.eval()
                 self.save_model()
 
     def eval(self):
