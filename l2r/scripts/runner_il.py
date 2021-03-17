@@ -8,15 +8,15 @@
 
 
 #import yaml
-import os, sys, argparse
-import pdb
 import torch
 from torch.utils.data import DataLoader
+import os, sys, argparse, json
+import ipdb as pdb
 from ruamel.yaml import YAML
-
 
 from baselines.il.il import ILAgent
 from baselines.il.data.il_dataset import ILDataset
+from envs.env import RacingEnv
 
 def main(params):
     env_kwargs = params['env_kwargs']
@@ -83,16 +83,18 @@ def main(params):
         os.makedirs(save_path)
 
     with open(save_path+'params.json', 'w') as f:
-        json = json.dumps(params)
-        f.write(json)
+        jsondump = json.dumps(params)
+        f.write(jsondump)
 
-    if il_kwargs['il_train_first']:
+    if not il_kwargs['inference_only']:
 
+        print("Training IL agent")
         # train agent with imitation learning
-        agent.train(env=env, **il_kwargs)
+        agent.il_train(train, **il_kwargs)
     
     # run agent on the track
-    agent.run(env=env, **il_kwargs)
+    print("Running IL agent")
+    agent.eval(env=env, **il_kwargs)
 
 if __name__ == "__main__":
     #argparser = argparse.ArgumentParser(description=__doc__)

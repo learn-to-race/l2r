@@ -5,8 +5,11 @@
 # Description:                                                              # 
 #    an agent that randomly chooses actions                                 #
 # ========================================================================= #
+import torch
 import torch.nn as nn
 import torch.optim as optim
+
+import ipdb as pdb
 
 from core.templates import AbstractAgent
 from envs.env import RacingEnv
@@ -35,7 +38,11 @@ class ILAgent(AbstractAgent):
         out = self.model(x, a)
         return out
 
-    def il_train(self, data_loader, n_epochs = 100, eval_every = 10):
+    def il_train(self, data_loader, **il_kwargs):
+
+        n_epochs = il_kwargs['n_epochs']
+        eval_every = il_kwargs['eval_every']
+
         for i in range(n_epochs):
             for imgs, sensors, target in data_loader:
                 '''
@@ -44,7 +51,12 @@ class ILAgent(AbstractAgent):
                     sensors: n x Dim 
                 Target: n x 2 
                 '''
-                imgs, sensors, target = imgs.to(DEVICE), sensors.to(DEVICE), target.to(DEVICE) 
+
+                imgs, sensors, target = imgs.type(torch.FloatTensor).to(DEVICE), \
+                        sensors.to(DEVICE), target.to(DEVICE) 
+                
+                imgs = imgs.transpose(1, 3) # B x 3 x 512 x 384 
+
                 # The output(branches) is a list of 5 branches results, each branch is with size [120,3]
                 self.model.zero_grad()
                 

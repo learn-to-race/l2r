@@ -58,135 +58,136 @@ class ILDataset(Dataset):
         
         measurement = self.measurements[idx]
 
-        try: next_measurement = self.measurements[idx+self.lookahead]
-        except IndexError: next_measurement = measurement
+#        try: next_measurement = self.measurements[idx+self.lookahead]
+#        except IndexError: next_measurement = measurement
 
         #mappings: http://ec2-3-90-183-136.compute-1.amazonaws.com/multimodal.html#environment-observations
 
-        image = self.transform_op(measurement['img'])
+        image = measurement['img']
+        #image = self.transform_op(measurement['img'])
 
-        steering = measurement['multimodal_data'][0]
-
-        gear = torch.FloatTensor(measurement['multimodal_data'][1])
-
-        mode = torch.FloatTensor(measurement['multimodal_data'][2])
-        
-        directional_velocity = torch.FloatTensor([measurement['multimodal_data'][3],
-                measurement['multimodal_data'][4],
-                measurement['multimodal_data'][5]])
-
-        directional_acceleration = torch.FloatTensor([measurement['multimodal_data'][6],
-                measurement['multimodal_data'][7],
-                measurement['multimodal_data'][8]])
-
-        directional_angular_velocity = torch.FloatTensor([measurement['multimodal_data'][9],
-                measurement['multimodal_data'][10],
-                measurement['multimodal_data'][11]])
-
-        yaw_pitch_roll = torch.FloatTensor([measurement['multimodal_data'][12],
-                measurement['multimodal_data'][13],
-                measurement['multimodal_data'][14]])
-
-        vehicle_center_coord = torch.FloatTensor([measurement['multimodal_data'][15],
-                measurement['multimodal_data'][16],
-                measurement['multimodal_data'][17]]) # y, x, z
-
-        wheel_rpm = torch.FloatTensor([measurement['multimodal_data'][18],
-                measurement['multimodal_data'][19],
-                measurement['multimodal_data'][20],
-                measurement['multimodal_data'][21]])
-
-        wheel_braking = torch.FloatTensor([measurement['multimodal_data'][22],
-                measurement['multimodal_data'][23],
-                measurement['multimodal_data'][24],
-                measurement['multimodal_data'][25]])
-
-        wheel_torque = torch.FloatTensor([measurement['multimodal_data'][26],
-                measurement['multimodal_data'][27],
-                measurement['multimodal_data'][28],
-                measurement['multimodal_data'][29]])
+#        steering = measurement['multimodal_data'][0]
+#
+#        gear = torch.FloatTensor(measurement['multimodal_data'][1])
+#
+#        mode = torch.FloatTensor(measurement['multimodal_data'][2])
+#        
+#        directional_velocity = torch.FloatTensor([measurement['multimodal_data'][3],
+#                measurement['multimodal_data'][4],
+#                measurement['multimodal_data'][5]])
+#
+#        directional_acceleration = torch.FloatTensor([measurement['multimodal_data'][6],
+#                measurement['multimodal_data'][7],
+#                measurement['multimodal_data'][8]])
+#
+#        directional_angular_velocity = torch.FloatTensor([measurement['multimodal_data'][9],
+#                measurement['multimodal_data'][10],
+#                measurement['multimodal_data'][11]])
+#
+#        yaw_pitch_roll = torch.FloatTensor([measurement['multimodal_data'][12],
+#                measurement['multimodal_data'][13],
+#                measurement['multimodal_data'][14]])
+#
+#        vehicle_center_coord = torch.FloatTensor([measurement['multimodal_data'][15],
+#                measurement['multimodal_data'][16],
+#                measurement['multimodal_data'][17]]) # y, x, z
+#
+#        wheel_rpm = torch.FloatTensor([measurement['multimodal_data'][18],
+#                measurement['multimodal_data'][19],
+#                measurement['multimodal_data'][20],
+#                measurement['multimodal_data'][21]])
+#
+#        wheel_braking = torch.FloatTensor([measurement['multimodal_data'][22],
+#                measurement['multimodal_data'][23],
+#                measurement['multimodal_data'][24],
+#                measurement['multimodal_data'][25]])
+#
+#        wheel_torque = torch.FloatTensor([measurement['multimodal_data'][26],
+#                measurement['multimodal_data'][27],
+#                measurement['multimodal_data'][28],
+#                measurement['multimodal_data'][29]])
 
         action = torch.FloatTensor(measurement['action'])
         
         # values from self.lookahead steps ahead
 
-        next_image = self.transform_op(measurement['img'])
-
-        next_steering = next_measurement['multimodal_data'][0]
-
-        next_gear = torch.FloatTensor(next_measurement['multimodal_data'][1])
-
-        next_mode = torch.FloatTensor(next_measurement['multimodal_data'][2])
-        
-        next_directional_velocity = torch.FloatTensor([next_measurement['multimodal_data'][3],
-                next_measurement['multimodal_data'][4],
-                next_measurement['multimodal_data'][5]])
-
-        next_directional_acceleration = torch.FloatTensor([next_measurement['multimodal_data'][6],
-                next_measurement['multimodal_data'][7],
-                next_measurement['multimodal_data'][8]])
-
-        next_directional_angular_velocity = torch.FloatTensor([next_measurement['multimodal_data'][9],
-                next_measurement['multimodal_data'][10],
-                next_measurement['multimodal_data'][11]])
-
-        next_yaw_pitch_roll = torch.FloatTensor([next_measurement['multimodal_data'][12],
-                next_measurement['multimodal_data'][13],
-                next_measurement['multimodal_data'][14]])
-
-        next_vehicle_center_coord = torch.FloatTensor([next_measurement['multimodal_data'][15],
-                next_measurement['multimodal_data'][16],
-                next_measurement['multimodal_data'][17]]) # y, x, z
-
-        next_wheel_rpm = torch.FloatTensor([next_measurement['multimodal_data'][18],
-                next_measurement['multimodal_data'][19],
-                next_measurement['multimodal_data'][20],
-                next_measurement['multimodal_data'][21]])
-
-        next_wheel_braking = torch.FloatTensor([next_measurement['multimodal_data'][22],
-                next_measurement['multimodal_data'][23],
-                next_measurement['multimodal_data'][24],
-                next_measurement['multimodal_data'][25]])
-
-        next_wheel_torque = torch.FloatTensor([next_measurement['multimodal_data'][26],
-                next_measurement['multimodal_data'][27],
-                next_measurement['multimodal_data'][28],
-                next_measurement['multimodal_data'][29]])
-
-        next_action = torch.FloatTensor(measurement['action'])
-
-        
-        sample = {
-                'image': image, 
-                'steering': steering,
-                'gear': gear,
-                'mode': mode,
-                'directional_velocity': directional_velocity,
-                'directional_acceleration': directional_acceleration,
-                'directional_angular_velocity': directional_angular_velocity,
-                'yaw_pitch_roll': yaw_pitch_roll,
-                'vehicle_center_coord': vehicle_center_coord,
-                'wheel_rpm': wheel_rpm,
-                'wheel_braking': wheel_braking,
-                'wheel_torque': wheel_torque,
-                'action': action
-                }
-        
-        target = {
-                'next_image': next_image, 
-                'next_steering': next_steering,
-                'next_gear': next_gear,
-                'next_mode': next_mode,
-                'next_directional_velocity': next_directional_velocity,
-                'next_directional_acceleration': next_directional_acceleration,
-                'next_directional_angular_velocity': next_directional_angular_velocity,
-                'next_yaw_pitch_roll': next_yaw_pitch_roll,
-                'next_vehicle_center_coord': next_vehicle_center_coord,
-                'next_wheel_rpm': next_wheel_rpm,
-                'next_wheel_braking': next_wheel_braking,
-                'next_wheel_torque': next_wheel_torque,
-                'next_action': next_action
-                }
+#        next_image = self.transform_op(measurement['img'])
+#
+#        next_steering = next_measurement['multimodal_data'][0]
+#
+#        next_gear = torch.FloatTensor(next_measurement['multimodal_data'][1])
+#
+#        next_mode = torch.FloatTensor(next_measurement['multimodal_data'][2])
+#        
+#        next_directional_velocity = torch.FloatTensor([next_measurement['multimodal_data'][3],
+#                next_measurement['multimodal_data'][4],
+#                next_measurement['multimodal_data'][5]])
+#
+#        next_directional_acceleration = torch.FloatTensor([next_measurement['multimodal_data'][6],
+#                next_measurement['multimodal_data'][7],
+#                next_measurement['multimodal_data'][8]])
+#
+#        next_directional_angular_velocity = torch.FloatTensor([next_measurement['multimodal_data'][9],
+#                next_measurement['multimodal_data'][10],
+#                next_measurement['multimodal_data'][11]])
+#
+#        next_yaw_pitch_roll = torch.FloatTensor([next_measurement['multimodal_data'][12],
+#                next_measurement['multimodal_data'][13],
+#                next_measurement['multimodal_data'][14]])
+#
+#        next_vehicle_center_coord = torch.FloatTensor([next_measurement['multimodal_data'][15],
+#                next_measurement['multimodal_data'][16],
+#                next_measurement['multimodal_data'][17]]) # y, x, z
+#
+#        next_wheel_rpm = torch.FloatTensor([next_measurement['multimodal_data'][18],
+#                next_measurement['multimodal_data'][19],
+#                next_measurement['multimodal_data'][20],
+#                next_measurement['multimodal_data'][21]])
+#
+#        next_wheel_braking = torch.FloatTensor([next_measurement['multimodal_data'][22],
+#                next_measurement['multimodal_data'][23],
+#                next_measurement['multimodal_data'][24],
+#                next_measurement['multimodal_data'][25]])
+#
+#        next_wheel_torque = torch.FloatTensor([next_measurement['multimodal_data'][26],
+#                next_measurement['multimodal_data'][27],
+#                next_measurement['multimodal_data'][28],
+#                next_measurement['multimodal_data'][29]])
+#
+#        next_action = torch.FloatTensor(measurement['action'])
+#
+#        
+#        sample = {
+#                'image': image, 
+#                'steering': steering,
+#                'gear': gear,
+#                'mode': mode,
+#                'directional_velocity': directional_velocity,
+#                'directional_acceleration': directional_acceleration,
+#                'directional_angular_velocity': directional_angular_velocity,
+#                'yaw_pitch_roll': yaw_pitch_roll,
+#                'vehicle_center_coord': vehicle_center_coord,
+#                'wheel_rpm': wheel_rpm,
+#                'wheel_braking': wheel_braking,
+#                'wheel_torque': wheel_torque,
+#                'action': action
+#                }
+#        
+#        target = {
+#                'next_image': next_image, 
+#                'next_steering': next_steering,
+#                'next_gear': next_gear,
+#                'next_mode': next_mode,
+#                'next_directional_velocity': next_directional_velocity,
+#                'next_directional_acceleration': next_directional_acceleration,
+#                'next_directional_angular_velocity': next_directional_angular_velocity,
+#                'next_yaw_pitch_roll': next_yaw_pitch_roll,
+#                'next_vehicle_center_coord': next_vehicle_center_coord,
+#                'next_wheel_rpm': next_wheel_rpm,
+#                'next_wheel_braking': next_wheel_braking,
+#                'next_wheel_torque': next_wheel_torque,
+#                'next_action': next_action
+#                }
 
 
         return image, torch.FloatTensor(measurement['multimodal_data']), action
@@ -217,6 +218,9 @@ class ILDataset(Dataset):
         sensor_data_names = []
         float_dicts = []
         number_of_hours_pre_loaded = 0
+        image = 0
+        multimodal_data = 0
+        action = 0
 
         # Now we do a check to try to find all the
         for episode in episodes_list:
@@ -237,7 +241,11 @@ class ILDataset(Dataset):
             for transition in transitions_list:
 
                 with np.load(transition) as sample:
-                    float_dicts.append(sample)
+                    img = sample['img']
+                    multimodal_data = sample['multimodal_data']
+                    action = sample['action']
+                    
+                float_dicts.append({"img": img, "multimodal_data": multimodal_data, "action": action})
                 
                 sensor_data_names.append(os.path.join(episode.split('/')[-1], transition))
                 count_added_measurements += 1

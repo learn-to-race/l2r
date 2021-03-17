@@ -10,27 +10,29 @@ il_kwargs:
   update_after: 3000
   num_updates: 5
   num_episodes: 10
+  n_epochs: 100
+  eval_every: 10
   max_ep_len: 5000
   encoder_path: './baselines/models/vae-144hw-32l-lvms.pt'
   latent_dims: 32
   im_w: 144
   im_h: 144
   checkpoint: './baselines/checkpoints/lvms/il_episode_1000.pt'
-  inference_only: True
+  inference_only: False
   save_path: './results/il/'
   TRAIN_BS: 64
   VAL_BS: 128
-  CPU: 8
+  CPU: 4
   GPU: 1
   PIN: TRUE
   DATASET:
       LOCATION: "/home/jmf1/data/l2r_expert_demonstrations"
       NAME: "thruxton"
       LOOKAHEAD: 1
-      PRELOAD_NAME: "il_thruxton" 
       SPLIT:
           TRAIN: "train"
           VAL: "val"
+      PRELOAD_NAME: "il_thruxton"
 
 env_kwargs:
   multimodal: True
