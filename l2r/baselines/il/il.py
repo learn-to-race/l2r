@@ -8,8 +8,9 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
+from torchvision import transforms
 
-import pdb as pdb
+import ipdb as pdb
 
 from core.templates import AbstractAgent
 from envs.env import RacingEnv
@@ -27,7 +28,9 @@ class ILAgent(AbstractAgent):
     """
     def __init__(self, model_params, training_kwargs):
         self.num_episodes = training_kwargs['num_episodes']
-        
+        self.normalize = transforms.Normalize((125.61341389, 118.31236235, 114.9765454), 
+                (68.98788514, 64.9655252, 64.56587821))
+
         self.model = CILModel(model_params)    
         # self.model = self.model.to(DEVICE)
 
@@ -61,8 +64,6 @@ class ILAgent(AbstractAgent):
                 
                 imgs = imgs.transpose(2, 3) # B x 3 x 512 x 384
 
-                pdb.set_trace()
-
                 # The output(branches) is a list of 5 branches results, each branch is with size [120,3]
                 self.model.zero_grad()
                 
@@ -75,7 +76,7 @@ class ILAgent(AbstractAgent):
             
             if (i+1)%eval_every == 0:
                 print("Eval / save")
-                self.eval()
+                #self.eval()
                 self.save_model(i)
 
     def eval(self):
@@ -95,6 +96,8 @@ class ILAgent(AbstractAgent):
             while not done:
                 (sensor, img) = obs
                 img = torch.FloatTensor(img).unsqueeze(0).transpose(1, 3) # 1 x 3 x 512 x 384 
+                img = self.normalize(img)
+
                 action = model_cpu(img, torch.FloatTensor(sensor).unsqueeze(0))
                 action = torch.clamp(action, -1, 1)
                 obs, reward, done, info = self.env.step(action.squeeze(0).detach().numpy())

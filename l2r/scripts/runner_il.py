@@ -34,7 +34,7 @@ def main(params):
     '''
     agent.create_env(env_kwargs, sim_kwargs)
     ## Test evaluation
-    agent.eval()
+    #agent.eval()
     
     train = ILDataset(il_kwargs['DATASET']['LOCATION'], 
             il_kwargs['DATASET']['NAME'], 
@@ -94,9 +94,11 @@ def main(params):
         # train agent with imitation learning
         agent.il_train(train, **il_kwargs)
     
-    # run agent on the track
-    print("Running IL agent")
-    agent.eval(env=env, **il_kwargs)
+    else:
+    
+        # run agent on the track
+        print("Running IL agent")
+        agent.eval(env=env, **il_kwargs)
 
 if __name__ == "__main__":
     #argparser = argparse.ArgumentParser(description=__doc__)

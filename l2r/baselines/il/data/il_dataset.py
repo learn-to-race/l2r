@@ -43,8 +43,9 @@ class ILDataset(Dataset):
         self.transform_op = transforms.Compose([
 #             transforms.Resize(256),
              transforms.ToTensor(),
-             transforms.Normalize(mean=[0.485, 0.456, 0.406], 
-                                  std=[0.229, 0.224, 0.225])
+             #transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+             transforms.Normalize(mean=[125.61341389, 118.31236235, 114.9765454], 
+                 std=[68.98788514, 64.9655252, 64.56587821])
             ])
 
     def __len__(self):
