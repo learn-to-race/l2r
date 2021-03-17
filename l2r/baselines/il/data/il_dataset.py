@@ -10,7 +10,8 @@ import copy
 import math
 import os
 from .utils import sort_nicely
-import pdb as pdb
+import ipdb as pdb
+from PIL import Image
 
 # Normalize speed to 0-1
 SPEED_FACTOR = 12.0
@@ -40,10 +41,11 @@ class ILDataset(Dataset):
             self.sensor_data_names, self.measurements = self._preload_files(self.data_dir) 
 
         self.transform_op = transforms.Compose([
-             transforms.Resize(256),
+#             transforms.Resize(256),
              transforms.ToTensor(),
-             transforms.Normalize(mean=[0.485, 0.456, 0.406], 
-                                  std=[0.229, 0.224, 0.225])
+             #transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+             transforms.Normalize(mean=[125.61341389, 118.31236235, 114.9765454], 
+                 std=[68.98788514, 64.9655252, 64.56587821])
             ])
 
     def __len__(self):
@@ -53,8 +55,6 @@ class ILDataset(Dataset):
        
         #sample_path = os.path.join(self.root_dir, self.data_dir, self.sensor_data_names[idx])
         
-        #input_image = Image.open(img_path)
-        #image_tensor = self.transform_op(input_image)
         
         measurement = self.measurements[idx]
 
@@ -63,8 +63,9 @@ class ILDataset(Dataset):
 
         #mappings: http://ec2-3-90-183-136.compute-1.amazonaws.com/multimodal.html#environment-observations
 
-        image = measurement['img']
-        #image = self.transform_op(measurement['img'])
+        input_image = Image.fromarray(measurement['img'])
+        image_tensor = self.transform_op(input_image)
+        image = image_tensor
 
 #        steering = measurement['multimodal_data'][0]
 #

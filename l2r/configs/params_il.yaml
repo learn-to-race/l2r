@@ -17,8 +17,8 @@ il_kwargs:
   latent_dims: 32
   im_w: 144
   im_h: 144
-  checkpoint: './baselines/checkpoints/lvms/il_episode_1000.pt'
-  inference_only: False
+  checkpoint: 'il_episode_19.pt'
+  inference_only: True
   save_path: './results/il/'
   TRAIN_BS: 64
   VAL_BS: 128
