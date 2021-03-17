@@ -68,7 +68,9 @@ class ILAgent(AbstractAgent):
                 self.optimizer.step()
             
             if (i+1)%eval_every == 0:
-                self.eval()
+                #self.eval()
+                self.save_model()
+
 
     def eval(self):
         """
@@ -78,18 +80,30 @@ class ILAgent(AbstractAgent):
 
         for e in range(self.num_episodes):
             print('='*10+f' Episode {e+1} of {self.num_episodes} '+'='*10)
-            ep_reward, ep_timestep = 0, 0
+            ep_reward, ep_timestep, best_ep_reward = 0, 0, 0
             state, done = self.env.reset(), False
 
             while not done:
-                action = model_cpu.select_action()
+                action = model_cpu(state, a)
                 state, reward, done, info = self.env.step(action)
                 ep_reward += reward
                 ep_timestep += 1
+            
+            # Save if best (or periodically)
+                if (ep_reward > best_ep_reward and ep_reward > 250):
+                    print(f'New best episode reward of {round(ep_reward,1)}!')
+                    best_ep_reward = ep_reward
+#                    path_name = f'{save_path}il_episode_{e}.pt'
+#                    torch.save(self.model, path_name)
 
             print(f'Completed episode with total reward: {ep_reward}')
             print(f'Episode info: {info}\n')
 
+
+    def save_model(self):
+
+            path_name = f'{save_path}il_episode_{e}.pt'
+            torch.save(self.model, path_name)
     
     def create_env(self, env_kwargs, sim_kwargs):
         """Instantiate a racing environment
