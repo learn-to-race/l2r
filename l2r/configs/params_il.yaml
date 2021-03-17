@@ -24,7 +24,7 @@ il_kwargs:
   GPU: 1
   PIN: TRUE
   DATASET:
-      LOCATION: "/home/bingqinc/l2r_expert_demonstrations"
+      LOCATION: "/home/jmf1/data/l2r_expert_demonstrations"
       NAME: "thruxton"
       SPLIT:
           TRAIN: "train"
@@ -60,7 +60,8 @@ env_kwargs:
     default: True
 
 sim_kwargs:
-  racetrack: 'VegasNorthRoad' # ['VegasNorthRoad', 'Thruxton']
+  racetrack: 'Thruxton' # ['VegasNorthRoad', 'Thruxton']
+  vehicle: 1
   active_sensors:
     - ImuOxtsSensor
     - CameraFrontRGB
