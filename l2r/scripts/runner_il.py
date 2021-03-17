@@ -11,7 +11,7 @@
 import torch
 from torch.utils.data import DataLoader
 import os, sys, argparse, json
-import ipdb as pdb
+import pdb as pdb
 from ruamel.yaml import YAML
 
 from baselines.il.il import ILAgent
@@ -27,13 +27,15 @@ def main(params):
     # instantiate agent
     agent = ILAgent(model_params, il_kwargs)
     '''
+    ## Test I/O
     imgs = torch.zeros(32, 3, 512, 384)
     others = torch.zeros(32, 30)
     out = agent.select_action(imgs, others)
-    pdb.set_trace()
     '''
     agent.create_env(env_kwargs, sim_kwargs)
-
+    ## Test evaluation
+    agent.eval()
+    
     train = ILDataset(il_kwargs['DATASET']['LOCATION'], 
             il_kwargs['DATASET']['NAME'], 
             il_kwargs['DATASET']['SPLIT']['TRAIN'],

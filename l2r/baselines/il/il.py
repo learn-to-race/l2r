@@ -9,7 +9,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 
-import ipdb as pdb
+import pdb as pdb
 
 from core.templates import AbstractAgent
 from envs.env import RacingEnv
@@ -27,7 +27,10 @@ class ILAgent(AbstractAgent):
     """
     def __init__(self, model_params, training_kwargs):
         self.num_episodes = training_kwargs['num_episodes']
+        
         self.model = CILModel(model_params)    
+        # self.model = self.model.to(DEVICE)
+
         self.optimizer = optim.Adam(self.model.parameters(), lr=training_kwargs['learning_rate'])
         self.mseLoss = nn.MSELoss()
         self.model = self.model.to(DEVICE)
@@ -56,7 +59,9 @@ class ILAgent(AbstractAgent):
                 imgs, sensors, target = imgs.type(torch.FloatTensor).to(DEVICE), \
                         sensors.to(DEVICE), target.to(DEVICE) 
                 
-                #imgs = imgs.transpose(1, 3) # B x 3 x 512 x 384 
+                imgs = imgs.transpose(2, 3) # B x 3 x 512 x 384
+
+                pdb.set_trace()
 
                 # The output(branches) is a list of 5 branches results, each branch is with size [120,3]
                 self.model.zero_grad()
@@ -70,24 +75,29 @@ class ILAgent(AbstractAgent):
             
             if (i+1)%eval_every == 0:
                 print("Eval / save")
-                #self.eval()
-                self.save_model(episode)
-
+                self.eval()
+                self.save_model(i)
 
     def eval(self):
         """
         evaluate the agent
         """
+        print("Model evaluation")
+
         model_cpu = self.model.cpu()
 
         for e in range(self.num_episodes):
             print('='*10+f' Episode {e+1} of {self.num_episodes} '+'='*10)
             ep_reward, ep_timestep, best_ep_reward = 0, 0, 0
-            state, done = self.env.reset(), False
+            obs = self.env.reset()
+            obs, reward, done, info = self.env.step([0, 1])
 
             while not done:
-                action = model_cpu(state, a)
-                state, reward, done, info = self.env.step(action)
+                (sensor, img) = obs
+                img = torch.FloatTensor(img).unsqueeze(0).transpose(1, 3) # 1 x 3 x 512 x 384 
+                action = model_cpu(img, torch.FloatTensor(sensor).unsqueeze(0))
+                action = torch.clamp(action, -1, 1)
+                obs, reward, done, info = self.env.step(action.squeeze(0).detach().numpy())
                 ep_reward += reward
                 ep_timestep += 1
             
@@ -95,17 +105,17 @@ class ILAgent(AbstractAgent):
                 if (ep_reward > best_ep_reward and ep_reward > 250):
                     print(f'New best episode reward of {round(ep_reward,1)}!')
                     best_ep_reward = ep_reward
-#                    path_name = f'{save_path}il_episode_{e}.pt'
-#                    torch.save(self.model, path_name)
+                    path_name = f'{self.save_path}il_episode_{e}_best.pt'
+                    torch.save(self.model.state_dict(), path_name)
 
             print(f'Completed episode with total reward: {ep_reward}')
             print(f'Episode info: {info}\n')
 
 
-    def save_model(self, episode):
-            path_name = f'{self.save_path}/il_episode_{episode}.pt'
-            torch.save(self.model.state_dict(), path_name)
-    
+    def save_model(self, e):
+        path_name = f'{self.save_path}il_episode_{e}.pt'
+        torch.save(self.model.state_dict(), path_name)
+
     def create_env(self, env_kwargs, sim_kwargs):
         """Instantiate a racing environment
 

@@ -36,9 +36,9 @@ il_kwargs:
 
 env_kwargs:
   multimodal: True
-  max_timesteps: 500
+  max_timesteps: 2000
   obs_delay: 0.1
-  not_moving_timeout: 50
+  not_moving_timeout: 20
   reward_pol: 'default'
   reward_kwargs:
     oob_penalty: 5.0
