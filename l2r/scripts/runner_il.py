@@ -24,6 +24,7 @@ def main(params):
 
     # instantiate agent
     agent = ILAgent(model_params, il_kwargs)
+    print("created the agent")
     agent.create_env(env_kwargs, sim_kwargs)
 
     train = ILDataset(il_kwargs['DATASET']['LOCATION'], 
