@@ -38,6 +38,11 @@ class ILAgent(AbstractAgent):
         self.mseLoss = nn.MSELoss()
         self.model = self.model.to(DEVICE)
         self.save_path = training_kwargs['save_path']
+        self.checkpoint_name = training_kwargs['checkpoint']
+
+        if training_kwargs['inference_only']:
+            self.model.eval()
+
 
     def select_action(self, x, a):
         """Select an action
@@ -51,6 +56,9 @@ class ILAgent(AbstractAgent):
         eval_every = il_kwargs['eval_every']
 
         for i in range(n_epochs):
+
+            print('Training: epoch {}'.format(i))
+
             for imgs, sensors, target in data_loader:
                 '''
                 Input for NN:
@@ -59,10 +67,10 @@ class ILAgent(AbstractAgent):
                 Target: n x 2 
                 '''
 
-                imgs, sensors, target = imgs.type(torch.FloatTensor).to(DEVICE), \
+                imgs, sensors, target = imgs.transpose(2,3).type(torch.FloatTensor).to(DEVICE), \
                         sensors.to(DEVICE), target.to(DEVICE) 
                 
-                imgs = imgs.transpose(2, 3) # B x 3 x 512 x 384
+                assert imgs.shape == torch.Size([imgs.shape[0], 3, 512, 384]), "FATAL: unexpectd image shape"
 
                 # The output(branches) is a list of 5 branches results, each branch is with size [120,3]
                 self.model.zero_grad()
@@ -75,7 +83,7 @@ class ILAgent(AbstractAgent):
                 self.optimizer.step()
             
             if (i+1)%eval_every == 0:
-                print("Eval / save")
+                print('Eval / save, eval_every: {}'.format(eval_every))
                 #self.eval()
                 self.save_model(i)
 
@@ -118,6 +126,10 @@ class ILAgent(AbstractAgent):
     def save_model(self, e):
         path_name = f'{self.save_path}il_episode_{e}.pt'
         torch.save(self.model.state_dict(), path_name)
+
+    def load_model(self):
+        path = f'{self.save_path}{self.checkpoint_name}'
+        self.model.load_state_dict(torch.load(path))
 
     def create_env(self, env_kwargs, sim_kwargs):
         """Instantiate a racing environment

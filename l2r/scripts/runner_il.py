@@ -33,31 +33,7 @@ def main(params):
     out = agent.select_action(imgs, others)
     '''
     agent.create_env(env_kwargs, sim_kwargs)
-    ## Test evaluation
-    #agent.eval()
     
-    train = ILDataset(il_kwargs['DATASET']['LOCATION'], 
-            il_kwargs['DATASET']['NAME'], 
-            il_kwargs['DATASET']['SPLIT']['TRAIN'],
-            il_kwargs['DATASET']['LOOKAHEAD'],
-            il_kwargs['DATASET']['PRELOAD_NAME'])
-
-    val = ILDataset(il_kwargs['DATASET']['LOCATION'], 
-            il_kwargs['DATASET']['NAME'], 
-            il_kwargs['DATASET']['SPLIT']['VAL'],
-            il_kwargs['DATASET']['LOOKAHEAD'],
-            il_kwargs['DATASET']['PRELOAD_NAME'])
-
-    train = DataLoader(train, params['il_kwargs']['TRAIN_BS'], 
-                       num_workers=params['il_kwargs']['CPU'], 
-                       pin_memory=params['il_kwargs']['PIN'],
-                       shuffle=True)
-
-    val = DataLoader(val, batch_size=params['il_kwargs']['VAL_BS'], 
-                     num_workers=params['il_kwargs']['CPU'], 
-                     pin_memory=params['il_kwargs']['PIN'],
-                     shuffle=False)
-
     env = RacingEnv(
         max_timesteps=env_kwargs['max_timesteps'],
         obs_delay=env_kwargs['obs_delay'],
@@ -90,6 +66,29 @@ def main(params):
 
     if not il_kwargs['inference_only']:
 
+        train = ILDataset(il_kwargs['DATASET']['LOCATION'], 
+                il_kwargs['DATASET']['NAME'], 
+                il_kwargs['DATASET']['SPLIT']['TRAIN'],
+                il_kwargs['DATASET']['LOOKAHEAD'],
+                il_kwargs['DATASET']['PRELOAD_NAME'])
+
+        val = ILDataset(il_kwargs['DATASET']['LOCATION'], 
+                il_kwargs['DATASET']['NAME'], 
+                il_kwargs['DATASET']['SPLIT']['VAL'],
+                il_kwargs['DATASET']['LOOKAHEAD'],
+                il_kwargs['DATASET']['PRELOAD_NAME'])
+
+        train = DataLoader(train, params['il_kwargs']['TRAIN_BS'], 
+                           num_workers=params['il_kwargs']['CPU'], 
+                           pin_memory=params['il_kwargs']['PIN'],
+                           shuffle=True)
+
+        val = DataLoader(val, batch_size=params['il_kwargs']['VAL_BS'], 
+                         num_workers=params['il_kwargs']['CPU'], 
+                         pin_memory=params['il_kwargs']['PIN'],
+                         shuffle=False)
+
+
         print("Training IL agent")
         # train agent with imitation learning
         agent.il_train(train, **il_kwargs)
@@ -98,7 +97,8 @@ def main(params):
     
         # run agent on the track
         print("Running IL agent")
-        agent.eval(env=env, **il_kwargs)
+        agent.load_model()
+        agent.eval()
 
 if __name__ == "__main__":
     #argparser = argparse.ArgumentParser(description=__doc__)
