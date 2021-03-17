@@ -33,6 +33,11 @@ class ILAgent(AbstractAgent):
 
         self.optimizer = optim.Adam(self.model.parameters(), lr=training_kwargs['learning_rate'])
         self.mseLoss = nn.MSELoss()
+<<<<<<< HEAD
+=======
+        self.model = self.model.to(DEVICE)
+        self.save_path = training_kwargs['save_path']
+>>>>>>> bc48642d85a9c430c93cab44bcc7b96c22afae29
 
     def select_action(self, x, a):
         """Select an action
@@ -70,8 +75,8 @@ class ILAgent(AbstractAgent):
                 self.optimizer.step()
             
             if (i+1)%eval_every == 0:
-                self.eval()
-                self.save_model()
+                # self.eval()
+                self.save_model(i)
 
     def eval(self):
         """
@@ -86,7 +91,6 @@ class ILAgent(AbstractAgent):
             obs, reward, done, info = self.env.step([0, 1])
 
             while not done:
-                #imgs, sensors = self.unpack_state(obs) 
                 (sensor, img) = obs
                 img = torch.FloatTensor(img).unsqueeze(0).transpose(1, 3) # 1 x 3 x 512 x 384 
                 action = model_cpu(img, torch.FloatTensor(sensor).unsqueeze(0))
@@ -107,10 +111,11 @@ class ILAgent(AbstractAgent):
             print(f'Episode info: {info}\n')
 
 
-    def save_model(self):
+    def save_model(self, e):
         path_name = f'{save_path}il_episode_{e}.pt'
         torch.save(self.model, path_name)
-    
+
+
     def create_env(self, env_kwargs, sim_kwargs):
         """Instantiate a racing environment
 
