@@ -33,12 +33,7 @@ class ILAgent(AbstractAgent):
 
         self.optimizer = optim.Adam(self.model.parameters(), lr=training_kwargs['learning_rate'])
         self.mseLoss = nn.MSELoss()
-<<<<<<< HEAD
-=======
-        self.model = self.model.to(DEVICE)
-        self.save_path = training_kwargs['save_path']
->>>>>>> bc48642d85a9c430c93cab44bcc7b96c22afae29
-
+        
     def select_action(self, x, a):
         """Select an action
         """
@@ -93,8 +88,9 @@ class ILAgent(AbstractAgent):
             while not done:
                 (sensor, img) = obs
                 img = torch.FloatTensor(img).unsqueeze(0).transpose(1, 3) # 1 x 3 x 512 x 384 
+                pdb.set_trace() 
                 action = model_cpu(img, torch.FloatTensor(sensor).unsqueeze(0))
-                #pdb.set_trace() 
+                
                 action = torch.clamp(action, -1, 1)
                 obs, reward, done, info = self.env.step(action.squeeze(0).detach().numpy())
                 ep_reward += reward
