@@ -12,23 +12,19 @@ import os, sys, argparse
 from torch.utils.data import DataLoader
 from ruamel.yaml import YAML
 
+
+from baselines.il.il import ILAgent
 from baselines.il.data.il_dataset import ILDataset
-from baselines.il import ILAgent
 
-def main(args):
-    assert args.exp is not None, "FATAL: "+__file__+": Specify an experiment config file:\npython scripts/runner_il.py configs/params_il.yaml" 
-
-    # load configuration file
-    yaml = YAML()
-    params = yaml.load(open(args.exp))
-
-    print("######### Configuration #########")
-    print(yaml.dump(params, default_flow_style=False))
-    print("#################################")
-
+def main(params):
     env_kwargs = params['env_kwargs']
     sim_kwargs = params['sim_kwargs']
     il_kwargs = params['il_kwargs']
+    model_params = params['MODEL_CONFIGURATION']
+
+    # instantiate agent
+    agent = ILAgent(model_params, il_kwargs)
+    agent.create_env(env_kwargs, sim_kwargs)
 
     train = ILDataset(il_kwargs['DATASET']['LOCATION'], 
             il_kwargs['DATASET']['NAME'], 
@@ -78,10 +74,6 @@ def main(args):
         json = json.dumps(params)
         f.write(json)
 
-    # instantiate agent
-    agent = ILAgent(training_kwargs)
-    agent.create_env(env_kwargs, sim_kwargs)
-
     if il_kwargs['il_train_first']:
 
         # train agent with imitation learning
@@ -91,7 +83,9 @@ def main(args):
     agent.run(env=env, **il_kwargs)
 
 if __name__ == "__main__":
-    argparser = argparse.ArgumentParser(description=__doc__)
-    argparser.add_argument('-e', '--exp', type=str)
-    args = argparser.parse_args()
-    main(args)
+    #argparser = argparse.ArgumentParser(description=__doc__)
+    #argparser.add_argument('-e', '--exp', type=str)
+    #args = argparser.parse_args()
+    yaml = YAML()
+    params = yaml.load(open(sys.argv[1]))
+    main(params)

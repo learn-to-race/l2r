@@ -74,3 +74,32 @@ sim_kwargs:
     Width: 512
     Height: 384
     bAutoAdvertise: True
+
+# From https://github.com/felipecode/coiltraine/blob/master/configs/sample/coil_icra.yaml
+MODEL_CONFIGURATION:  # Based on the MODEL_TYPE, we specify the structure
+  perception:  # The module that process the image input, it ouput the number of classes
+    conv:
+      channels: [32, 32, 64, 64, 128, 128, 256, 256]
+      kernels: [5, 3, 3, 3, 3, 3, 3, 3]
+      strides: [2, 1, 2, 1, 2, 1, 1, 1]
+      dropouts: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    fc:
+      neurons: [512, 512]
+      dropouts: [0.5, 0.5]
+  measurements:  # The module the process the input float data, in this case speed_input
+    fc:  # Easy to configure fully connected layer
+      neurons: [128, 128] # Each position add a new layer with the specified number of neurons
+      dropouts: [0.0, 0.0]
+  join:  # The module that joins both the measurements and the perception
+    fc:
+      neurons: [512]
+      dropouts: [0.0]
+  speed_branch:  # The prediction branch speed branch
+    fc:
+      neurons: [256, 256]
+      dropouts: [0.0, 0.5]
+  branches:  # The output branches for the different possible directions ( Straight, Left, Right, None)
+    number_of_branches: 4
+    fc:
+      neurons: [256, 256]
+      dropouts: [0.0, 0.5]

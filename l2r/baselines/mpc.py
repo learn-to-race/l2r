@@ -131,6 +131,7 @@ class MPCAgent(AbstractAgent):
         :return: array of shape (4, n_targets)
         :rtype: numpy array
         """
+        ##TODO: Interval between waypoint have to change as well
         target_idxs = [(idx + step_size*t) % self.raceline_length for t in range(1, 1+n_targets)]
         target_x = [self.race_x[i] for i in target_idxs]
         target_y = [self.race_y[i] for i in target_idxs]
