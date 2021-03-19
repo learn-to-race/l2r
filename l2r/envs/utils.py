@@ -49,6 +49,10 @@ GEAR_REQ_RANGE = 4
 MIN_ACC_REQ = -16.
 MAX_ACC_REQ = 6.
 
+# Steering request boundaries
+MIN_STEER_REQ = -1.
+MAX_STEER_REQ = 1.
+
 
 class InvalidActionException(Exception):
 	pass
@@ -57,18 +61,12 @@ class ActionInterface(object):
 	"""Action send interface. This class communicates with the simulator and
 	sends action requests from the agent.
 
-	:param ip: ip address
-	:type ip: str, optional
-	:param port: port to bind to
-	:type port: int, optional
-	:param max_steer: maximum steering request to use, bounded by 1.
-	:type max_steer: float, optional
-	:param min_steer: minimum steering request to use, bounded by -1.
-	:type min_steer: float, optional
-	:param max_accel: maximum acceleration request to use, bounded by 6.
-	:type max_accel: float, optional
-	:param min_accel: minimum acceleration request to use, bounded by -16.
-	:type min_accel: float, optional
+	:param str ip: ip address
+	:param int port: port to bind to
+	:param float max_steer: maximum steering request, bounded by 1.
+	:param float min_steer: minimum steering request, bounded by -1.
+	:param flaot max_accel: maximum acceleration request, bounded by 6.
+	:param float min_accel: minimum acceleration request, bounded by -16.
 	"""
 	def __init__(self, ip='', port=7077, max_steer=1., min_steer=-1.,
 		         max_accel=MAX_ACC_REQ, min_accel=MIN_ACC_REQ):
@@ -78,7 +76,7 @@ class ActionInterface(object):
 		self.min_steer = min_steer
 		self.max_accel = max_accel
 		self.min_accel = min_accel
-		if max_steer > 1. or min_steer < -1.:
+		if max_steer > MAX_STEER_REQ or min_steer < MIN_ACC_REQ:
 			raise InvalidActionException('Invalid steering boundaries')
 		if max_accel > MAX_ACC_REQ or min_accel < MIN_ACC_REQ:
 			raise InvalidActionException('Invalid acceleration boundaries')
@@ -86,8 +84,8 @@ class ActionInterface(object):
 	def act(self, action):
 		"""Send action request to the simulator.
 
-		:param action: action to take including the steering and acceleration
-		:type action: array of shape (2,)
+		:param array-like action: action to send to the simulator in the form: 
+		  [steering, acceleration], expected to be in the range (-1., 1.)
 		"""
 		self._check_action(action)
 		steer, acc = self._scale_action(action)
@@ -105,8 +103,8 @@ class ActionInterface(object):
 	def _check_action(self, action):
 		"""Check that the action is valid with reference to the action space.
 
-		:param action: action to take including the steering and acceleration
-		:type action: array of shape (2,)
+		:param array-like action: action to send to the simulator in the form: 
+		  [steering, acceleration], expected to be in the range (-1., 1.)
 		"""
 		if action[0] < -1.0 or action[0] > 1.0:
 			raise InvalidActionException('Invalid steering request')
@@ -116,26 +114,23 @@ class ActionInterface(object):
 
 
 class PoseInterface(AbstractInterface):
-	"""Receives pose, and other data, from the simulator. The data received is
-	in the following format:
+	"""Receives sensor data from the simulator. The data received is in the
+	following format:
 
-	[0,1,2] steering, gear, mode
-	[3,4,5] velocity
-	[6,7,8] acceleration
-	[9,10,11] angular velocity
-	[12,13,14] yaw, pitch, roll
-	[15,16,17] location coordinates in the format (y, x, z)
-	[18,19,20 21] rpm (by wheel)
-	[22,23,24,25] brake (by wheel)
+	[0,1,2] steering, gear, mode \n
+	[3,4,5] \n
+	[6,7,8] acceleration \n
+	[9,10,11] angular velocity \n
+	[12,13,14] yaw, pitch, roll \n 
+	[15,16,17] location coordinates in the format (y, x, z) \n
+	[18,19,20 21] rpm (by wheel) \n 
+	[22,23,24,25] brake (by wheel) \n
 	[26,27,28,29] torq (by wheel)
 
-	:param ip: ip address
-	:type ip: str, optional
-	:param port: port to bind to
-	:type port: int, optional
-	:param data_elems: number of elements to listen for, elements are assumed
-	  to be of type float
-	:type data_elems: int, optional
+	:param str ip: ip address
+	:param int port: port to bind to
+	:param int data_elems: number of elements to listen for, elements are
+	  assumed to be of type float
 	"""
 	def __init__(self, ip='', port=7078, data_elems=30):
 		addr = (ip, port)
@@ -177,10 +172,8 @@ class PoseInterface(AbstractInterface):
 class CameraInterface(AbstractInterface):
 	"""Receives images from the simulator.
 
-	:param ip: ip address to listen on
-	:type ip: str, optional
-	:param port: system port
-	:type port: int, optional
+	:param str ip: ip address to listen on
+	:param int port: system port
 	"""
 	def __init__(self, ip='tcp://127.0.0.1', port=8008):
 		ctx = zmq.Context()
@@ -193,9 +186,8 @@ class CameraInterface(AbstractInterface):
 	def start(self, img_dims):
 		"""Starts a thread to listen for images on.
 
-		:param img_dims: dimensions of the image to listen for in the form:
-		  (width, height, depth)
-		:type img_dims: tuple of ints
+		:param tuple img_dims: dimensions of the image to listen for in the
+		  form: (width, height, depth)
 		"""
 		self.img_dims = (img_dims[1], img_dims[0], img_dims[2])
 		self.reset()
@@ -206,7 +198,7 @@ class CameraInterface(AbstractInterface):
 		"""Return the most recent image(s) received from the simulator.
 
 		:return: RGB image of shape (height, width, 3)
-		:rtype: numpy array
+		:rtype: numpy.array
 		"""
 		return copy.deepcopy(self.img)
 
@@ -250,9 +242,8 @@ class CameraInterface(AbstractInterface):
 class GeoLocation(object):
 	"""Global to local coordinate conversion class.
 
-	:param ref_point: local reference point which serves as the local origin in
-	  the form (east, north, up)
-	:type ref_point: tuple of floats
+	:param tuple ref_point: local reference point which serves as the local
+	  origin in the form (east, north, up)
 	"""
 	def __init__(self, ref_point):
 		self.ref_point = ref_point
@@ -265,16 +256,13 @@ class GeoLocation(object):
 		"""Get the corner's of the vehicle. Assumes the vehicle is perfectly
 		rectangular.
 
-		:param center: the (x,y) coordinates of the center of the vehicle
-		:type center: tuple of floats
-		:param angle: heading of the vehicle in radians
-		:type angle: float
-		:param dimensions: [height, width] of the vehicle in meters
-		:type dimesions: list
+		:param tuple center: the (x,y) coordinates of the center of the vehicle
+		:param float angle: heading of the vehicle in radians
+		:param list dimensions: [height, width] of the vehicle in meters
 
 		:return: array of (x,y) coordinates in the following order: 
 		  Top_right, Top_left, Bottom_right, Bottom_left
-		:rtype: numpy array
+		:rtype: numpy.array
 		"""
 		length, width = dimensions
 
@@ -305,10 +293,10 @@ class GeoLocation(object):
 	def convert_to_ENU(self, center):
 		"""Convert latitude/longitude coordinates to ENU coordinates.
 
-		:param center: latitude/longitude coordinates of vehicle
-		:type center: list
-		:return: ENU coordinates of the center of the vehicle
-		:rtype: numpy array [East, North, Up]
+		:param list center: latitude/longitude coordinates of vehicle
+		:return: ENU coordinates of the center of the vehicle in the form:
+		  [East, North, Up]
+		:rtype: numpy.array
 		"""
 		ref_x, ref_y, ref_z = self.ref_point
 		x, y, z = center

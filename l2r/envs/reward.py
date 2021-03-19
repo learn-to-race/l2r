@@ -4,7 +4,7 @@
 #                                                                           #
 # Description:                                                              # 
 #    Dense incentive policy based off Super-Human Performance in Gran       #
-#    Turismo Sport Using Deep Reinforcement Learning.                       #
+#    Turismo Sport Using Deep Reinforcement Learning                        #
 #    https://arxiv.org/abs/2008.07971                                       #
 # ========================================================================= #
 
@@ -23,11 +23,9 @@ class GranTurismo(AbstractReward):
 	is a dense reward function that rewards the agent for progressing down the
 	track and penalizes the agent for going out-of-bounds.
 
-	:param oob_penalty: penalty factor for going out-of-bounds where the total
-	  penalty is this factor times the velocity of the vehicle
-	:type oob_penalty: float, optional
-	:param min_oob_penalty: minimum penalty for going out-of-bounds
-	:type min_oob_penalty: float, optional
+	:param float oob_penalty: penalty factor for going out-of-bounds where the
+	  total penalty is this factor times the velocity of the vehicle
+	:param float min_oob_penalty: minimum penalty for going out-of-bounds
 	"""
 	def __init__(self, oob_penalty=5.0, min_oob_penalty=25.0):
 		self.oob_penalty = oob_penalty
@@ -43,8 +41,8 @@ class GranTurismo(AbstractReward):
 		:type oob_flag: boolean, optional
 		"""
 		(pose_data, race_idx) = state
-		velocity = np.linalg.norm(pose_data[VELOCITY_IDX_LOW:VELOCITY_IDX_HIGH])
-		oob_reward = self._reward_oob(velocity, oob_flag)
+		v = np.linalg.norm(pose_data[VELOCITY_IDX_LOW:VELOCITY_IDX_HIGH])
+		oob_reward = self._reward_oob(v, oob_flag)
 		progress_reward = self._reward_progress(race_idx)
 		return oob_reward + progress_reward
 
@@ -56,24 +54,21 @@ class GranTurismo(AbstractReward):
 	def _reward_oob(self, velocity, oob_flag):
 		"""Determine the reward for going out-of-bounds.
 
-		:param velocity: magnitude of the velocity of the vehicle
-		:type velocity: float
-		:param oob_flag: true if out-of-bounds, otherwise false
-		:type oob_flag: boolean
+		:param float velocity: magnitude of the velocity of the vehicle
+		:param bool oob_flag: true if out-of-bounds, otherwise false
 		:return: reward for going out-of-bounds
 		:rtype: float
 		"""
 		if not oob_flag:
 			return 0.0
 
-		return min(-1.0*self.min_oob_penalty, -1.0*self.oob_penalty * velocity)
+		return min(-1.0*self.min_oob_penalty, -1.0*self.oob_penalty*velocity)
 
 	def _reward_progress(self, race_idx):
 		"""Reward for progressing down the track. This is simply a reward of 1
 		for each index the vehicle has progressed since the previous step.
 
-		:param race_idx: nearest index on the centerline of the racetrack
-		:type race_idx: int
+		:param int race_idx: nearest index on the centerline of the racetrack
 		:return: reward for progressing down the track
 		:rtype: float
 		"""
@@ -89,4 +84,3 @@ class GranTurismo(AbstractReward):
 
 		self.prior_idx = race_idx
 		return float(rwd)
-
