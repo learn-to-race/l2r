@@ -12,13 +12,12 @@ from envs.env import RacingEnv
 class RandomActionAgent(AbstractAgent):
 	"""Reinforcement learning agent that simply chooses random actions.
 
-	:param training_kwargs: training keyword arguments
-	:type training_kwargs: dict
+	:param dict training_kwargs: training keyword arguments
 	"""
 	def __init__(self, training_kwargs):
 		self.num_episodes = training_kwargs['num_episodes']
 
-	def train(self):
+	def race(self):
 		"""Demonstrative training method. 
 		"""
 		for e in range(self.num_episodes):
@@ -46,10 +45,8 @@ class RandomActionAgent(AbstractAgent):
 	def create_env(self, env_kwargs, sim_kwargs):
 		"""Instantiate a racing environment
 
-		:param env_kwargs: environment keyword arguments
-		:type env_kwargs: dict
-		:param sim_kwargs: simulator setting keyword arguments
-		:type sim_kwargs: dict
+		:param dict env_kwargs: environment keyword arguments
+		:param dict sim_kwargs: simulator setting keyword arguments
 		"""
 		self.env = RacingEnv(
 			max_timesteps=env_kwargs['max_timesteps'],
