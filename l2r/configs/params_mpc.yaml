@@ -2,7 +2,11 @@
 
 mpc_kwargs:
   num_episodes: 1
-  save_path: './results/mpc/'
+  velocity_target: 12.5 # m/s
+  step_size: 10 # number of indicies b/w waypoints
+  save_transitions: False
+  save_path: False
+  plot: False
 
 env_kwargs:
   multimodal: True

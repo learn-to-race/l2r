@@ -1,21 +1,20 @@
 # ========================================================================= #
 # Filename:                                                                 #
-#    runner.py                                                              #
+#    runner_mpc.py                                                          #
 #                                                                           #
 # Description:                                                              # 
-#    Convenience script to load parameters and train a model.               #
+#    Convenience script to load parameters and run a MPC agent              #
 # ========================================================================= #
 
 import json
 import os
 import sys
 
-sys.path.insert(0, "../")
-
 from ruamel.yaml import YAML
 
-from baselines.mpc import MPCAgent
+from baselines.control.mpc import MPCAgent
 
+sys.path.insert(0, "../")
     
 if __name__ == "__main__":
 
@@ -27,15 +26,7 @@ if __name__ == "__main__":
     sim_kwargs = params['sim_kwargs']
     mpc_kwargs = params['mpc_kwargs']
 
-    # create results directory
-    save_path = mpc_kwargs['save_path']
-    if not os.path.exists(save_path):
-        os.makedirs(save_path)
-
-    with open(save_path+'params.json', 'w') as f:
-        data = json.dumps(params)
-        f.write(data)
-
+    # create and run agent
     agent = MPCAgent(mpc_kwargs)
     agent.create_env(env_kwargs, sim_kwargs)
     agent.race()
