@@ -32,19 +32,14 @@ class SimulatorController(object):
 	the position of the vehicle, set the map, reset the map, change the
 	settings (such as turning the camera on), etc.
 
-	:param ip: IP address of the simulator
-	:type ip: str, optional
-	:param port: port to connect to
-	:type port: str, optional
-	:param quiet: flag to show print statements about changes being made to the
-	  simulator
-	:type quiet: boolean, optional
-	:param sim_version: version of the simulator
-	:type sim_version: str, optional
-	:param start_container: start simulator container. Assumes unix-based os
-	:type start_container: boolean, optional
-	:param image_name: name of the simulator's docker image
-	:type image_name: str, optional
+	:param str ip: IP address of the simulator
+	:param str port: port to connect to
+	:param boolean quiet: flag to show print statements about changes being
+	  made to the simulator
+	:param str sim_version: version of the simulator
+	:param boolean start_container: start simulator container. Assumes
+	  unix-based os
+	:param str image_name: name of the simulator's docker image
 	"""
 	def __init__(self, ip='0.0.0.0', port='16000', quiet=False,
 		         sim_version='ArrivalSim-linux-0.3.0.137341-roborace',
@@ -76,7 +71,8 @@ class SimulatorController(object):
 			self.kill_simulator()
 
 	def start_simulator(self):
-		"""Starts the simulator container
+		"""Starts the simulator container, and briefly waits. If a connection
+		error occurs, you may need to increase this delay.
 		"""
 		with open('/tmp/sim_log.txt', 'w') as out:
 			Popen(self.start, shell=True, stdout=out, stderr=out)
@@ -85,7 +81,7 @@ class SimulatorController(object):
 		return
 
 	def kill_simulator(self):
-		"""Kill the simulator container
+		"""Kill the simulator container.
 		"""
 		Popen(self.kill, shell=True)
 		time.sleep(MEDIUM_DELAY)
@@ -101,9 +97,7 @@ class SimulatorController(object):
 	def set_level(self, level):
 		"""Sets the simulator to a specified level (map).
 
-		:param level: name of the racetrack. must be in ['VegasNorthRoad', 
-		  'Thruxton']
-		:type level: string 
+		:param string level: name of the racetrack
 		"""
 		level_name = level_2_simlevel(level, self.sim_version)
 		self._print(f'Setting level to {level}')
@@ -115,12 +109,10 @@ class SimulatorController(object):
 	def set_location(self, coords, rot, veh_id=0):
 		"""Sets a vehicle to a specific location on track.
 
-		:param coords: desired ENU coordinates
-		:type coords: dict of cordinates with keys x, y, z
-		:param rot: rotation of the vehicle in degrees
-		:type rot: dict of coordinates with keys yaw, pitch, roll
-		:param veh_id: identifier of the vehicle, defaults to 0
-		:type veh_id: int, optional
+		:param dict coords: desired ENU coordinates with keys [x, y, z]
+		:param dict rot: rotation of the vehicle in degrees with keys
+		  [yaw, pitch, roll]
+		:param int veh_id: identifier of the vehicle, defaults to 0
 		"""
 		_ = self._send_msg(
 			method='set_vehicle_position',
@@ -158,10 +150,10 @@ class SimulatorController(object):
 	def get_position(self, veh_id=0):
 		"""Get vehicle's current position.
 
-		:param veh_id: identifier of the vehicle, defaults to 0
-		:type veh_id: int, optional
-		:return: ENU coordinates of the vehicle [East, North, Up]
-		:rtype: list of floats
+		:param int veh_id: identifier of the vehicle, defaults to 0
+		:return: ENU coordinates of the vehicle [East, North, Up], vehicle
+		  heading
+		:rtype: list of floats, float
 		"""
 		result = self._send_msg(
 			method='get_vehicle_state',
@@ -172,8 +164,7 @@ class SimulatorController(object):
 	def get_vehicle_params(self, veh_id=0):
 		"""Get the active parameters of a vehicle.
 
-		:param veh_id: identifier of the vehicle, defaults to 0
-		:type veh_id: int, optional
+		:param int veh_id: identifier of the vehicle, defaults to 0
 		:return: a dictionary of the vehicle's parameters
 		:rtype: dict
 		"""
@@ -185,10 +176,8 @@ class SimulatorController(object):
 	def set_vehicle_params(self, parameters, veh_id=0):
 		"""Set parameters of a vehicle.
 
-		:param parameters: name value pairs
-		:type parameters: list of dictionaries
-		:param veh_id: identifier of the vehicle, defaults to 0
-		:type veh_id: int, optional
+		:param list parameters: name value pairs, list of dictionaries
+		:param int veh_id: identifier of the vehicle, defaults to 0
 		"""
 		self._print(f'Setting vehicle parameters for vehicle: {veh_id}')
 		_ = self._send_msg(
@@ -202,8 +191,7 @@ class SimulatorController(object):
 	def reset_vehicle_params(self, veh_id=0):
 		"""Reset a vehicle's parameters to default.
 		
-		:param veh_id: identifier of the vehicle, defaults to 0
-		:type veh_id: int, optional
+		:param int veh_id: identifier of the vehicle, defaults to 0
 		"""
 		self._print(f'Resetting vehicle parameters for vehicle: {veh_id}')
 		_ = self._send_msg(
@@ -235,9 +223,8 @@ class SimulatorController(object):
 	def get_sensors_params(self, veh_id=0):
 		"""Get the parameters of each sensor for a specified vehicle.
 
-		:param veh_id: identifier of the vehicle, defaults to 0
-		:type veh_id: int, optional
-		:return: list of parameters for each sensor
+		:param int veh_id: identifier of the vehicle, defaults to 0
+		:return: parameters for each sensor
 		:rtype: list
 		"""
 		return self._send_msg(
@@ -248,10 +235,8 @@ class SimulatorController(object):
 	def get_sensor_params(self, sensor, veh_id=0):
 		"""Get the parameters of a specified sensor of a specified vehicle.
 
-		:param sensor: name of sensor to get the params for
-		:type sensor: str
-		:param veh_id: identifier of the vehicle, defaults to 0
-		:type veh_id: int, optional
+		:param str sensor: name of sensor to get the params for
+		:param int veh_id: identifier of the vehicle, defaults to 0
 		:return: the sensor's parameters
 		:rtype: dict
 		"""
@@ -267,14 +252,10 @@ class SimulatorController(object):
 		"""Set a specified parameter to a specified value of a specified
 		sensor on a specified vehicle.
 
-		:param sensor: name of sensor to set
-		:type sensor: str
-		:param name: name of the parameter to set
-		:type name: str
-		:param value: value of the parameter to set
-		:type value: str
-		:param veh_id: identifier of the vehicle, defaults to 0
-		:type veh_id: int, optional
+		:param str sensor: name of sensor to set
+		:param str name: name of the parameter to set
+		:param str value: value of the parameter to set
+		:param int veh_id: identifier of the vehicle, defaults to 0
 		:return: 0, if successful
 		:rtype: int
 		"""
@@ -293,12 +274,9 @@ class SimulatorController(object):
 		"""Set specified parameters of a specified sensor on a specified
 		vehicle.
 
-		:param sensor: name of sensor to set
-		:type sensor: str
-		:param parameters: name value pairs of the parameters to set
-		:type parameters: dictionary
-		:param veh_id: identifier of the vehicle, defaults to 0
-		:type veh_id: int, optional
+		:param str sensor: name of sensor to set
+		:param dict parameters: name value pairs of the parameters to set
+		:param int veh_id: identifier of the vehicle, defaults to 0
 		"""
 		self._print(f'Setting: {sensor} parameters for vehicle: {veh_id}')
 		parameters = [{'name': k, 'value': v} for k, v in params.items()]
@@ -314,8 +292,7 @@ class SimulatorController(object):
 	def get_vehicle_driver_params(self, veh_id=0):
 		"""Get the parameters of the sensor 'ArrivalVehicleDriver'.
 
-		:param veh_id: identifier of the vehicle, defaults to 0
-		:type veh_id: int, optional
+		:param int veh_id: identifier of the vehicle, defaults to 0
 		:return: parameters of the vehicle driver
 		:rtype: dict
 		"""
@@ -330,8 +307,7 @@ class SimulatorController(object):
 	def get_driver_mode(self, veh_id=0):
 		"""Get the mode of a specified vehicle.
 
-		:param veh_id: identifier of the vehicle, defaults to 0
-		:type veh_id: int, optional
+		:param int veh_id: identifier of the vehicle, defaults to 0
 		:return: true if manual mode, false if AI mode
 		:rtype: boolean
 		"""
@@ -347,8 +323,7 @@ class SimulatorController(object):
 	def set_mode_ai(self, veh_id=0):
 		"""Sets a specified vehicle mode to "AI".
 
-		:param veh_id: identifier of the vehicle, defaults to 0
-		:type veh_id: int, optional
+		:param int veh_id: identifier of the vehicle, defaults to 0
 		"""
 		self._print(f'Setting to AI mode for vehicle: {veh_id}')
 		_ = self._send_msg(
@@ -364,8 +339,7 @@ class SimulatorController(object):
 	def set_mode_manual(self, veh_id=0):
 		"""Sets a specified vehicle mode to "manual".
 
-		:param veh_id: identifier of the vehicle, defaults to 0
-		:type veh_id: int, optional
+		:param int veh_id: identifier of the vehicle, defaults to 0
 		"""
 		self._print(f'Setting to manual mode for vehicle: {veh_id}')
 		_ = self._send_msg(
@@ -382,8 +356,7 @@ class SimulatorController(object):
 		"""Set a specified vehicle API class to VApiUdp to allow the RL
 		agent to control it.
 
-		:param veh_id: identifier of the vehicle, defaults to 0
-		:type veh_id: int, optional
+		:param int veh_id: identifier of the vehicle, defaults to 0
 		"""
 		self._print(f'Setting to RL mode for vehicle: {veh_id}')
 		_ = self._send_msg(
@@ -399,10 +372,8 @@ class SimulatorController(object):
 	def enable_sensor(self, sensor_name, veh_id=0):
 		"""Activates a specified sensor on a specified vehicle.
 
-		:param sensor_name: sensor to be activated
-		:type sensor_name: str
-		:param veh_id: identifier of the vehicle, defaults to 0
-		:type veh_id: int, optional
+		:param str sensor_name: sensor to be activated
+		:param int veh_id: identifier of the vehicle, defaults to 0
 		:return: 0, if successful
 		:rtype: int
 		"""
@@ -418,10 +389,8 @@ class SimulatorController(object):
 	def disable_sensor(self, sensor_name, veh_id=0):
 		"""Disables a specified sensor on a specified vehicle.
 
-		:param sensor_name: sensor to be deactivated
-		:type sensor_name: str
-		:param veh_id: identifier of the vehicle, defaults to 0
-		:type veh_id: int, optional
+		:param str sensor_name: sensor to be deactivated
+		:param int veh_id: identifier of the vehicle, defaults to 0
 		:return: 0, if successful
 		:rtype: int
 		"""
@@ -437,10 +406,8 @@ class SimulatorController(object):
 	def _send_msg(self, method, params=None):
 		"""Helper routine to send jsonprc messages.
 
-		:param method: specified method
-		:type method: str
-		:param params: parameters to send
-		:type params: dict, optional
+		:param str method: specified method
+		:param dict params: parameters to send
 		:return: response from the simulator
 		:rtype: varies
 		"""

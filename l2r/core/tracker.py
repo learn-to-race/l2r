@@ -29,25 +29,17 @@ class ProgressTracker(object):
 	of laps that the vehicle has completed and how long each one took. It also
 	evaluates for termination conditions.
 
-	:param n_indices: number of indicies of the centerline of the track
-	:type n_indices: int
-	:param inner_track: path of the inner track boundary
-	:type inner_track: matplotlib.path
-	:param outer_track: path of the outer track boundary
-	:type outer_track: matplotlib.path
-	:param centerline: path of the centerline
-	:type centerline: np array
-	:param car_dims: dimensions of the vehicle in meters [len, width]
-	:type car_dims: list of floats
-	:param obs_delay: time delay between a RacingEnv action and observation
-	:type obs_delay: float
-	:param max_timesteps: maximum number of timesteps in an episode
-	:type max_timesteps: int
-	:param not_moving_ct: maximum number of vehicle can be stationary before
+	:param int n_indices: number of indicies of the centerline of the track
+	:param matplotlib.path inner_track: path of the inner track boundary
+	:param matplotlib.path outer_track: path of the outer track boundary
+	:param numpy.array centerline: path of the centerline
+	:param list car_dims: dimensions of the vehicle in meters [len, width]
+	:param float obs_delay: time delay between a RacingEnv action and
+	  observation
+	:param int max_timesteps: maximum number of timesteps in an episode
+	:param int not_moving_ct: maximum number of vehicle can be stationary before
 	  being considered stuck
-	:type not_moving_ct: int
-	:param debug: debugging print statement flag
-	:type debug: boolean
+	:param boolean debug: debugging print statement flag
 	"""
 	def __init__(self, n_indices, inner_track, outer_track, centerline,
 		         car_dims, obs_delay, max_timesteps, not_moving_ct,
@@ -66,9 +58,8 @@ class ProgressTracker(object):
 	def reset(self, start_idx):
 		"""Reset the tracker for the next episode.
 
-		:param start_idx: index on the track's centerline which the vehicle is
-		  nearest to
-		:type start_idx: int
+		:param int start_idx: index on the track's centerline which the vehicle
+		  is nearest to
 		"""
 		self.start_idx = start_idx
 		self.lap_start = None
@@ -86,21 +77,14 @@ class ProgressTracker(object):
 		track of the yaw, brake pressure, centerline displacement, and
 		calculates the offical metrics for the environment.
 
-		:param idx: index on the track's centerline which the vehicle is
+		:param int idx: index on the track's centerline which the vehicle is
 		  nearest to
-		:type idx: int
-		:param e: east coordinate
-		:type e: float
-		:param n: north coordinate
-		:type n: float
-		:param u: up coordinate
-		:type u: float
-		:param yaw: vehicle heading, in radians
-		:type yaw: float
-		:param ac: directional acceleration
-		:type ac: numpy array of shape (4,)
-		:param bp: brake pressure, per wheel
-		:type bp: array of shape (4,)
+		:param float e: east coordinate
+		:param float n: north coordinate
+		:param float u: up coordinate
+		:param float yaw: vehicle heading, in radians
+		:param numpy.array ac: directional acceleration, shape of (3,)
+		:param numpy.array bp: brake pressure, per wheel, shape of (4,)
 		"""
 		now = time.time()
 
@@ -136,22 +120,17 @@ class ProgressTracker(object):
 	def _store(self, e, n, u, idx, yaw, c_dist, dt, ac, bp, n_out):
 		"""Transitions are stored as a list of lists
 
-		:param e: east coordinate
-		:type e: float
-		:param n: north coordinate
-		:type n: float
-		:param u: up coordinate
-		:type u: float
-		:param idx: nearest centerline index to current position (shifted)
-		:type idx: int
-		:param c_dist: distance to centerline
-		:type c_dist: float
-		:param bp: brake pressure, per wheel
-		:type bp: array of shape (4,)
-		:param a: magnitude of the vehicles acceleration, adjusted for gravity
-		:type a: float
-		:param n_out: number of wheels out-of-bounds
-		:type n_out: int
+		:param float e: east coordinate
+		:param float n: north coordinate
+		:param float u: up coordinate
+		:param int idx: nearest centerline index to current position (shifted)
+		:param float yaw: vehicle heading, in radians
+		:param float c_dist: distance to centerline
+		:param float dt: time delta, in seconds, from last update
+		:param float ac: magnitude of the vehicles acceleration, adjusted for
+		  gravity
+		:param numpy.array bp: brake pressure, per wheel, shape of (4,)
+		:param int n_out: number of wheels out-of-bounds
 		"""
 		b = np.average(bp)
 		a = np.linalg.norm(ac) - GRAVITY
@@ -166,11 +145,10 @@ class ProgressTracker(object):
 		end time is a linear interpolation between the time of the prior 
 		update and the current time
 
-		:param shifted_idx: index on the track's centerline which the vehicle
-		  is nearest to shifted based on the starting index on the track
-		:type shifted_idx: int
-		:param now: time of the update
-		:type now: float
+		:param int shifted_idx: index on the track's centerline which the
+		  vehicle is nearest to shifted based on the starting index on the
+		  track
+		:param float now: time of the update
 		"""
 		if not self.halfway_flag:
 			return False
@@ -197,10 +175,7 @@ class ProgressTracker(object):
 		"""
 		info = self._is_terminal()
 
-		if info['stuck'] or info['not_progressing'] or info['dnf'] or info['oob']:
-			return True, self.append_metrics(info) # info
-
-		if info['success']:
+		if info['stuck'] or info['not_progressing'] or info['dnf'] or info['oob'] or info['success']:
 			return True, self.append_metrics(info)
 
 		return False, info
@@ -208,8 +183,7 @@ class ProgressTracker(object):
 	def append_metrics(self, info):
 		"""Calculate metrics and append to info
 
-		:param info: episode information
-		:type info: dict
+		:param dict info: episode information
 		:return: info with appended metrics
 		:rtype: dict
 		"""
@@ -244,8 +218,7 @@ class ProgressTracker(object):
 	def _path_length(path):
 		"""Calculate length of a path.
 
-		:param path: set of (x,y) pairs
-		:type path: numpy array of shape (2, N)
+		:param numpy.array path: set of (x,y) pairs with shape (2, N)
 		:return: path length in meters
 		:rtype: float
 		"""
@@ -259,8 +232,7 @@ class ProgressTracker(object):
 		"""Returns the root mean square of the curvature of the path where
 		curvature is calculate parametrically using finite differences.
 
-		:param path: set of (x,y) pairs
-		:type path: numpy array of shape (2, N)
+		:param numpy.array path: set of (x,y) pairs with shape (2, N)
 		:return: RMS of the path's curvature
 		:rtype: float
 		"""
@@ -282,12 +254,11 @@ class ProgressTracker(object):
 
 		Source: https://github.com/siva82kb/SPARC/blob/master/scripts/smoothness.py
 
-		:param movement: movement speed profile of t data points
-		:type movement: np.array of shape (t,)
-		:param freq: the sampling frequency of the data
-		:type freq: float
-		:param data_type: type of movement data provided. must be in ['speed','accl','jerk']
-		:type data_type: str
+		:param numpy.array movement: movement speed profile of t data points
+		  with shape (t,)
+		:param float freq: the sampling frequency of the data
+		:param str data_type: type of movement data provided. must be in
+		  ['speed','accl','jerk']
 		:return: dimensionless jerk, a smoothness metric
 		:rtype: float
 		"""
@@ -307,7 +278,7 @@ class ProgressTracker(object):
 		p = _p[data_type]
 		scale = pow(movement_dur, p) / pow(movement_peak, 2)
 
-        # estimate jerk
+		# estimate jerk
 		if data_type == 'speed':
 			jerk = np.diff(movement, 2) / pow(dt, 2)
 		elif data_type == 'accl':
@@ -323,8 +294,7 @@ class ProgressTracker(object):
 		"""Returns the shortest distance between point p a line segment
 		between the two nearest points on the centerline of the track.
 
-		:param p: (x,y) reference point
-		:type p: list or numpy array
+		:param array-like p: (x,y) reference point
 		:param idx: centerline index to compare to
 		:type idx: int
 		"""
@@ -377,6 +347,9 @@ class ProgressTracker(object):
 	def _count_wheels_oob(self, e, n, yaw):
 		"""Count number of wheels that are out of the drivable area
 
+		:param float e: east coordinate
+		:param float n: north coordinate
+		:param float yaw: vehicle heading, in radians
 		:return: Number of wheels out of drivable area
 		:rtype: int
 		"""
