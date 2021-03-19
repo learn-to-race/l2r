@@ -1,6 +1,6 @@
 # ========================================================================= #
 # Filename:                                                                 #
-#    runner.py                                                              #
+#    runner_random.py                                                       #
 #                                                                           #
 # Description:                                                              # 
 #    Convenience script to load parameters and train a model.               #
@@ -24,5 +24,5 @@ if __name__ == "__main__":
     # instantiate and train agent
     agent = RandomActionAgent(training_kwargs)
     agent.create_env(env_kwargs, sim_kwargs)
-    agent.train()
+    agent.race()
     

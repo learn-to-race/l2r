@@ -1,9 +1,9 @@
 # ========================================================================= #
 # Filename:                                                                 #
-#    runner.py                                                              #
+#    runner_sac.py                                                          #
 #                                                                           #
 # Description:                                                              # 
-#    Convenience script to load parameters and train a model.               #
+#    Convenience script to load parameters and train an sac agent           #
 # ========================================================================= #
 import json
 import os

@@ -16,7 +16,7 @@ from websocket import create_connection
 from racetracks.mapping import level_2_simlevel
 
 SHORT_DELAY=0.02
-MEDIUM_DELAY=10
+MEDIUM_DELAY=12
 
 # Shell commands to launch and kill container
 START_CMD = 'docker run -t --rm ' \
