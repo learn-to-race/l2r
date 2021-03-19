@@ -28,7 +28,7 @@ env_kwargs:
     min_oob_penalty: 25.0
   controller_kwargs:
     sim_version: 'ArrivalSim-linux-0.3.0.137341-roborace'
-    quiet: True
+    quiet: False
     start_container: True # False 
   action_if_kwargs:
     max_accel: 4.

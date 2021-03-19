@@ -11,7 +11,7 @@ import sys
 
 from ruamel.yaml import YAML
 
-from baselines.sac import sac
+from baselines.rl.sac import sac
 from baselines.models.vae import *
 from envs.env import RacingEnv
 

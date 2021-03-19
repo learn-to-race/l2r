@@ -294,8 +294,9 @@ class RacingEnv(gym.Env):
         if self.provide_waypoints:
             info['waypoints'] = self._waypoints()
             info['track_idx'] = self.nearest_idx
+            return observation, info
 
-        return observation, info
+        return observation
 
     def render(self):
         """Not implmeneted. The simulator, by default, provides a graphical

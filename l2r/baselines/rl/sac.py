@@ -18,7 +18,7 @@ import numpy as np
 import torch
 from torch.optim import Adam
 
-import baselines.rl.core as core
+import baselines.core as core
 
 DEVICE=torch.device('cuda') if torch.cuda.is_available() else 'cpu'
 
@@ -314,9 +314,7 @@ def sac(env, actor_critic=core.MLPActorCritic, ac_kwargs=dict(), seed=0,
                 ep_ret += r
                 ep_len += 1
 
-            pc, lts = info['pct_complete'], info['lap_times']
-            print(f'[eval episode] reward: {ep_ret}\tpct complete: {pc}\tlap times: {lts}')
-            print(f'{info}')
+            print(f'[eval episode] {info}')
 
     if inference_only:
         test_agent()
