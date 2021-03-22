@@ -1,6 +1,4 @@
-import torch
 import torch.nn as nn
-import math
 import torch.utils.model_zoo as model_zoo
 
 
@@ -65,7 +63,8 @@ class Bottleneck(nn.Module):
         self.conv2 = nn.Conv2d(planes, planes, kernel_size=3, stride=stride,
                                padding=1, bias=False)
         self.bn2 = nn.BatchNorm2d(planes)
-        self.conv3 = nn.Conv2d(planes, planes * self.expansion, kernel_size=1, bias=False)
+        self.conv3 = nn.Conv2d(planes, planes * self.expansion,
+                               kernel_size=1, bias=False)
         self.bn3 = nn.BatchNorm2d(planes * self.expansion)
         self.relu = nn.ReLU(inplace=True)
         self.downsample = downsample
@@ -230,7 +229,6 @@ def resnet50(pretrained=False, **kwargs):
         model.load_state_dict(state)
 
     return model
-
 
 
 def resnet101(pretrained=False, **kwargs):

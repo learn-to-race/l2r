@@ -2,25 +2,20 @@ import torch
 from torch.utils.data import Dataset
 from PIL import Image
 import numpy as np
-from numpy import load
 from torchvision import transforms
 import glob
-import json
-import copy
-import math
 import os
 from .utils import sort_nicely
-import ipdb as pdb
-from PIL import Image
 
 # Normalize speed to 0-1
 SPEED_FACTOR = 12.0
 AUGMENT_LATERAL_STEERINGS = 6
 
+
 class ILDataset(Dataset):
 
     def __init__(self, root_dir, dataset_name, split_name, lookahead=1, preload_name=None):
-        
+
         self.root_dir = root_dir
         self.data_dir = os.path.join(root_dir, dataset_name, split_name)
         self.preload_name = preload_name
@@ -28,40 +23,40 @@ class ILDataset(Dataset):
 
         if self.preload_name is not None and os.path.exists(
                 os.path.join('_preloads', self.preload_name + '.npy')):
-        
+
             print(" Loading from NPY ")
-            
+
             self.sensor_data_names, self.measurements = np.load(
-                os.path.join('_preloads', self.preload_name + '.npy'), 
+                os.path.join('_preloads', self.preload_name + '.npy'),
                 allow_pickle=True)
-            
+
             print(self.sensor_data_names)
-        
+
         else:
-            self.sensor_data_names, self.measurements = self._preload_files(self.data_dir) 
+            self.sensor_data_names, self.measurements = self._preload_files(
+                self.data_dir)
 
         self.transform_op = transforms.Compose([
-#             transforms.Resize(256),
-             transforms.ToTensor(),
-             #transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-             transforms.Normalize(mean=[125.61341389, 118.31236235, 114.9765454], 
-                 std=[68.98788514, 64.9655252, 64.56587821])
-            ])
+            #             transforms.Resize(256),
+            transforms.ToTensor(),
+            # transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+            transforms.Normalize(mean=[125.61341389, 118.31236235, 114.9765454],
+                                 std=[68.98788514, 64.9655252, 64.56587821])
+        ])
 
     def __len__(self):
         return len(self.measurements)
-    
+
     def __getitem__(self, idx):
-       
-        #sample_path = os.path.join(self.root_dir, self.data_dir, self.sensor_data_names[idx])
-        
-        
+
+        # sample_path = os.path.join(self.root_dir, self.data_dir, self.sensor_data_names[idx])
+
         measurement = self.measurements[idx]
 
 #        try: next_measurement = self.measurements[idx+self.lookahead]
 #        except IndexError: next_measurement = measurement
 
-        #mappings: http://ec2-3-90-183-136.compute-1.amazonaws.com/multimodal.html#environment-observations
+        # mappings: http://ec2-3-90-183-136.compute-1.amazonaws.com/multimodal.html#environment-observations
 
         input_image = Image.fromarray(measurement['img'])
         image_tensor = self.transform_op(input_image)
@@ -72,7 +67,7 @@ class ILDataset(Dataset):
 #        gear = torch.FloatTensor(measurement['multimodal_data'][1])
 #
 #        mode = torch.FloatTensor(measurement['multimodal_data'][2])
-#        
+#
 #        directional_velocity = torch.FloatTensor([measurement['multimodal_data'][3],
 #                measurement['multimodal_data'][4],
 #                measurement['multimodal_data'][5]])
@@ -109,7 +104,7 @@ class ILDataset(Dataset):
 #                measurement['multimodal_data'][29]])
 
         action = torch.FloatTensor(measurement['action'])
-        
+
         # values from self.lookahead steps ahead
 
 #        next_image = self.transform_op(measurement['img'])
@@ -119,7 +114,7 @@ class ILDataset(Dataset):
 #        next_gear = torch.FloatTensor(next_measurement['multimodal_data'][1])
 #
 #        next_mode = torch.FloatTensor(next_measurement['multimodal_data'][2])
-#        
+#
 #        next_directional_velocity = torch.FloatTensor([next_measurement['multimodal_data'][3],
 #                next_measurement['multimodal_data'][4],
 #                next_measurement['multimodal_data'][5]])
@@ -157,9 +152,9 @@ class ILDataset(Dataset):
 #
 #        next_action = torch.FloatTensor(measurement['action'])
 #
-#        
+#
 #        sample = {
-#                'image': image, 
+#                'image': image,
 #                'steering': steering,
 #                'gear': gear,
 #                'mode': mode,
@@ -173,9 +168,9 @@ class ILDataset(Dataset):
 #                'wheel_torque': wheel_torque,
 #                'action': action
 #                }
-#        
+#
 #        target = {
-#                'next_image': next_image, 
+#                'next_image': next_image,
 #                'next_steering': next_steering,
 #                'next_gear': next_gear,
 #                'next_mode': next_mode,
@@ -190,9 +185,7 @@ class ILDataset(Dataset):
 #                'next_action': next_action
 #                }
 
-
         return image, torch.FloatTensor(measurement['multimodal_data']), action
-
 
     def _preload_files(self, path):
         """
@@ -214,7 +207,8 @@ class ILDataset(Dataset):
         sort_nicely(episodes_list)
 
         # Do a check if the episodes list is empty
-        assert len(episodes_list) > 0, "Fatal: "+__file__+": No episodes in train set - "+ path
+        assert len(episodes_list) > 0, "Fatal: " + __file__ + \
+            ": No episodes in train set - " + path
 
         sensor_data_names = []
         float_dicts = []
@@ -245,10 +239,12 @@ class ILDataset(Dataset):
                     img = sample['img']
                     multimodal_data = sample['multimodal_data']
                     action = sample['action']
-                    
-                float_dicts.append({"img": img, "multimodal_data": multimodal_data, "action": action})
-                
-                sensor_data_names.append(os.path.join(episode.split('/')[-1], transition))
+
+                float_dicts.append(
+                    {"img": img, "multimodal_data": multimodal_data, "action": action})
+
+                sensor_data_names.append(os.path.join(
+                    episode.split('/')[-1], transition))
                 count_added_measurements += 1
 
             last_data_point_number = transitions_list[-1].split('_')[-1].split('.')[0]
@@ -260,7 +256,7 @@ class ILDataset(Dataset):
             os.mkdir('_preloads')
         # If there is a name we saved the preloaded data
         if self.preload_name is not None:
-            np.save(os.path.join('_preloads', self.preload_name), [sensor_data_names, float_dicts])
+            np.save(os.path.join('_preloads', self.preload_name),
+                    [sensor_data_names, float_dicts])
 
         return sensor_data_names, float_dicts
-

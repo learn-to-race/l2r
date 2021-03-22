@@ -2,7 +2,7 @@
 # Filename:                                                                 #
 #    visualize_track.py                                                     #
 #                                                                           #
-# Description:                                                              # 
+# Description:                                                              #
 #    Simple racetrack plotter                                               #
 # ========================================================================= #
 
@@ -31,10 +31,10 @@ if __name__ == "__main__":
         outside_coords = numpy.asarray(racetrack['Outside'])
         center_coords = numpy.asarray(racetrack['Centre'])
 
-    if track_name=='VegasNorthRoad':
-    	raceline = numpy.asarray(racetrack['Racing'])
-    	inside_coords = inside_coords[:, :-1]
-    	outside_coords = outside_coords[:, :-1]
+    if track_name == 'VegasNorthRoad':
+        raceline = numpy.asarray(racetrack['Racing'])
+        inside_coords = inside_coords[:, :-1]
+        outside_coords = outside_coords[:, :-1]
 
     in_arr = numpy.transpose(inside_coords)
     out_arr = numpy.transpose(outside_coords)
@@ -46,11 +46,11 @@ if __name__ == "__main__":
     plt.plot(center_arr[0], center_arr[1], color='grey', linewidth=0.5)
 
     tn = 'Thruxton Circuit'
-    if track_name=='VegasNorthRoad':
-    	race_arr = numpy.transpose(raceline)
-    	plt.plot(race_arr[0], race_arr[1], linewidth=0.5, label='Expert Line')
-    	tn = 'Las Vegas North'
-    
+    if track_name == 'VegasNorthRoad':
+        race_arr = numpy.transpose(raceline)
+        plt.plot(race_arr[0], race_arr[1], linewidth=0.5, label='Expert Line')
+        tn = 'Las Vegas North'
+
     plt.title(tn + ' Racetrack')
     # plt.legend()
     plt.show()

@@ -2,32 +2,34 @@
 This file is a slight modification of Shubham Chandel's implementation of a
 variational autoencoder -> https://github.com/sksq96/pytorch-vae
 """
-import copy
 import glob
 
 import cv2
 import numpy as np
-import matplotlib.pyplot as plt
 
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.autograd import Variable
-from torchvision import transforms
 from torch.utils.data import DataLoader
 from torch.utils.data.dataset import TensorDataset
+
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
 
 class Flatten(nn.Module):
     def forward(self, input):
         return input.view(input.size(0), -1)
 
+
 class UnFlatten(nn.Module):
     def forward(self, input, size=20736):
         return input.view(input.size(0), size, 1, 1)
 
+
 class ReshapeImg(nn.Module):
-	def forward(self, input, im_w=144, im_h=144):
-		return input.view(input.size(0), im_w, im_h, 3)
+    def forward(self, input, im_w=144, im_h=144):
+        return input.view(input.size(0), im_w, im_h, 3)
+
 
 class VAE(nn.Module):
     def __init__(self, image_channels=3, h_dim=20736, z_dim=32):
@@ -43,11 +45,11 @@ class VAE(nn.Module):
             nn.ReLU(),
             Flatten()
         )
-        
+
         self.fc1 = nn.Linear(h_dim, z_dim)
         self.fc2 = nn.Linear(h_dim, z_dim)
         self.fc3 = nn.Linear(z_dim, h_dim)
-        
+
         self.decoder = nn.Sequential(
             UnFlatten(),
             nn.ConvTranspose2d(h_dim, 128, kernel_size=4, stride=4),
@@ -63,30 +65,30 @@ class VAE(nn.Module):
 
         self.optimizer = torch.optim.Adam(self.parameters())
         self.dataloader = None
-        
+
     def reparameterize(self, mu, logvar):
         std = logvar.mul(0.5).exp_()
         # return torch.normal(mu, std)
         esp = torch.randn(*mu.size()).to(device)
         z = mu + std * esp
         return z
-    
+
     def bottleneck(self, h):
         mu, logvar = self.fc1(h), self.fc2(h)
         z = self.reparameterize(mu, logvar)
         return z, mu, logvar
-        
+
     def representation(self, x):
         return self.bottleneck(self.encoder(x))[0]
 
     def encode(self, x):
-    	h = self.encoder(x)
-    	z, mu, logvar = self.bottleneck(h)
-    	return z, mu, logvar
+        h = self.encoder(x)
+        z, mu, logvar = self.bottleneck(h)
+        return z, mu, logvar
 
     def decode(self, z):
-    	z = self.fc3(z)
-    	return self.decoder(z)
+        z = self.fc3(z)
+        return self.decoder(z)
 
     def forward(self, x):
         z, mu, logvar = self.encode(x)
@@ -94,9 +96,9 @@ class VAE(nn.Module):
         return z, mu, logvar
 
     def loss(self, recon, actual, mu, logvar):
-    	bce = F.binary_cross_entropy(recon, actual, size_average=False)
-    	kld = -0.5 * torch.sum(1 + logvar - mu**2 - logvar.exp())
-    	return bce + kld
+        bce = F.binary_cross_entropy(recon, actual, size_average=False)
+        kld = -0.5 * torch.sum(1 + logvar - mu**2 - logvar.exp())
+        return bce + kld
 
     def train(self, num_epochs):
         if not self.dataloader:
@@ -112,21 +114,22 @@ class VAE(nn.Module):
                 self.optimizer.zero_grad()
                 loss.backward()
                 self.optimizer.step()
-                
+
             print(f'[{epoch+1} of {num_epochs}] Loss: {loss.item()/self.batch_size}')
 
     def test(self):
-    	raise NotImplementedError
+        raise NotImplementedError
 
     def load_images(self, path, im_w, im_h, shuffle=True, batch_size=32):
         """Utility to load images
         """
         self.im_w, self.im_h = im_w, im_h
         self.batch_size = batch_size
-        
+
         images = []
         for index, file in enumerate(glob.glob(path + "*.png")):
-            if len(images) == 4992: break
+            if len(images) == 4992:
+                break
             image = cv2.imread(file)
             images.append(cv2.resize(image, (im_w, im_h)))
 

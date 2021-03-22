@@ -2,95 +2,99 @@
 # Filename:                                                                 #
 #    templates.py                                                           #
 #                                                                           #
-# Description:                                                              # 
+# Description:                                                              #
 #    template classes                                                       #
 # ========================================================================= #
 
 import abc
 
+
 class AbstractAgent(abc.ABC):
-	"""Abstract agent class. This class is a subclass of :class: abc.ABC and is
-	useful as template for training an agent.
-	"""
-	def __init__(self, *args, **kwargs):
-		pass
+    """Abstract agent class. This class is a subclass of :class: abc.ABC and is
+    useful as template for training an agent.
+    """
 
-	@abc.abstractmethod
-	def create_env(self):
-		"""Instantiate a racing environment.
-		"""
-		pass
+    def __init__(self, *args, **kwargs):
+        pass
 
-	@abc.abstractmethod
-	def select_action(self):
-		"""Select an action to take.
-		"""
-		pass
+    @abc.abstractmethod
+    def create_env(self):
+        """Instantiate a racing environment.
+        """
+        pass
+
+    @abc.abstractmethod
+    def select_action(self):
+        """Select an action to take.
+        """
+        pass
 
 
 class AbstractInterface(abc.ABC):
-	"""Abstract simulator interface to receive data from the simulator.
-	"""
-	def __init__(self, *args, **kwargs):
-		pass
+    """Abstract simulator interface to receive data from the simulator.
+    """
 
-	@abc.abstractmethod
-	def start(self):
-		"""The start method is used to start communication with the simulator.
-		"""
-		pass
+    def __init__(self, *args, **kwargs):
+        pass
 
-	@abc.abstractmethod
-	def get_data(self):
-		"""This method is used to return the most up-to-date information from
-		the interface."""
-		pass
+    @abc.abstractmethod
+    def start(self):
+        """The start method is used to start communication with the simulator.
+        """
+        pass
 
-	@abc.abstractmethod
-	def reset(self):
-		"""Used to reset the interface, often to clear existing data.
-		"""
-		pass
+    @abc.abstractmethod
+    def get_data(self):
+        """This method is used to return the most up-to-date information from
+        the interface."""
+        pass
+
+    @abc.abstractmethod
+    def reset(self):
+        """Used to reset the interface, often to clear existing data.
+        """
+        pass
 
 
 class AbstractReward(abc.ABC):
-	"""Abstract reward class. It is recommended that new reward policies follow
-	this template so that they are compatible with the RacingEnv."""
-	def __init__(self, *args, **kwargs):
-		pass
+    """Abstract reward class. It is recommended that new reward policies follow
+    this template so that they are compatible with the RacingEnv."""
 
-	def set_track(self, inside_path, outside_path, centre_path, car_dims):
-		"""Store the track and vehicle information as class variables. This is
-		useful for evaluating the reward based on the position of the vehicle.
+    def __init__(self, *args, **kwargs):
+        pass
 
-		:param inside_path: ENU coordinates of the inside track boundary
-		:type inside_path: matplotlib.Path
-		:param outside_path: ENU coordinates of the outside track boundary
-		:type outside_path: matplotlib.Path
-		:param centre_path: ENU coordinates of the track's centerline
-		:type centre_path: matplotlib.Path
-		:param car_dims: dimensions of the vehicle in meters: [length, width]
-		:type car_dims: list
-		"""
-		self.inner_track = inside_path.vertices
-		self.outside_track = outside_path.vertices
-		self.centre_path = centre_path.vertices
-		self.n_inner = len(inside_path)
-		self.n_outer = len(outside_path)
-		self.n_centre = len(centre_path)
-		self.car_dims = car_dims
+    def set_track(self, inside_path, outside_path, centre_path, car_dims):
+        """Store the track and vehicle information as class variables. This is
+        useful for evaluating the reward based on the position of the vehicle.
 
-	@abc.abstractmethod
-	def get_reward(self, state, **kwargs):
-		"""Return the reward for the provided state.
+        :param inside_path: ENU coordinates of the inside track boundary
+        :type inside_path: matplotlib.Path
+        :param outside_path: ENU coordinates of the outside track boundary
+        :type outside_path: matplotlib.Path
+        :param centre_path: ENU coordinates of the track's centerline
+        :type centre_path: matplotlib.Path
+        :param car_dims: dimensions of the vehicle in meters: [length, width]
+        :type car_dims: list
+        """
+        self.inner_track = inside_path.vertices
+        self.outside_track = outside_path.vertices
+        self.centre_path = centre_path.vertices
+        self.n_inner = len(inside_path)
+        self.n_outer = len(outside_path)
+        self.n_centre = len(centre_path)
+        self.car_dims = car_dims
 
-		:param state: the current environment state
-		:type state: varies
-		"""
-		pass
+    @abc.abstractmethod
+    def get_reward(self, state, **kwargs):
+        """Return the reward for the provided state.
 
-	@abc.abstractmethod
-	def reset(self):
-		"""Reset the reward policy.
-		"""
-		pass
+        :param state: the current environment state
+        :type state: varies
+        """
+        pass
+
+    @abc.abstractmethod
+    def reset(self):
+        """Reset the reward policy.
+        """
+        pass

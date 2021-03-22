@@ -2,7 +2,7 @@
 # Filename:                                                                 #
 #    runner.py                                                              #
 #                                                                           #
-# Description:                                                              # 
+# Description:                                                              #
 #    Convenience script to load parameters and train a model.               #
 # ========================================================================= #
 import json
@@ -52,10 +52,9 @@ if __name__ == "__main__":
     if not os.path.exists(save_path):
         os.makedirs(save_path)
 
-    with open(save_path+'params.json', 'w') as f:
+    with open(save_path + 'params.json', 'w') as f:
         json = json.dumps(params)
         f.write(json)
 
     # train an agent
     sac(env=env, **sac_kwargs)
-    

@@ -2,15 +2,13 @@
 # Filename:                                                                 #
 #    random.py                                                              #
 #                                                                           #
-# Description:                                                              # 
+# Description:                                                              #
 #    an agent that randomly chooses actions                                 #
 # ========================================================================= #
 import torch
 import torch.nn as nn
 import torch.optim as optim
 from torchvision import transforms
-
-import ipdb as pdb
 
 from core.templates import AbstractAgent
 from envs.env import RacingEnv
@@ -20,25 +18,26 @@ from baselines.il.il_model import CILModel
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 DEVICE
 
+
 class ILAgent(AbstractAgent):
     """Reinforcement learning agent that simply chooses random actions.
 
     :param training_kwargs: training keyword arguments
     :type training_kwargs: dict
     """
+
     def __init__(self, model_params, training_kwargs):
         self.num_episodes = training_kwargs['num_episodes']
-        self.normalize = transforms.Normalize((125.61341389, 118.31236235, 114.9765454), 
-                (68.98788514, 64.9655252, 64.56587821))
+        self.normalize = transforms.Normalize((125.61341389, 118.31236235, 114.9765454),
+                                              (68.98788514, 64.9655252, 64.56587821))
 
-        self.model = CILModel(model_params)    
+        self.model = CILModel(model_params)
         # self.model = self.model.to(DEVICE)
 
-        self.optimizer = optim.Adam(self.model.parameters(), lr=training_kwargs['learning_rate'])
+        self.optimizer = optim.Adam(self.model.parameters(),
+                                    lr=training_kwargs['learning_rate'])
         self.mseLoss = nn.MSELoss()
-<<<<<<< HEAD
-        
-=======
+
         self.model = self.model.to(DEVICE)
         self.save_path = training_kwargs['save_path']
         self.checkpoint_name = training_kwargs['checkpoint']
@@ -46,8 +45,6 @@ class ILAgent(AbstractAgent):
         if training_kwargs['inference_only']:
             self.model.eval()
 
-
->>>>>>> b7863b2de7494034c7dbfd49a855f0d27fb90e04
     def select_action(self, x, a):
         """Select an action
         """
@@ -67,28 +64,29 @@ class ILAgent(AbstractAgent):
                 '''
                 Input for NN:
                     imgs: n x 3 x H x W
-                    sensors: n x Dim 
-                Target: n x 2 
+                    sensors: n x Dim
+                Target: n x 2
                 '''
 
-                imgs, sensors, target = imgs.transpose(2,3).type(torch.FloatTensor).to(DEVICE), \
-                        sensors.to(DEVICE), target.to(DEVICE) 
-                
-                assert imgs.shape == torch.Size([imgs.shape[0], 3, 512, 384]), "FATAL: unexpectd image shape"
+                imgs, sensors, target = imgs.transpose(2, 3).type(torch.FloatTensor).to(DEVICE), \
+                    sensors.to(DEVICE), target.to(DEVICE)
+
+                assert imgs.shape == torch.Size(
+                    [imgs.shape[0], 3, 512, 384]), "FATAL: unexpectd image shape"
 
                 # The output(branches) is a list of 5 branches results, each branch is with size [120,3]
                 self.model.zero_grad()
-                
-                ##TODO: Match I/O
+
+                # TODO: Match I/O
                 out = self.model(imgs, sensors)
-                
+
                 loss = self.mseLoss(out, target)
                 loss.backward()
                 self.optimizer.step()
-            
-            if (i+1)%eval_every == 0:
+
+            if (i + 1) % eval_every == 0:
                 print('Eval / save, eval_every: {}'.format(eval_every))
-                #self.eval()
+                # self.eval()
                 self.save_model(i)
 
     def eval(self):
@@ -100,28 +98,25 @@ class ILAgent(AbstractAgent):
         model_cpu = self.model.cpu()
 
         for e in range(self.num_episodes):
-            print('='*10+f' Episode {e+1} of {self.num_episodes} '+'='*10)
+            print('=' * 10 + f' Episode {e+1} of {self.num_episodes} ' + '=' * 10)
             ep_reward, ep_timestep, best_ep_reward = 0, 0, 0
             obs = self.env.reset()
             obs, reward, done, info = self.env.step([0, 1])
 
             while not done:
                 (sensor, img) = obs
-                img = torch.FloatTensor(img).unsqueeze(0).transpose(1, 3) # 1 x 3 x 512 x 384 
-<<<<<<< HEAD
-                pdb.set_trace() 
-                action = model_cpu(img, torch.FloatTensor(sensor).unsqueeze(0))
-                
-=======
+                img = torch.FloatTensor(img).unsqueeze(
+                    0).transpose(1, 3)  # 1 x 3 x 512 x 384
+
                 img = self.normalize(img)
 
                 action = model_cpu(img, torch.FloatTensor(sensor).unsqueeze(0))
->>>>>>> b7863b2de7494034c7dbfd49a855f0d27fb90e04
                 action = torch.clamp(action, -1, 1)
-                obs, reward, done, info = self.env.step(action.squeeze(0).detach().numpy())
+                obs, reward, done, info = self.env.step(
+                    action.squeeze(0).detach().numpy())
                 ep_reward += reward
                 ep_timestep += 1
-            
+
             # Save if best (or periodically)
                 if (ep_reward > best_ep_reward and ep_reward > 250):
                     print(f'New best episode reward of {round(ep_reward,1)}!')
@@ -131,7 +126,6 @@ class ILAgent(AbstractAgent):
 
             print(f'Completed episode with total reward: {ep_reward}')
             print(f'Episode info: {info}\n')
-
 
     def save_model(self, e):
         path_name = f'{self.save_path}il_episode_{e}.pt'

@@ -1,5 +1,6 @@
 import torch.nn as nn
-#from logger import coil_logger
+# from logger import coil_logger
+
 
 class Branching(nn.Module):
 
@@ -18,13 +19,10 @@ class Branching(nn.Module):
 
         self.branched_modules = nn.ModuleList(branched_modules)
 
-
     # TODO: iteration control should go inside the logger, somehow
 
     def forward(self, x):
         # get only the speeds from measurement labels
-
-
 
         # TODO: we could easily place this speed outside
 
