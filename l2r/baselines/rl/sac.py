@@ -9,7 +9,6 @@ https://github.com/openai/spinningup/blob/master/spinup/algos/pytorch/sac/sac.py
 """
 import itertools
 import os
-import time
 from copy import deepcopy
 
 import cv2
@@ -178,7 +177,7 @@ def sac(env, actor_critic=core.MLPActorCritic, ac_kwargs=dict(), seed=0,
     act_dim = env.action_space.shape[0]
 
     # Action limit for clamping: critically, assumes all dimensions share the same bound!
-    act_limit = env.action_space.high[0]
+    # act_limit = env.action_space.high[0]
 
     # Create actor-critic module and target networks
     if checkpoint:
@@ -202,7 +201,7 @@ def sac(env, actor_critic=core.MLPActorCritic, ac_kwargs=dict(), seed=0,
     replay_buffer = ReplayBuffer(obs_dim=obs_dim, act_dim=act_dim, size=replay_size)
 
     # Count variables (protip: try to get a feel for how different size networks behave!)
-    var_counts = tuple(core.count_vars(module) for module in [ac.pi, ac.q1, ac.q2])
+    # var_counts = tuple(core.count_vars(module) for module in [ac.pi, ac.q1, ac.q2])
 
     # Set up function for computing SAC Q-losses
     def compute_loss_q(data):
@@ -323,7 +322,7 @@ def sac(env, actor_critic=core.MLPActorCritic, ac_kwargs=dict(), seed=0,
 
     else:
         # Prepare for interaction with environment
-        start_time = time.time()
+        # start_time = time.time()
         best_ret, ep_ret, ep_len = 0, 0, 0
         o = _reset()
 

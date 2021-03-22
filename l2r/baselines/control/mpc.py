@@ -6,10 +6,6 @@
 #    an agent using a MPC controller                                        #
 # ========================================================================= #
 
-import json
-import os
-import pathlib
-
 import numpy as np
 import torch
 import matplotlib.pyplot as plt
@@ -215,8 +211,8 @@ class MPCAgent(AbstractAgent):
         """
         map_file, _ = level_2_trackmap(track_name)
 
-        with open(os.path.join(pathlib.Path().absolute(), map_file), 'r') as f:
-            original_map = json.load(f)
+        # with open(os.path.join(pathlib.Path().absolute(), map_file), 'r') as f:
+        #     original_map = json.load(f)
 
         # np.asarray(original_map['Racing'], dtype=np.float32).T
         raceline = self.env.centerline_arr

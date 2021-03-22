@@ -198,7 +198,7 @@ class ProgressTracker(object):
         avg_cline_displacement = np.average(transitions[4])
         avg_curvature = ProgressTracker._path_curvature(path)
         track_curvature = ProgressTracker._path_curvature(self.centerline.T)
-        brake_pressure = transitions[-2]
+        # brake_pressure = transitions[-2]
         accel = transitions[-3]
         sampling_freq = len(self.transitions) / total_time
         ms = ProgressTracker._log_dimensionless_jerk(accel, sampling_freq)

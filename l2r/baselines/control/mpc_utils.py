@@ -76,7 +76,7 @@ class BikeModel(nn.Module):
         T, _ = x.shape
         x, y, v, phi = torch.unbind(x, dim=-1)  # T
 
-        a = u[:, 0] * k1
+        # a = u[:, 0] * k1
         delta = u[:, 1] * k2
         '''
         ## Reference: Center of Mass

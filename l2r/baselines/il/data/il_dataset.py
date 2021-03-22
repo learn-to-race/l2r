@@ -213,7 +213,6 @@ class ILDataset(Dataset):
         sensor_data_names = []
         float_dicts = []
         number_of_hours_pre_loaded = 0
-        image = 0
         multimodal_data = 0
         action = 0
 
@@ -247,7 +246,7 @@ class ILDataset(Dataset):
                     episode.split('/')[-1], transition))
                 count_added_measurements += 1
 
-            last_data_point_number = transitions_list[-1].split('_')[-1].split('.')[0]
+            # last_data_point_number = transitions_list[-1].split('_')[-1].split('.')[0]
             number_of_hours_pre_loaded += (float(count_added_measurements) / 3600.0)
             print(" Loaded ", number_of_hours_pre_loaded, " hours of data")
 

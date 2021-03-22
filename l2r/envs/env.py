@@ -52,15 +52,15 @@ GEAR_REQ_RANGE = 4
 
 # Pose observation space boundaries
 MIN_OBS_ARR = [
-    -1., -1., -1.,                  # steering, gear, mode
-    -200., -200., -10.,             # velocity
-    -100., -100., -100.,            # acceleration
-    -1., -1., -5.,                  # angular velocity
-    -6.2832, -6.2832, -6.2832,      # yaw, pitch, roll
-    -2000., 2000., 2000.,           # location coordinates in the format (y, x, z)
+    -1., -1., -1.,                   # steering, gear, mode
+    -200., -200., -10.,              # velocity
+    -100., -100., -100.,             # acceleration
+    -1., -1., -5.,                   # angular velocity
+    -6.2832, -6.2832, -6.2832,       # yaw, pitch, roll
+    -2000., 2000., 2000.,            # location coordinates in the format (y, x, z)
     -2000., -2000., -2000., -2000.,  # rpm (per wheel)
-    -1., -1., -1., -1.,             # brake (per wheel)
-    -1., -1., -1300., -1300.]       # torq (per wheel)
+    -1., -1., -1., -1.,              # brake (per wheel)
+    -1., -1., -1300., -1300.]        # torq (per wheel)
 
 MAX_OBS_ARR = [
     1., 4., 1.,                  # steering, gear, mode
@@ -462,9 +462,9 @@ class RacingEnv(gym.Env):
     def _waypoints(self, goal='center', ct=3, step=8):
         """Return position of goal
         """
-        l = len(self.centerline_arr)
+        num = len(self.centerline_arr)
         idxs = [self.nearest_idx + i * step for i in range(ct)]
         if goal == 'center':
-            return np.asarray([self.centerline_arr[idx % l] for idx in idxs])
+            return np.asarray([self.centerline_arr[idx % num] for idx in idxs])
         else:
             raise NotImplementedError
