@@ -5,7 +5,6 @@ import pdb
 from baselines.il.il_utils import AttributeDict
 from baselines.il.building_blocks import Conv, Branching, FC, Join
 
-
 g_conf = AttributeDict()
 g_conf.immutable(False)
 

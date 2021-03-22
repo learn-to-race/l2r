@@ -1,9 +1,9 @@
 # ========================================================================= #
 # Filename:                                                                 #
-#    random.py                                                              #
+#    il.py                                                                  #
 #                                                                           #
 # Description:                                                              # 
-#    an agent that randomly chooses actions                                 #
+#    imitation learning agent                                               #
 # ========================================================================= #
 import torch
 import torch.nn as nn
@@ -33,12 +33,8 @@ class ILAgent(AbstractAgent):
 
         self.model = CILModel(model_params)    
         # self.model = self.model.to(DEVICE)
-
         self.optimizer = optim.Adam(self.model.parameters(), lr=training_kwargs['learning_rate'])
         self.mseLoss = nn.MSELoss()
-<<<<<<< HEAD
-        
-=======
         self.model = self.model.to(DEVICE)
         self.save_path = training_kwargs['save_path']
         self.checkpoint_name = training_kwargs['checkpoint']
@@ -46,8 +42,6 @@ class ILAgent(AbstractAgent):
         if training_kwargs['inference_only']:
             self.model.eval()
 
-
->>>>>>> b7863b2de7494034c7dbfd49a855f0d27fb90e04
     def select_action(self, x, a):
         """Select an action
         """
@@ -108,15 +102,10 @@ class ILAgent(AbstractAgent):
             while not done:
                 (sensor, img) = obs
                 img = torch.FloatTensor(img).unsqueeze(0).transpose(1, 3) # 1 x 3 x 512 x 384 
-<<<<<<< HEAD
                 pdb.set_trace() 
                 action = model_cpu(img, torch.FloatTensor(sensor).unsqueeze(0))
-                
-=======
                 img = self.normalize(img)
-
                 action = model_cpu(img, torch.FloatTensor(sensor).unsqueeze(0))
->>>>>>> b7863b2de7494034c7dbfd49a855f0d27fb90e04
                 action = torch.clamp(action, -1, 1)
                 obs, reward, done, info = self.env.step(action.squeeze(0).detach().numpy())
                 ep_reward += reward
