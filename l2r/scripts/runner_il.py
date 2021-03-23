@@ -2,21 +2,22 @@
 # Filename:                                                                 #
 #    runner.py                                                              #
 #                                                                           #
-# Description:                                                              # 
+# Description:                                                              #
 #    Convenience script to load parameters and train a model.               #
 # ========================================================================= #
 
 
-#import yaml
-import torch
+# import yaml
 from torch.utils.data import DataLoader
-import os, sys, argparse, json
-import pdb as pdb
+import os
+import sys
+import json
 from ruamel.yaml import YAML
 
 from baselines.il.il import ILAgent
 from baselines.il.data.il_dataset import ILDataset
 from envs.env import RacingEnv
+
 
 def main(params):
     env_kwargs = params['env_kwargs']
@@ -33,7 +34,7 @@ def main(params):
     out = agent.select_action(imgs, others)
     '''
     agent.create_env(env_kwargs, sim_kwargs)
-    
+
     env = RacingEnv(
         max_timesteps=env_kwargs['max_timesteps'],
         obs_delay=env_kwargs['obs_delay'],
@@ -60,50 +61,50 @@ def main(params):
     if not os.path.exists(save_path):
         os.makedirs(save_path)
 
-    with open(save_path+'params.json', 'w') as f:
+    with open(save_path + 'params.json', 'w') as f:
         jsondump = json.dumps(params)
         f.write(jsondump)
 
     if not il_kwargs['inference_only']:
 
-        train = ILDataset(il_kwargs['DATASET']['LOCATION'], 
-                il_kwargs['DATASET']['NAME'], 
-                il_kwargs['DATASET']['SPLIT']['TRAIN'],
-                il_kwargs['DATASET']['LOOKAHEAD'],
-                il_kwargs['DATASET']['PRELOAD_NAME'])
+        train = ILDataset(il_kwargs['DATASET']['LOCATION'],
+                          il_kwargs['DATASET']['NAME'],
+                          il_kwargs['DATASET']['SPLIT']['TRAIN'],
+                          il_kwargs['DATASET']['LOOKAHEAD'],
+                          il_kwargs['DATASET']['PRELOAD_NAME'])
 
-        val = ILDataset(il_kwargs['DATASET']['LOCATION'], 
-                il_kwargs['DATASET']['NAME'], 
-                il_kwargs['DATASET']['SPLIT']['VAL'],
-                il_kwargs['DATASET']['LOOKAHEAD'],
-                il_kwargs['DATASET']['PRELOAD_NAME'])
+        val = ILDataset(il_kwargs['DATASET']['LOCATION'],
+                        il_kwargs['DATASET']['NAME'],
+                        il_kwargs['DATASET']['SPLIT']['VAL'],
+                        il_kwargs['DATASET']['LOOKAHEAD'],
+                        il_kwargs['DATASET']['PRELOAD_NAME'])
 
-        train = DataLoader(train, params['il_kwargs']['TRAIN_BS'], 
-                           num_workers=params['il_kwargs']['CPU'], 
+        train = DataLoader(train, params['il_kwargs']['TRAIN_BS'],
+                           num_workers=params['il_kwargs']['CPU'],
                            pin_memory=params['il_kwargs']['PIN'],
                            shuffle=True)
 
-        val = DataLoader(val, batch_size=params['il_kwargs']['VAL_BS'], 
-                         num_workers=params['il_kwargs']['CPU'], 
+        val = DataLoader(val, batch_size=params['il_kwargs']['VAL_BS'],
+                         num_workers=params['il_kwargs']['CPU'],
                          pin_memory=params['il_kwargs']['PIN'],
                          shuffle=False)
-
 
         print("Training IL agent")
         # train agent with imitation learning
         agent.il_train(train, **il_kwargs)
-    
+
     else:
-    
+
         # run agent on the track
         print("Running IL agent")
         agent.load_model()
         agent.eval()
 
+
 if __name__ == "__main__":
-    #argparser = argparse.ArgumentParser(description=__doc__)
-    #argparser.add_argument('-e', '--exp', type=str)
-    #args = argparser.parse_args()
+    # argparser = argparse.ArgumentParser(description=__doc__)
+    # argparser.add_argument('-e', '--exp', type=str)
+    # args = argparser.parse_args()
     yaml = YAML()
     params = yaml.load(open(sys.argv[1]))
     main(params)

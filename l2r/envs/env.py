@@ -2,7 +2,7 @@
 # Filename:                                                                 #
 #    env.py                                                                 #
 #                                                                           #
-# Description:                                                              # 
+# Description:                                                              #
 #    Reinforcement learning environment for autonomous racing               #
 # ========================================================================= #
 
@@ -14,7 +14,7 @@ import time
 import gym
 import matplotlib.path as mplPath
 import numpy as np
-from gym.spaces import Box, Discrete, Dict
+from gym.spaces import Box, Dict
 from scipy.spatial import KDTree
 
 import envs.utils as utils
@@ -30,7 +30,7 @@ TIMEOUT_DELAY = 30
 LAUNCHING_DELAY = 15
 
 # Restart simulator container every so often
-SIM_RESET=60*20
+SIM_RESET = 60 * 20
 
 # Vehicle dimensions in meters
 CAR_DIMS = [3.0, 1.68]
@@ -52,15 +52,15 @@ GEAR_REQ_RANGE = 4
 
 # Pose observation space boundaries
 MIN_OBS_ARR = [
-    -1., -1., -1.,                  # steering, gear, mode
-    -200., -200., -10.,             # velocity
-    -100., -100., -100.,            # acceleration
-    -1., -1., -5.,                  # angular velocity
-    -6.2832, -6.2832, -6.2832,      # yaw, pitch, roll
-    -2000., 2000., 2000.,           # location coordinates in the format (y, x, z)
-    -2000., -2000., -2000., -2000., # rpm (per wheel)
-    -1., -1., -1., -1.,             # brake (per wheel)
-    -1., -1., -1300., -1300.]       # torq (per wheel)
+    -1., -1., -1.,                   # steering, gear, mode
+    -200., -200., -10.,              # velocity
+    -100., -100., -100.,             # acceleration
+    -1., -1., -5.,                   # angular velocity
+    -6.2832, -6.2832, -6.2832,       # yaw, pitch, roll
+    -2000., 2000., 2000.,            # location coordinates in the format (y, x, z)
+    -2000., -2000., -2000., -2000.,  # rpm (per wheel)
+    -1., -1., -1., -1.,              # brake (per wheel)
+    -1., -1., -1300., -1300.]        # torq (per wheel)
 
 MAX_OBS_ARR = [
     1., 4., 1.,                  # steering, gear, mode
@@ -73,6 +73,7 @@ MAX_OBS_ARR = [
     1., 1., 2., 2.,              # brake (per wheel)
     1., 1., 1300., 1300.         # torq (per wheel)
 ]
+
 
 class RacingEnv(gym.Env):
     """A reinforcement learning environment for autonomous racing.
@@ -91,6 +92,7 @@ class RacingEnv(gym.Env):
       waypoints on the track in the info returned from **step()**
     :param float obs_delay: time delay between action and observation
    """
+
     def __init__(self, max_timesteps, controller_kwargs, reward_kwargs,
                  action_if_kwargs, camera_if_kwargs, pose_if_kwargs,
                  logger_kwargs, reward_pol='default', not_moving_timeout=20,
@@ -142,7 +144,7 @@ class RacingEnv(gym.Env):
         self.vehicle_params = vehicle_params
         self.camera_params = camera_params
         self.driver_params = driver_params
-        
+
         self.controller.set_level(level)
         self.controller.reset_vehicle_params()
         self.controller.set_api_udp()
@@ -200,7 +202,7 @@ class RacingEnv(gym.Env):
         :return: observation, reward, done, info
         :rtype: if multimodal, the observation is a dict of numpy arrays with
           keys 'pose' and 'img' and shapes (30,) and (height, width, 3),
-          respectively, otherwise the observation is just the image array. 
+          respectively, otherwise the observation is just the image array.
           reward is of type float, done bool, and info dict
         """
         self.action_if.act(action)
@@ -217,7 +219,7 @@ class RacingEnv(gym.Env):
         if self.provide_waypoints:
             info['track_idx'] = self.nearest_idx
             info['waypoints'] = self._waypoints()
-            
+
         return observation, reward, done, info
 
     def reset(self, random_pos=False):
@@ -247,7 +249,7 @@ class RacingEnv(gym.Env):
         self.controller.enable_sensor('CameraFrontRGB')
 
         if self.vehicle_params:
-            self.controller.set_vehicle_params(vehicle_params)
+            self.controller.set_vehicle_params(self.vehicle_params)
 
         for sensor in self.sensors:
             self.controller.enable_sensor(sensor)
@@ -350,7 +352,7 @@ class RacingEnv(gym.Env):
 
         self.nearest_idx = self.kdtree.query(np.asarray([enu_x, enu_y]))[1]
         self.tracker.update(self.nearest_idx, enu_x, enu_y, enu_z, yaw, a, bp)
-        
+
         return (pose, imgs)
 
     def _is_complete(self, observation):
@@ -404,7 +406,7 @@ class RacingEnv(gym.Env):
         self.reward.set_track(
             inside_path=self.inside_path,
             outside_path=self.outside_path,
-            centre_path=self.centre_path, 
+            centre_path=self.centre_path,
             car_dims=CAR_DIMS
         )
 
@@ -437,10 +439,10 @@ class RacingEnv(gym.Env):
             filename = f'{output_dir}/{fname}_{n}'
             np.savez_compressed(filename, pose_data=pose, image=img)
 
-        print(f'Complete')
+        print('Complete')
 
     def random_start_location(self):
-        """Randomly selects an index on the centerline of the track and 
+        """Randomly selects an index on the centerline of the track and
         returns the ENU coordinates of the selected index along with the yaw of
         the centerline at that point.
 
@@ -460,10 +462,9 @@ class RacingEnv(gym.Env):
     def _waypoints(self, goal='center', ct=3, step=8):
         """Return position of goal
         """
-        l = len(self.centerline_arr)
-        idxs = [self.nearest_idx+i*step for i in range(ct)]
-        if goal=='center':
-            return np.asarray([self.centerline_arr[idx % l] for idx in idxs])
+        num = len(self.centerline_arr)
+        idxs = [self.nearest_idx + i * step for i in range(ct)]
+        if goal == 'center':
+            return np.asarray([self.centerline_arr[idx % num] for idx in idxs])
         else:
             raise NotImplementedError
-

@@ -1,8 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-track='thruxton'
-n=100
+track = 'thruxton'
+n = 100
 
 # view files
 loaded = np.load(f'{track}/{track}_{n}.npz')

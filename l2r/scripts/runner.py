@@ -2,7 +2,7 @@
 # Filename:                                                                 #
 #    runner.py                                                              #
 #                                                                           #
-# Description:                                                              # 
+# Description:                                                              #
 #    Convenience script to load parameters and train a model.               #
 # ========================================================================= #
 import json
@@ -12,7 +12,6 @@ import sys
 from ruamel.yaml import YAML
 
 from baselines.sac import sac
-from baselines.models.vae import *
 from envs.env import RacingEnv
 
 if __name__ == "__main__":
@@ -52,10 +51,9 @@ if __name__ == "__main__":
     if not os.path.exists(save_path):
         os.makedirs(save_path)
 
-    with open(save_path+'params.json', 'w') as f:
+    with open(save_path + 'params.json', 'w') as f:
         json = json.dumps(params)
         f.write(json)
 
     # train an agent
     sac(env=env, **sac_kwargs)
-    

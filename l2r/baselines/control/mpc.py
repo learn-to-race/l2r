@@ -2,14 +2,9 @@
 # Filename:                                                                 #
 #    mpc.py                                                                 #
 #                                                                           #
-# Description:                                                              # 
+# Description:                                                              #
 #    an agent using a MPC controller                                        #
 # ========================================================================= #
-
-import json
-import os
-import pathlib
-import time
 
 import numpy as np
 import torch
@@ -20,8 +15,6 @@ from core.templates import AbstractAgent
 from envs.env import RacingEnv
 from racetracks.mapping import level_2_trackmap
 
-import pdb
-
 if float(torch.__version__[0:3]) > 1.4:
     raise Exception('MPC agent requires torch version of 1.4 or lower')
 
@@ -30,17 +23,19 @@ WB = 2.7  # [m]
 
 # State variables
 DT = 0.1  # [s] time tick
-N_STATE = 4 # [x, y, v, yaw]
+N_STATE = 4  # [x, y, v, yaw]
 
 # Controller
 T = 6
 dl = 0.25
+
 
 class MPCAgent(AbstractAgent):
     """Agent that selects actions using an MPC controller
 
     :param dict mpc_kwargs: keyword arguments
     """
+
     def __init__(self, mpc_kwargs):
         self.vt = mpc_kwargs['velocity_target']
         self.step_size = mpc_kwargs['step_size']
@@ -49,10 +44,10 @@ class MPCAgent(AbstractAgent):
         self.save_path = mpc_kwargs['save_path']
         self.save_transitions = mpc_kwargs['save_transitions']
 
-        self.car = BikeModel(dt=DT, 
+        self.car = BikeModel(dt=DT,
                              init_params=np.array([WB, 10, 6]))
-        self.controller = MPC(T = T,
-                              cost_weight=torch.FloatTensor([1,1,1,16,0.1,1]), 
+        self.controller = MPC(T=T,
+                              cost_weight=torch.FloatTensor([1, 1, 1, 16, 0.1, 1]),
                               cost_type='reference')
 
     def race(self):
@@ -63,22 +58,22 @@ class MPCAgent(AbstractAgent):
             self._imgs = []
             self._multimodal = []
             self._actions = []
- 
+
         for e in range(self.num_episodes):
-            print('='*10+f' Episode {e+1} of {self.num_episodes} '+'='*10)
+            print('=' * 10 + f' Episode {e+1} of {self.num_episodes} ' + '=' * 10)
             ep_reward, ep_timestep = 0, 0
             obs, info = self.env.reset()
             obs, reward, done, info = self.env.step([0, 1])
 
             while not done:
-                x, y, v, yaw = MPCAgent.unpack_state(obs) 
+                x, y, v, yaw = MPCAgent.unpack_state(obs)
 
                 idx = info['track_idx']
                 xref, to2pi_flag = self.get_xref(idx, yaw)
-                
+
                 if to2pi_flag:
-                    if yaw<0:
-                        yaw += 2*np.pi
+                    if yaw < 0:
+                        yaw += 2 * np.pi
                 x0 = [x, y, v, yaw]  # current state
 
                 print(f'State: @{idx}, loc=({x}, {y}), v={v}, yaw={yaw*180/np.pi}')
@@ -87,19 +82,20 @@ class MPCAgent(AbstractAgent):
                 if self.plot:
                     plt.plot([x], [y], 'bo', markersize=4)
                     l_arr = 10
-                    plt.arrow(x, y, l_arr*np.cos(yaw), l_arr*np.sin(yaw), 
-                              color='r',) #head_width = 0.5, 
+                    plt.arrow(x, y, l_arr * np.cos(yaw), l_arr * np.sin(yaw),
+                              color='r',)  # head_width = 0.5,
                     plt.plot(xref[0, 0], xref[1, 0], 'o')
-                
+
                 # action selection
-                _, u_opt = self.controller.forward(self.car,
-                        torch.tensor(x0).unsqueeze(0), 
-                        torch.tensor(xref).transpose(0, 1).unsqueeze(1))
+                _, u_opt = self.controller.forward(
+                    self.car,
+                    torch.tensor(x0).unsqueeze(0),
+                    torch.tensor(xref).transpose(0, 1).unsqueeze(1))
 
                 u = u_opt[0].squeeze().detach().numpy()
                 ai, di = u
 
-                # u_opt is a sequence of actions, along the predicted trajectory, 
+                # u_opt is a sequence of actions, along the predicted trajectory,
                 # so we'll take the first one to give to the environment
                 obs, reward, done, info = self.env.step([di, ai])
                 ep_reward += reward
@@ -121,7 +117,6 @@ class MPCAgent(AbstractAgent):
                                 action=self._actions[i]
                             )
 
-
             print(f'Completed episode with total reward: {ep_reward}')
             print(f'Episode info: {info}\n')
 
@@ -134,20 +129,21 @@ class MPCAgent(AbstractAgent):
         :rtype: numpy array
         """
         # TODO: Interval between waypoint have to change as well
-        target_idxs = [(idx + self.step_size*t) % self.raceline_length for t in range(1, 1+n_targets)]
+        target_idxs = [(idx + self.step_size * t) %
+                       self.raceline_length for t in range(1, 1 + n_targets)]
         target_x = [self.race_x[i] for i in target_idxs]
         target_y = [self.race_y[i] for i in target_idxs]
 
         target_yaw = np.array([self.race_yaw[i] for i in target_idxs])
-        if np.any((target_yaw > 5/6*np.pi)|(target_yaw < -5/6*np.pi)):
+        if np.any((target_yaw > 5 / 6 * np.pi) | (target_yaw < -5 / 6 * np.pi)):
             to2pi_flag = True
-            target_yaw[target_yaw<0]+=2*np.pi
+            target_yaw[target_yaw < 0] += 2 * np.pi
         else:
             to2pi_flag = False
 
-        cdy = abs(target_yaw[-1]-yaw)
-        mdy = abs(target_yaw[0]-target_yaw[-3])
-        tdy = abs(target_yaw[0]-target_yaw[-1])
+        cdy = abs(target_yaw[-1] - yaw)
+        mdy = abs(target_yaw[0] - target_yaw[-3])
+        tdy = abs(target_yaw[0] - target_yaw[-1])
         vt = self.vt
 
         # crude velocity profile
@@ -157,10 +153,10 @@ class MPCAgent(AbstractAgent):
             vt = self.vt * 0.7
         if tdy > 0.4 or cdy > 0.4:
             vt = self.vt * 0.5
-        if tdy > 1.0 or mdy > 1.0: 
+        if tdy > 1.0 or mdy > 1.0:
             vt = self.vt * 0.3
 
-        target_v = [vt] * n_targets        
+        target_v = [vt] * n_targets
 
         return np.array([target_x, target_y, target_v, target_yaw], dtype=np.float32), to2pi_flag
 
@@ -170,7 +166,7 @@ class MPCAgent(AbstractAgent):
         x = state[16]
         y = state[15]
         v = (state[4]**2 + state[3]**2 + state[5]**2)**0.5
-        yaw = np.pi/2 - state[12]
+        yaw = np.pi / 2 - state[12]
         # Ensure the yaw is within [-pi, pi)
         yaw = (yaw + np.pi) % (2 * np.pi) - np.pi
         return x, y, v, yaw
@@ -185,29 +181,28 @@ class MPCAgent(AbstractAgent):
         :param dict sim_kwargs: simulator setting keyword arguments
         """
         self.env = RacingEnv(
-                max_timesteps=env_kwargs['max_timesteps'],
-                obs_delay=env_kwargs['obs_delay'],
-                not_moving_timeout=env_kwargs['not_moving_timeout'],
-                controller_kwargs=env_kwargs['controller_kwargs'],
-                reward_pol=env_kwargs['reward_pol'],
-                reward_kwargs=env_kwargs['reward_kwargs'],
-                action_if_kwargs=env_kwargs['action_if_kwargs'],
-                camera_if_kwargs=env_kwargs['camera_if_kwargs'],
-                pose_if_kwargs=env_kwargs['pose_if_kwargs'],
-                provide_waypoints=env_kwargs['provide_waypoints'],
-                logger_kwargs=env_kwargs['pose_if_kwargs']
+            max_timesteps=env_kwargs['max_timesteps'],
+            obs_delay=env_kwargs['obs_delay'],
+            not_moving_timeout=env_kwargs['not_moving_timeout'],
+            controller_kwargs=env_kwargs['controller_kwargs'],
+            reward_pol=env_kwargs['reward_pol'],
+            reward_kwargs=env_kwargs['reward_kwargs'],
+            action_if_kwargs=env_kwargs['action_if_kwargs'],
+            camera_if_kwargs=env_kwargs['camera_if_kwargs'],
+            pose_if_kwargs=env_kwargs['pose_if_kwargs'],
+            provide_waypoints=env_kwargs['provide_waypoints'],
+            logger_kwargs=env_kwargs['pose_if_kwargs']
         )
 
         self.env.make(
-                level=sim_kwargs['racetrack'],
-                multimodal=env_kwargs['multimodal'],
-                driver_params=sim_kwargs['driver_params'],
-                camera_params=sim_kwargs['camera_params'],
-                sensors=sim_kwargs['active_sensors']
+            level=sim_kwargs['racetrack'],
+            multimodal=env_kwargs['multimodal'],
+            driver_params=sim_kwargs['driver_params'],
+            camera_params=sim_kwargs['camera_params'],
+            sensors=sim_kwargs['active_sensors']
         )
 
         self.load_track(sim_kwargs['racetrack'])
-
 
     def load_track(self, track_name='VegasNorthRoad'):
         """Load trace track
@@ -216,23 +211,22 @@ class MPCAgent(AbstractAgent):
         """
         map_file, _ = level_2_trackmap(track_name)
 
-        with open(os.path.join(pathlib.Path().absolute(), map_file), 'r') as f:
-            original_map = json.load(f)
+        # with open(os.path.join(pathlib.Path().absolute(), map_file), 'r') as f:
+        #     original_map = json.load(f)
 
-        raceline = self.env.centerline_arr# np.asarray(original_map['Racing'], dtype=np.float32).T
+        # np.asarray(original_map['Racing'], dtype=np.float32).T
+        raceline = self.env.centerline_arr
         self.race_x = raceline[:, 0]
         self.race_y = raceline[:, 1]
         self.raceline_length = self.race_x.shape[0]
 
-        X_diff = np.concatenate([self.race_x[1:]-self.race_x[:-1], 
-                [self.race_x[0]-self.race_x[-1]]])
-        Y_diff = np.concatenate([self.race_y[1:]-self.race_y[:-1], 
-                [self.race_y[0]-self.race_y[-1]]])
-        self.race_yaw = np.arctan(Y_diff / X_diff) # (L-1, n)
-        self.race_yaw[X_diff<0] += np.pi
+        X_diff = np.concatenate([self.race_x[1:] - self.race_x[:-1],
+                                 [self.race_x[0] - self.race_x[-1]]])
+        Y_diff = np.concatenate([self.race_y[1:] - self.race_y[:-1],
+                                 [self.race_y[0] - self.race_y[-1]]])
+        self.race_yaw = np.arctan(Y_diff / X_diff)  # (L-1, n)
+        self.race_yaw[X_diff < 0] += np.pi
         # Ensure the yaw is within [-pi, pi)
-        self.race_yaw = (self.race_yaw + np.pi) % (2 * np.pi) - np.pi 
-        #pdb.set_trace()
-        #self.race_yaw = np.asarray(original_map['RacingPsi'], dtype=np.float32)
-        
-    
+        self.race_yaw = (self.race_yaw + np.pi) % (2 * np.pi) - np.pi
+        # pdb.set_trace()
+        # self.race_yaw = np.asarray(original_map['RacingPsi'], dtype=np.float32)

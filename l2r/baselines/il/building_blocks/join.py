@@ -1,8 +1,6 @@
-#from logger import coil_logger
+# from logger import coil_logger
 import torch.nn as nn
-import torch.nn.init as init
 import torch
-import torch.nn.functional as F
 
 
 class Join(nn.Module):
@@ -26,8 +24,6 @@ class Join(nn.Module):
         self.after_process = params['after_process']
         self.mode = params['mode']
 
-
-
     # TODO: iteration control should go inside the logger, somehow
 
     def forward(self, x, m):
@@ -40,8 +36,6 @@ class Join(nn.Module):
             raise ValueError("Mode to join networks not found")
 
         return self.after_process(j)
-
-
 
     '''
     def load_network(self, checkpoint):
@@ -56,4 +50,4 @@ class Join(nn.Module):
                 })
     '''
 
-        # TODO: implement
+    # TODO: implement
