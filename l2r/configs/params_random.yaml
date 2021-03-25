@@ -33,7 +33,7 @@ env_kwargs:
     default: True
 
 sim_kwargs:
-  racetrack: 'VegasNorthRoad' # ['VegasNorthRoad', 'Thruxton']
+  racetrack: 'Thruxton' # ['VegasNorthRoad', 'Thruxton']
   active_sensors:
     - ImuOxtsSensor
     - CameraFrontRGB

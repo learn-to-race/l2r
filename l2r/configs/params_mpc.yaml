@@ -1,9 +1,9 @@
 # parameters for the baseline mpc agent
 
 mpc_kwargs:
-  num_episodes: 1
-  velocity_target: 12.5 # m/s
-  step_size: 10 # number of indicies b/w waypoints
+  num_episodes: 3
+  velocity_target: 14 # m/s
+  step_size: 8 # number of indicies b/w waypoints
   save_transitions: False
   save_path: False
   plot: False
