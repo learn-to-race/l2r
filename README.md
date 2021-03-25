@@ -1,10 +1,23 @@
 # Learn-to-Race
 
-Learn-to-Race is an [OpenAI gym](https://gym.openai.com/) compliant, multimodal reinforcement learning environment where agents learn how to race. Unlike many simplistic learning environments, ours is built around Arrival’s CARLA-based software-in-the-loop racing simulator which was built specifically to accurately model race cars. This simulator is used in practice in [Roborace](https://roborace.com/), the world’s first extreme competition of teams developing self-driving AI.
+Learn-to-Race is an [OpenAI gym](https://gym.openai.com/) compliant, multimodal reinforcement learning environment where agents learn how to race. Unlike many simplistic learning environments, ours is built around Arrival’s high-fidelity racing simulator featuring full software-in-the-loop (SIL), and even hardware-in-the-loop (HIL), simulation capabilities. This simulator has played a key role in bringing autonomous racing technology to real life in the [Roborace series](https://roborace.com/), the world’s first extreme competition of teams developing self-driving AI.
+
+<div align="center">
+  <br>
+  <img src='./assets/imgs/main_figure.png' alt='missing'/ width=80%>
+  <p style="padding: 10px 15px 15px;"><i>The Learn-to-Race Framework</i></p>
+  <br>
+</div>
+
 
 ## Documentation
 
 Please visit our [official docs](https://learn-to-race.com/) for a comprehensive guide on getting started with the environment. Happy racing!
+
+## Learn-to-Race Task
+
+While learning-based agents continue to demonstrate superhuman performance in many areas, we believe that they still lack in terms of generalization abilities and often require too many interactions. In summary, agents will have the ability to learn on training racetracks, but will be evaluated on their performance on an unseen evaluation track. However, the evaluation track is not *truly* unseen. Much like a Formula-1 driver, we will let agents interact with the new track for 60 minutes during a pre-evaluation stage before true evaluation.
+
 
 ## Baseline Agents
 
@@ -28,7 +41,7 @@ We provide multiple baseline agents to demonstrate how to use Learn-to-Race. The
 
 **Python:** We use Learn-to-Race with Python 3.6 or 3.7.
 
-**Graphics Hardware:** The racing simulator runs in a container, but it requires a GPU with Nvidia drivers installed. A Nvidia 970 GTX graphics card is minimally sufficient to simply run the simulator.
+**Graphics Hardware:** The racing simulator runs in a container, but it requires a GPU with Nvidia drivers installed. An Nvidia 970 GTX graphics card is minimally sufficient to simply run the simulator.
 
 **Docker:** The racing simulator runs in a [Docker](https://www.docker.com/get-started) container.
 
@@ -55,8 +68,15 @@ $ source venv/bin/activate                  # activate the environment
 
 ## Research
 
-To cite this repository in publications: 
+Please cite this work if you use L2R as a part of your research.
 
 ```
-TBD
+@misc{herman2021learntorace,
+      title={Learn-to-Race: A Multimodal Control Environment for Autonomous Racing}, 
+      author={James Herman and Jonathan Francis and Siddha Ganju and Bingqing Chen and Anirudh Koul and Abhinav Gupta and Alexey Skabelkin and Ivan Zhukov and Andrey Gostev and Max Kumskoy and Eric Nyberg},
+      year={2021},
+      eprint={2103.11575},
+      archivePrefix={arXiv},
+      primaryClass={cs.RO}
+}
 ``` 
