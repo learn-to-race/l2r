@@ -9,11 +9,11 @@ sac_kwargs:
   update_after: 3000
   num_updates: 5
   max_ep_len: 5000
-  encoder_path: './baselines/models/vae-144hw-32l-lvms.pt'
+  encoder_path: './baselines/models/vae-144hw-32l-thruxton.pt'
   latent_dims: 32
   im_w: 144
   im_h: 144
-  checkpoint: './baselines/checkpoints/lvms/sac_episode_1000.pt'
+  checkpoint: './baselines/checkpoints/thruxton/sac_episode_1000.pt'
   inference_only: True
   save_path: './results/sac/'
 
@@ -29,7 +29,7 @@ env_kwargs:
   controller_kwargs:
     sim_version: 'ArrivalSim-linux-0.3.0.137341-roborace'
     quiet: False
-    start_container: True # False 
+    start_container: False 
   action_if_kwargs:
     max_accel: 4.
     min_accel: -1.
@@ -47,7 +47,7 @@ env_kwargs:
     default: True
 
 sim_kwargs:
-  racetrack: 'VegasNorthRoad' # ['VegasNorthRoad', 'Thruxton']
+  racetrack: 'Thruxton' # ['VegasNorthRoad', 'Thruxton']
   active_sensors:
     - ImuOxtsSensor
     - CameraFrontRGB
