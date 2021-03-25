@@ -1,14 +1,13 @@
 # Learn-to-Race
 
-Learn-to-Race is an [OpenAI gym](https://gym.openai.com/) compliant, multimodal reinforcement learning environment where agents learn how to race. Unlike many simplistic learning environments, ours is built around Arrival’s high-fidelity racing simulator featuring full software-in-the-loop (SIL), and even hardware-in-the-loop (HIL), simulation capabilities. This simulator has played a key role in bringing autonomous racing technology to real life in the [Roborace series](https://roborace.com/), the world’s first extreme competition of teams developing self-driving AI.
+Learn-to-Race is an [OpenAI gym](https://gym.openai.com/) compliant, multimodal control environment where agents learn how to race. Unlike many simplistic learning environments, ours is built around Arrival’s high-fidelity racing simulator featuring full software-in-the-loop (SIL), and even hardware-in-the-loop (HIL), simulation capabilities. This simulator has played a key role in bringing autonomous racing technology to real life in the [Roborace series](https://roborace.com/), the world’s first extreme competition of teams developing self-driving AI.
 
 <div align="center">
   <br>
   <img src='./assets/imgs/main_figure.png' alt='missing'/ width=80%>
-  <p style="padding: 10px 15px 15px;"><i>The Learn-to-Race Framework</i></p>
+  <p style="padding: 20px 20px 20px 20px;"><i>An Overview of the Learn-to-Race framework</i></p>
   <br>
 </div>
-
 
 ## Documentation
 
@@ -21,7 +20,7 @@ While learning-based agents continue to demonstrate superhuman performance in ma
 
 ## Baseline Agents
 
-We provide multiple baseline agents to demonstrate how to use Learn-to-Race. The first is a ``RandomActionAgent`` to show basic functionality. We also include a [Soft Actor-Critic](https://arxiv.org/abs/1801.01290v1) agent, *tabula rasa*, trained for 1000 epsiodes. On the Las Vegas track, it is able to consistently complete laps in under 2 minutes each using only visual features from the virtual camera as input.
+We provide multiple baseline agents to demonstrate how to use Learn-to-Race including both classical and learning-based controllers. The first is a ``RandomActionAgent`` to show basic functionality. We also include a [Soft Actor-Critic](https://arxiv.org/abs/1801.01290v1) agent, *tabula rasa*, trained for 1000 epsiodes. On the Las Vegas track, it is able to consistently complete laps in under 2 minutes each using only visual features from the virtual camera as input.
 
 <div align="center">
   <br>
