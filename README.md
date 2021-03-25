@@ -4,8 +4,9 @@ Learn-to-Race is an [OpenAI gym](https://gym.openai.com/) compliant, multimodal 
 
 <div align="center">
   <br>
+  <p style="padding: 20px 20px 20px 20px;"><i>An overview of the Learn-to-Race framework</i></p>
+  <br>
   <img src='./assets/imgs/main_figure.png' alt='missing'/ width=80%>
-  <p style="padding: 20px 20px 20px 20px;"><i>An Overview of the Learn-to-Race framework</i></p>
   <br>
 </div>
 
