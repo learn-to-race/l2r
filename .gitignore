@@ -2,5 +2,8 @@
 *.swo
 **/__pycache__/
 l2r/results/
-runtime
 l2r/sanity_test.png
+runtime
+datasets/lvms-resized/
+datasets/thruxton-resized/
+docs/
