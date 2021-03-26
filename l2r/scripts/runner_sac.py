@@ -12,7 +12,7 @@ import sys
 from ruamel.yaml import YAML
 
 from baselines.rl.sac import sac
-from baselines.models.vae import *
+from baselines.models.vae import *  # noqa: F401, F403
 from envs.env import RacingEnv
 
 if __name__ == "__main__":
