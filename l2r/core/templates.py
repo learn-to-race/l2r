@@ -10,8 +10,7 @@ import abc
 
 
 class AbstractAgent(abc.ABC):
-    """Abstract agent class. This class is a subclass of :class: abc.ABC and is
-    useful as template for training an agent.
+    """Abstract agent class. A potentially useful template for racing agents.
     """
 
     def __init__(self, *args, **kwargs):
