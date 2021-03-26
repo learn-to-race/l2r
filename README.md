@@ -48,6 +48,9 @@ We provide multiple baseline agents to demonstrate how to use Learn-to-Race incl
 
 ## Installation
 
+| :exclamation:  The racing simulator has not yet been released. Please visit our docs for more information. |
+|------------------------------------------------------------------------------------------------------------|
+
 Due to the container GPU access requirement, this installation assumes a Linux operating system. If you do not have a Linux OS, we recommend running Learn-to-Race on a public cloud instance that has a sufficient GPU.
 
 1. Request access to the Racing simulator. Once obtained, you can load the docker image:
