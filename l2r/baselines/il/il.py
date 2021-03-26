@@ -2,7 +2,7 @@
 # Filename:                                                                 #
 #    il.py                                                                  #
 #                                                                           #
-# Description:                                                              # 
+# Description:                                                              #
 #    imitation learning agent                                               #
 # ========================================================================= #
 import torch
@@ -72,7 +72,8 @@ class ILAgent(AbstractAgent):
                 assert imgs.shape == torch.Size(
                     [imgs.shape[0], 3, 512, 384]), "FATAL: unexpectd image shape"
 
-                # The output(branches) is a list of 5 branches results, each branch is with size [120,3]
+                # The output(branches) is a list of 5 branches results
+                # each branch is with size [120,3]
                 self.model.zero_grad()
 
                 # TODO: Match I/O
