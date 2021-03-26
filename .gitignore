@@ -1,9 +1,16 @@
 *.swp
 *.swo
 **/__pycache__/
+
 l2r/results/
 l2r/sanity_test.png
+l2r/_preloads/
+
 runtime
+
 datasets/lvms-resized/
 datasets/thruxton-resized/
 docs/
+
+assets/vids/
+assets/checkpoints/
