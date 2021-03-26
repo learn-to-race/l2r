@@ -11,7 +11,7 @@ Learn-to-Race is an [OpenAI gym](https://gym.openai.com/) compliant, multimodal 
 
 ## Documentation
 
-Please visit our [official docs](https://learn-to-race.com/) for a comprehensive guide on getting started with the environment. Happy racing!
+Please visit our [official docs](http://learn-to-race.com/) for a comprehensive guide on getting started with the environment. Happy racing!
 
 ## Learn-to-Race Task
 
