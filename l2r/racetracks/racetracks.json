@@ -39,6 +39,21 @@
 				"VegasNorthRoad": "../../../ArrivalSim/Content/Ribbon/VegasNorthRoad/VegasNorthRoad.umap",
 				"Thruxton": "../../../ArrivalSim/Content/Ribbon/thruxton/thruxton.umap"
 			}
+		},
+		{
+			"version": "ArrivalSim-linux-0.7.0-cmu4",
+			"levels": {
+				"OneLane2": "../../../ArrivalSim/Content/OneLane/Maps/OneLane2.umap",
+				"OneLane": "../../../ArrivalSim/Content/OneLane/Maps/OneLane.umap",
+				"VegasNorthRoad": "../../../ArrivalSim/Content/Ribbon/VegasNorthRoad/VegasNorthRoad.umap",
+				"AngleseyNational": "../../../ArrivalSim/Content/Ribbon/anglesey_national/anglesey_national.umap",
+				"Thruxton": "../../../ArrivalSim/Content/Ribbon/thruxton/thruxton.umap",
+				"Banbury": "../../../ArrivalSim/Content/SelfDriveProject/Maps/Banbury_map.umap",
+				"UPP_UDRV": "../../../ArrivalSim/Content/GeneratedTracks/Maps/Arr_UPP_UDRV.umap",
+				"RaceTrack": "../../../ArrivalSim/Content/RaceTrack_Kit_Pack_1/Maps/RaceTrack.umap", 
+				"Ternois": "../../../ArrivalSim/Content/RaceTrack_Kit_Pack_1/Maps/TernoisTrack.umap",
+				"WinterTrack": "../../../ArrivalSim/Content/racing_track/Maps/WinterTrack.umap"
+			}
 		}
 	],
 	"racetracks": [
@@ -59,8 +74,20 @@
 			]
 		},
 		{
-			"level": "anglesey_national",
-			"trackmap": "racetracks/anglesey/UPP-UDRV-200806.json"
+			"level": "AngleseyNational",
+			"trackmap": "racetracks/anglesey/AngleseyFromGoogle.json",
+			"random_pos": [
+				[113.4, 206.9, 8.81, -2.728],
+				[230.8, 277.1, 7.46, -1.281],
+				[338.4, 176.1, 13.68, -0.736],
+				[396.1, 176.5, 14.70, -2.689],
+				[447.1, 113.0, 15.49, 0.205],
+				[362.5, 11.2, 18.03, 2.076],
+				[259.5, 142.2, 13.43, 2.385],
+				[159.3, 122.5, 11.86, 0.377],
+				[74.5, -78.5, 14.36, 0.420],
+				[13.7, -211.5, 14.18, 0.575]
+			]
 		},
 		{
 			"level": "Thruxton",
