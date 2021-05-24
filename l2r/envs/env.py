@@ -249,10 +249,11 @@ class RacingEnv(gym.Env):
 
         :param dict action: the action and acceleration requests
         :return: observation, reward, done, info
-        :rtype: if multimodal, the observation is a dict of numpy arrays with
-          keys 'pose' and 'img' and shapes (30,) and (height, width, 3),
-          respectively, otherwise the observation is just the image array.
-          reward is of type float, done bool, and info dict
+        :rtype: if multimodal, the observation is a tuple containing the
+          positional sensor data and a dictionary of images with shapes (30,)
+          and (height, width, 3), respectively, otherwise the observation is
+          just the dictionary of images. reward is of type float, done bool,
+          and info dict
         """
         self.action_if.act(action)
         _obs = self._observe()
