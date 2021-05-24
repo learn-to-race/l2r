@@ -22,7 +22,7 @@ class RandomActionAgent(AbstractAgent):
         """Demonstrative training method.
         """
         for e in range(self.num_episodes):
-            print('='*10 + f' Episode {e+1} of {self.num_episodes} ' + '='*10)
+            print(f'Episode {e+1} of {self.num_episodes}')
             ep_reward, ep_timestep = 0, 0
             state, done = self.env.reset(), False
 

@@ -96,7 +96,7 @@ class RacingEnv(gym.Env):
     :param dict pose_if_kwargs: keyword args for the position receive interface
     :param str reward_pol: reward policy to use, defaults to GranTurismo
     :param float obs_delay: time delay between action and observation
-    :param dict segm_if_kwargs: keyword args for the segmentation camera 
+    :param dict segm_if_kwargs: keyword args for the segmentation camera
       interface
     :param dict birdseye_if_kwargs: keyword args for the birdseye camera
       interface
@@ -107,6 +107,7 @@ class RacingEnv(gym.Env):
     :param bool provide_waypoints: flag to provide ground-truth, future
       waypoints on the track in the info returned from **step()**
    """
+
     def __init__(self, max_timesteps, controller_kwargs, reward_kwargs,
                  action_if_kwargs, camera_if_kwargs, pose_if_kwargs,
                  reward_pol='default', obs_delay=0.10, segm_if_kwargs=False,
@@ -118,19 +119,19 @@ class RacingEnv(gym.Env):
         self.pose_if = utils.PoseInterface(**pose_if_kwargs)
 
         self.cameras = [('CameraFrontRGB',
-            utils.CameraInterface(**camera_if_kwargs))]
+                        utils.CameraInterface(**camera_if_kwargs))]
 
         if segm_if_kwargs:
             self.cameras.append(('CameraFrontSegm',
-                utils.CameraInterface(**segm_if_kwargs)))
+                                 utils.CameraInterface(**segm_if_kwargs)))
 
         if birdseye_if_kwargs:
             self.cameras.append(('CameraBirdsEye',
-                utils.CameraInterface(**birdseye_if_kwargs)))
+                                 utils.CameraInterface(**birdseye_if_kwargs)))
 
         if birdseye_segm_if_kwargs:
             self.cameras.append(('CameraBirdsEyeSegm',
-                utils.CameraInterface(**birdseye_segm_if_kwargs)))
+                             utils.CameraInterface(**birdseye_segm_if_kwargs)))
 
         self.reward = GranTurismo(**reward_kwargs) if reward_pol == 'default' \
             else CustomReward(**reward_kwargs)
@@ -164,9 +165,9 @@ class RacingEnv(gym.Env):
         :param multi_agent: not currently supported
         :param bool remake: if remaking, reset the camera interface
         """
-        self.camera_dims = {'CameraFrontRGB': 
-            {'width': camera_params['Width'],
-             'height': camera_params['Height']}}
+        self.camera_dims = {'CameraFrontRGB':
+                             {'width': camera_params['Width'],
+                              'height': camera_params['Height']}}
 
         if segm_params:
             self.camera_dims['CameraFrontSegm'] = \
@@ -321,7 +322,7 @@ class RacingEnv(gym.Env):
         time.sleep(MEDIUM_DELAY)
 
         _obs = self._observe()
-        _data, _img = _obs
+        _data, _imgs = _obs
         obs = _obs if self.multimodal else _imgs
         self.tracker.reset(start_idx=self.nearest_idx)
 
@@ -389,7 +390,7 @@ class RacingEnv(gym.Env):
         """
         time.sleep(self.observation_delay)
         pose = self.pose_if.get_data()
-        imgs = {name:cam.get_data() for (name, cam) in self.cameras}
+        imgs = {name: cam.get_data() for (name, cam) in self.cameras}
 
         yaw = pose[12]
         bp = pose[22:25]
