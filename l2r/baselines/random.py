@@ -15,7 +15,6 @@ class RandomActionAgent(AbstractAgent):
 
     :param dict training_kwargs: training keyword arguments
     """
-
     def __init__(self, training_kwargs):
         self.num_episodes = training_kwargs['num_episodes']
 
@@ -23,9 +22,16 @@ class RandomActionAgent(AbstractAgent):
         """Demonstrative training method.
         """
         for e in range(self.num_episodes):
-            print('=' * 10 + f' Episode {e+1} of {self.num_episodes} ' + '=' * 10)
+            print('='*10 + f' Episode {e+1} of {self.num_episodes} ' + '='*10)
             ep_reward, ep_timestep = 0, 0
             state, done = self.env.reset(), False
+
+            obs, track = state
+            pose, imgs = obs
+            print(f'Track id: {track}')
+            print(f'Positional data shape: {pose.shape}')
+            for name, img in imgs.items():
+                print(f'{name} images have shape: {img.shape}')
 
             while not done:
                 action = self.select_action()
@@ -59,8 +65,10 @@ class RandomActionAgent(AbstractAgent):
             reward_kwargs=env_kwargs['reward_kwargs'],
             action_if_kwargs=env_kwargs['action_if_kwargs'],
             camera_if_kwargs=env_kwargs['camera_if_kwargs'],
-            pose_if_kwargs=env_kwargs['pose_if_kwargs'],
-            logger_kwargs=env_kwargs['pose_if_kwargs']
+            segm_if_kwargs=env_kwargs['segm_if_kwargs'],
+            birdseye_if_kwargs=env_kwargs['birdseye_if_kwargs'],
+            birdseye_segm_if_kwargs=env_kwargs['birdseye_segm_if_kwargs'],
+            pose_if_kwargs=env_kwargs['pose_if_kwargs']
         )
 
         self.env.make(
@@ -68,5 +76,8 @@ class RandomActionAgent(AbstractAgent):
             multimodal=env_kwargs['multimodal'],
             driver_params=sim_kwargs['driver_params'],
             camera_params=sim_kwargs['camera_params'],
+            segm_params=sim_kwargs['segm_params'],
+            birdseye_params=sim_kwargs['birdseye_params'],
+            birdseye_segm_params=sim_kwargs['birdseye_segm_params'],
             sensors=sim_kwargs['active_sensors']
         )

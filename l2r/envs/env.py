@@ -9,6 +9,7 @@
 import json
 import os
 import pathlib
+import random
 import time
 
 import gym
@@ -74,9 +75,18 @@ MAX_OBS_ARR = [
     1., 1., 1300., 1300.         # torq (per wheel)
 ]
 
+# Racetrack IDs
+RACETRACKS = {
+    'VegasNorthRoad': 0,
+    'Thruxton': 1,
+    'AngleseyNational': 2,
+}
 
 class RacingEnv(gym.Env):
-    """A reinforcement learning environment for autonomous racing.
+    """A reinforcement learning environment for autonomous racing. Certain
+    features, including segmentation images, ground-truth waypoints, or
+    birdseye cameras are not realistically accessible and should not be
+    used in evalution.
 
     :param int max_timesteps: maximimum number of timesteps per episode
     :param dict controller_kwargs: keyword args for the simulator controller
@@ -84,23 +94,44 @@ class RacingEnv(gym.Env):
     :param dict action_if_kwargs: keyword args for the action interface
     :param dict camera_if_kwargs: keyword args for the camera interface
     :param dict pose_if_kwargs: keyword args for the position receive interface
-    :param dict logger_kwargs: keyword args for the logger
     :param str reward_pol: reward policy to use, defaults to GranTurismo
+    :param float obs_delay: time delay between action and observation
+    :param dict segm_if_kwargs: keyword args for the segmentation camera 
+      interface
+    :param dict birdseye_if_kwargs: keyword args for the birdseye camera
+      interface
+    :param dict birdseye_segm_if_kwargs: keyword args for the birdseye
+      segmentation camera interface
     :param int not_moving_timeout: terminate if not moving for this many
       timesteps
     :param bool provide_waypoints: flag to provide ground-truth, future
       waypoints on the track in the info returned from **step()**
-    :param float obs_delay: time delay between action and observation
    """
-
     def __init__(self, max_timesteps, controller_kwargs, reward_kwargs,
                  action_if_kwargs, camera_if_kwargs, pose_if_kwargs,
-                 logger_kwargs, reward_pol='default', not_moving_timeout=20,
-                 provide_waypoints=False, obs_delay=0.08):
+                 reward_pol='default', obs_delay=0.10, segm_if_kwargs=False,
+                 birdseye_if_kwargs=False, birdseye_segm_if_kwargs=False,
+                 not_moving_timeout=20, provide_waypoints=False):
+
         self.controller = SimulatorController(**controller_kwargs)
         self.action_if = utils.ActionInterface(**action_if_kwargs)
-        self.camera_if = utils.CameraInterface(**camera_if_kwargs)
         self.pose_if = utils.PoseInterface(**pose_if_kwargs)
+
+        self.cameras = [('CameraFrontRGB',
+            utils.CameraInterface(**camera_if_kwargs))]
+
+        if segm_if_kwargs:
+            self.cameras.append(('CameraFrontSegm',
+                utils.CameraInterface(**segm_if_kwargs)))
+
+        if birdseye_if_kwargs:
+            self.cameras.append(('CameraBirdsEye',
+                utils.CameraInterface(**birdseye_if_kwargs)))
+
+        if birdseye_segm_if_kwargs:
+            self.cameras.append(('CameraBirdsEyeSegm',
+                utils.CameraInterface(**birdseye_segm_if_kwargs)))
+
         self.reward = GranTurismo(**reward_kwargs) if reward_pol == 'default' \
             else CustomReward(**reward_kwargs)
         self.max_timesteps = max_timesteps
@@ -113,58 +144,76 @@ class RacingEnv(gym.Env):
         self.action_space = Box(low=-1., high=1., shape=(2,), dtype=np.float64)
 
     def make(self, level, multimodal, camera_params, sensors, driver_params,
-             vehicle_params=None, use_lidar=False, multi_agent=False,
-             remake=False):
+             segm_params=False, birdseye_params=False,
+             birdseye_segm_params=False, vehicle_params=None,
+             multi_agent=False, remake=False):
         """Unlike many environments, make does not start the simulator process.
         It does, however, configure the simulator's settings. The simulator
         process must be running prior to calling this method otherwise an error
         will occur when trying to establish a connection with the simulator.
 
-        :param str level: the desired racetrack map
+        :param str level: the desired racetrack map in
+          ['VegasNorthRoad', 'Thruxton', 'AngleseyNational']
         :param bool multimodal: if false, then the agent is 'visual only'
-          and only receives pixel values, if true, the agent also has access
-          to additional sensor data
+          and only receives image data, if true, the agent also has access
+          to positional sensor data
         :param dict camera_params: camera parameters to set
         :param list sensors: sensors to enable for the simulation
         :param dict driver_params: driver parameters to modify
         :param dict vehicle_params: vehicle parameters to set
-        :param bool use_lidar: activate all lidar sensors
         :param multi_agent: not currently supported
         :param bool remake: if remaking, reset the camera interface
         """
-        self.camera_dims = {
-            'width': camera_params['Width'],
-            'height': camera_params['Height']
-        }
-        self.level = level
+        self.camera_dims = {'CameraFrontRGB': 
+            {'width': camera_params['Width'],
+             'height': camera_params['Height']}}
+
+        if segm_params:
+            self.camera_dims['CameraFrontSegm'] = \
+                {'width': segm_params['Width'],
+                 'height': segm_params['Height']}
+
+        if birdseye_params:
+            self.camera_dims['CameraBirdsEye'] = \
+                {'width': birdseye_params['Width'],
+                 'height': birdseye_params['Height']}
+
+        if birdseye_segm_params:
+            self.camera_dims['CameraBirdsEyeSegm'] = \
+                {'width': birdseye_segm_params['Width'],
+                 'height': birdseye_segm_params['Height']}
+
+        self.levels = level
+        self.active_level = random.choice(self.levels)
+        self.active_level_id = RACETRACKS[self.active_level]
         self.sensors = sensors
-        self.use_lidar = use_lidar
         self.multimodal = multimodal
         self.multi_agent = multi_agent
         self.vehicle_params = vehicle_params
         self.camera_params = camera_params
         self.driver_params = driver_params
 
-        self.controller.set_level(level)
-        self.controller.reset_vehicle_params()
+        self.controller.set_level(self.active_level)
         self.controller.set_api_udp()
-        self._load_map(level)
+        self._load_map()
 
-        self.controller.set_sensor_params(
-            sensor='CameraFrontRGB',
-            params=camera_params
-        )
-        self.controller.set_sensor_params(
-            sensor='ArrivalVehicleDriver',
-            params=driver_params
-        )
+        for sensor in sensors:
+            self.controller.enable_sensor(sensor)
+
+        self.controller.set_sensor_params(sensor='ArrivalVehicleDriver',
+                                          params=driver_params)
+
+        for name, params in self.camera_dims.items():
+            self.controller.set_sensor_params(sensor=name, params=params)
 
         if remake:
-            self.camera_if.reconnect()
+            for (_, cam) in self.cameras:
+                cam.reconnect()
         else:
-            _shape = (camera_params['Width'], camera_params['Height'], 3)
             self.pose_if.start()
-            self.camera_if.start(img_dims=_shape)
+            for (name, cam) in self.cameras:
+                cam.start(img_dims=(self.camera_dims[name]['width'],
+                                    self.camera_dims[name]['height'], 3))
 
     def _restart_simulator(self):
         """Periodically need to restart the container for long runtimes
@@ -178,7 +227,6 @@ class RacingEnv(gym.Env):
             sensors=self.sensors,
             driver_params=self.driver_params,
             vehicle_params=self.vehicle_params,
-            use_lidar=self.use_lidar,
             multi_agent=self.multi_agent,
             remake=True
         )
@@ -186,7 +234,7 @@ class RacingEnv(gym.Env):
     def _check_restart(self, done):
         """Check if we should restart the simulator
         """
-        if not done:
+        if not done or not self.controller.start_container:
             return
 
         if time.time() - self.last_restart > SIM_RESET:
@@ -196,7 +244,8 @@ class RacingEnv(gym.Env):
     def step(self, action):
         """The primary method of the environment. Executes the desired action,
         receives the observation from the simulator, and evaluates termination
-        conditions.
+        conditions. The returned observation is a tuple with the observation
+        and a racetrack identifier.
 
         :param dict action: the action and acceleration requests
         :return: observation, reward, done, info
@@ -206,10 +255,10 @@ class RacingEnv(gym.Env):
           reward is of type float, done bool, and info dict
         """
         self.action_if.act(action)
-        _observation = self._observe()
-        _data, _img = _observation
-        observation = _observation if self.multimodal else _img
-        done, info = self._is_complete(_observation)
+        _obs = self._observe()
+        _data, _imgs = _obs
+        obs = _obs if self.multimodal else _imgs
+        done, info = self._is_complete(_obs)
         reward = self.reward.get_reward(
             state=(_data, self.nearest_idx),
             oob_flag=info['oob']
@@ -220,33 +269,40 @@ class RacingEnv(gym.Env):
             info['track_idx'] = self.nearest_idx
             info['waypoints'] = self._waypoints()
 
-        return observation, reward, done, info
+        return (obs, self.active_level_id), reward, done, info
 
-    def reset(self, random_pos=False):
+    def reset(self, level=False, random_pos=True):
         """Resets the vehicle to start position. A small time delay is used
         allow for the simulator to reset.
 
+        :param str level: if specified, will set the simulator to this level,
+          otherwise set to a random track
         :param bool random_pos: true/false for random starting position on the
-          track. the yaw of the vehicle will align with the centerline
+          track
         :return: an intial observation as in the *step* method
         :rtype: see **step()** method
         """
-        self.controller.reset_level()
+        new_level = level if level else random.choice(self.levels)
+        if new_level is self.active_level:
+            self.controller.reset_level()
+        else:
+            self.active_level = new_level
+            self.active_level_id = RACETRACKS[self.active_level]
+            self.controller.set_level(self.active_level)
+            self._load_map()
+
         self.nearest_idx, info = None, {}
 
         # give the simulator time to reset
         time.sleep(MEDIUM_DELAY)
 
-        # randomly initialize starting location
         if random_pos:
-            raise NotImplementedError('This feature causes unknown instability.')
             coords, rot = self.random_start_location()
             self.controller.set_location(coords, rot)
             time.sleep(MEDIUM_DELAY)
 
         # reset simulator sensors
         self.controller.set_mode_ai()
-        self.controller.enable_sensor('CameraFrontRGB')
 
         if self.vehicle_params:
             self.controller.set_vehicle_params(self.vehicle_params)
@@ -254,31 +310,26 @@ class RacingEnv(gym.Env):
         for sensor in self.sensors:
             self.controller.enable_sensor(sensor)
 
-        if not self.use_lidar:
-            for i in range(1, 5):
-                self.controller.disable_sensor(f'iBeoLidar{i}')
-
-        if not self.multi_agent:
-            self.controller.disable_sensor('V2VHub')
-
         self.reward.reset()
         self.pose_if.reset()
-        self.camera_if.reset()
 
-        # no delay is causing issues with the initial starting index
+        for (_, cam) in self.cameras:
+            cam.reset()
+
+        # wait briefly for interfaces to reset
         time.sleep(MEDIUM_DELAY)
 
-        _observation = self._observe()
-        _data, _img = _observation
-        observation = _observation if self.multimodal else _img
+        _obs = self._observe()
+        _data, _img = _obs
+        obs = _obs if self.multimodal else _imgs
         self.tracker.reset(start_idx=self.nearest_idx)
 
         if self.provide_waypoints:
             info['waypoints'] = self._waypoints()
             info['track_idx'] = self.nearest_idx
-            return observation, info
+            return obs, info
 
-        return observation
+        return (obs, self.active_level_id)
 
     def render(self):
         """Not implmeneted. The simulator, by default, provides a graphical
@@ -289,9 +340,8 @@ class RacingEnv(gym.Env):
     @property
     def multimodal(self):
         """Getter method for the multimodal property. Changing this value will
-        cause the environment's observation space to change. If true, the
-        environment returns observations as a dictionary with keys:
-        ['sensors', 'img'], otherwise, just the image is returned.
+        cause the environment's observation space to include the positional
+        sensor data in the observation.
 
         :return: true if the environment is set to multimodal, false otherwise
         :rtype: bool
@@ -304,26 +354,24 @@ class RacingEnv(gym.Env):
 
         :param bool value: value to self the multimodal property to. true sets
           the environment to multimodal and makes the observation space a
-          dictionary of the camera images and the sensor data. false is visual
-          only features.
+          dictionary of with positional sensor data and the camera images.
+          if false, only camera images are part of the observation
         """
         if not isinstance(value, bool):
             raise TypeError('Multimodal property must be of type: bool')
 
         self._multimodal = value
-        _shape = (self.camera_dims['height'], self.camera_dims['width'], 3)
-        _img_space = Box(low=0, high=255, shape=_shape, dtype=np.uint8)
+        _spaces = {}
+
+        for (name, cam) in self.cameras:
+            _shape = (self.camera_dims[name]['width'],
+                      self.camera_dims[name]['height'], 3)
+            _spaces[name] = Box(low=0, high=255, shape=_shape, dtype=np.uint8)
 
         if self._multimodal:
-            self.observation_space = Dict({
-                'sensors': Box(
-                    low=np.array(MIN_OBS_ARR),
-                    high=np.array(MAX_OBS_ARR)
-                ),
-                'img': _img_space
-            })
-        else:
-            self.observation_space = _img_space
+            _spaces['sensors'] = Box(low=np.array(MIN_OBS_ARR),
+                                     high=np.array(MAX_OBS_ARR))
+        self.observation_space = Dict(_spaces)
 
     def _observe(self):
         """Perform an observation action by getting the most recent data from
@@ -333,13 +381,14 @@ class RacingEnv(gym.Env):
         converted to a local ENU coordinate system to be consistent with the
         racetrack maps.
 
-        :return: a tuple of numpy arrays (pose_data, images) with shapes
-          (30,) and (height, width, 3), respectively
+        :return: a tuple containing a numpy array of the positional data and a
+          dictionary of numpy arrays containing the images. shapes are (30,)
+          and (height, width, 3), respectively
         :rtype: tuple
         """
         time.sleep(self.observation_delay)
         pose = self.pose_if.get_data()
-        imgs = self.camera_if.get_data()
+        imgs = {name:cam.get_data() for (name, cam) in self.cameras}
 
         yaw = pose[12]
         bp = pose[22:25]
@@ -362,14 +411,14 @@ class RacingEnv(gym.Env):
         """
         return self.tracker.is_complete()
 
-    def _load_map(self, level):
+    def _load_map(self):
         """Loads the racetrack map from a data file. The map is parsed into
         numerous arrays and matplotlib Path objects representing the inside
         and outside track boundaries along with the centerline.
 
         :param str level: the racetrack name
         """
-        map_file, self.random_poses = level_2_trackmap(level)
+        map_file, self.random_poses = level_2_trackmap(self.active_level)
 
         with open(os.path.join(pathlib.Path().absolute(), map_file), 'r') as f:
             self.original_map = json.load(f)
@@ -378,8 +427,6 @@ class RacingEnv(gym.Env):
         _out = np.asarray(self.original_map['Outside'])
         _in = np.asarray(self.original_map['Inside'])
 
-        # self.outside_arr = np.asarray(self.original_map['Outside'])[:, :-1]
-        # self.inside_arr = np.asarray(self.original_map['Inside'])[:, :-1]
         self.outside_arr = _out if _out.shape[-1] == 2 else _out[:, :-1]
         self.inside_arr = _in if _in.shape[-1] == 2 else _in[:, :-1]
         self.centerline_arr = np.asarray(self.original_map['Centre'])
@@ -410,44 +457,10 @@ class RacingEnv(gym.Env):
             car_dims=CAR_DIMS
         )
 
-    def record_manually(self, output_dir, fname='thruxton', num_imgs=5000,
-                        sleep_time=0.03):
-        """Record observations, including images, to an output directory. This
-        is useful for collecting images from the environment. This method does
-        not use the an agent to take environment steps; instead, it just
-        listens for observations while a user manually drives the car in the
-        simulator.
-
-        :param str output_dir: path of the output directory
-        :param str fname: file name for output
-        :param int num_imgs: number of images to record
-        :param float sleep_time: time to sleep between images, in seconds
-        """
-        self.multimodal = True
-        self.reset()
-
-        if not os.path.exists(output_dir):
-            os.makedirs(output_dir)
-
-        observations = []
-        for i in range(num_imgs):
-            observations.append(self._observe())
-            time.sleep(sleep_time)
-
-        for n, observation in enumerate(observations):
-            pose, img = observation
-            filename = f'{output_dir}/{fname}_{n}'
-            np.savez_compressed(filename, pose_data=pose, image=img)
-
-        print('Complete')
-
     def random_start_location(self):
         """Randomly selects an index on the centerline of the track and
         returns the ENU coordinates of the selected index along with the yaw of
         the centerline at that point.
-
-        NOT FUNCTIONAL
-        TODO: adjust vehicle yaw
 
         :returns: coordinates of a random index on centerline, yaw
         :rtype: np array, float
