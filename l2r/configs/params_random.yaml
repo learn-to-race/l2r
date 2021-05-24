@@ -13,9 +13,11 @@ env_kwargs:
     oob_penalty: 5.0
     min_oob_penalty: 25.0
   controller_kwargs:
-    sim_version: 'ArrivalSim-linux-0.3.0.137341-roborace'
+    sim_version: 'ArrivalSim-linux-0.7.0-cmu4'
     quiet: False
-    start_container: True
+    user: 'ubuntu'
+    start_container: False
+    sim_path: '/home/ubuntu/ArrivalSim-linux-0.7.0-cmu4/ArrivalSim-linux-0.7.0.182276/LinuxNoEditor'
   action_if_kwargs:
     max_accel: 6.
     min_accel: 3.
@@ -29,19 +31,46 @@ env_kwargs:
   camera_if_kwargs:
     ip: 'tcp://127.0.0.1'
     port: 8008
-  logger_kwargs:
-    default: True
+  segm_if_kwargs:
+    ip: 'tcp://127.0.0.1'
+    port: 8009
+  birdseye_if_kwargs:
+    ip: 'tcp://127.0.0.1'
+    port: 8010
+  birdseye_segm_if_kwargs:
+    ip: 'tcp://127.0.0.1'
+    port: 8011
 
 sim_kwargs:
-  racetrack: 'Thruxton' # ['VegasNorthRoad', 'Thruxton']
+  racetrack: ['Thruxton', 'AngleseyNational']
   active_sensors:
-    - ImuOxtsSensor
     - CameraFrontRGB
+    - CameraFrontSegm
+    - CameraBirdsEye
+    - CameraBirdsEyeSegm
   driver_params:
     DriverAPIClass: 'VApiUdp'
     DriverAPI_UDP_SendAddress: '0.0.0.0'
   camera_params:
     Format: ColorBGR8
+    FOVAngle: 90
+    Width: 512
+    Height: 384
+    bAutoAdvertise: True
+  segm_params:
+    Format: SegmBGR8
+    FOVAngle: 90
+    Width: 512
+    Height: 384
+    bAutoAdvertise: True
+  birdseye_params:
+    Format: HdrRGB8
+    FOVAngle: 90
+    Width: 512
+    Height: 384
+    bAutoAdvertise: True
+  birdseye_segm_params:
+    Format: SegmBGR8
     FOVAngle: 90
     Width: 512
     Height: 384
