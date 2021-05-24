@@ -122,7 +122,7 @@ class SimulatorController(object):
         """Kill the simulator
         """
         if self.start_container:
-            subproces.Popen(self.kill, shell=True)
+            subprocess.Popen(self.kill, shell=True)
         elif self.sim_path:
             self.simproc.kill()
 
@@ -463,11 +463,10 @@ class SimulatorController(object):
             msg = json.loads(self.ws.recv())
             time.sleep(SHORT_DELAY)
             return msg['result']
-        except:
+        except Exception:
             print(msg)
             print('Disconnected from simulator')
             exit(-1)
-        
         return msg['result']
 
     def _print(self, msg, force=False):
