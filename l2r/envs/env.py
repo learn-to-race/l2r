@@ -82,6 +82,7 @@ RACETRACKS = {
     'AngleseyNational': 2,
 }
 
+
 class RacingEnv(gym.Env):
     """A reinforcement learning environment for autonomous racing. Certain
     features, including segmentation images, ground-truth waypoints, or
@@ -107,7 +108,6 @@ class RacingEnv(gym.Env):
     :param bool provide_waypoints: flag to provide ground-truth, future
       waypoints on the track in the info returned from **step()**
    """
-
     def __init__(self, max_timesteps, controller_kwargs, reward_kwargs,
                  action_if_kwargs, camera_if_kwargs, pose_if_kwargs,
                  reward_pol='default', obs_delay=0.10, segm_if_kwargs=False,
@@ -130,8 +130,8 @@ class RacingEnv(gym.Env):
                                  utils.CameraInterface(**birdseye_if_kwargs)))
 
         if birdseye_segm_if_kwargs:
-            self.cameras.append(('CameraBirdsEyeSegm',
-                             utils.CameraInterface(**birdseye_segm_if_kwargs)))
+            birdseys_if = utils.CameraInterface(**birdseye_segm_if_kwargs)
+            self.cameras.append(('CameraBirdsEyeSegm', birdseys_if))
 
         self.reward = GranTurismo(**reward_kwargs) if reward_pol == 'default' \
             else CustomReward(**reward_kwargs)
@@ -165,9 +165,9 @@ class RacingEnv(gym.Env):
         :param multi_agent: not currently supported
         :param bool remake: if remaking, reset the camera interface
         """
-        self.camera_dims = {'CameraFrontRGB':
-                             {'width': camera_params['Width'],
-                              'height': camera_params['Height']}}
+        self.camera_dims = {'CameraFrontRGB': {
+            'width': camera_params['Width'],
+            'height': camera_params['Height']}}
 
         if segm_params:
             self.camera_dims['CameraFrontSegm'] = \
