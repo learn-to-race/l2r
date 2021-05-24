@@ -7,14 +7,16 @@
 #    simulator's via the API.                                               #
 # ========================================================================= #
 import json
+import os
+import subprocess
 import time
-from subprocess import Popen
 
 from websocket import create_connection
 
 from racetracks.mapping import level_2_simlevel
 
-SHORT_DELAY = 0.02
+SHORT_DELAY = 0.05
+POLL_DELAY = 0.5
 MEDIUM_DELAY = 12
 
 # Shell commands to launch and kill container
@@ -43,20 +45,33 @@ class SimulatorController(object):
     """
 
     def __init__(self, ip='0.0.0.0', port='16000', quiet=False,
-                 sim_version='ArrivalSim-linux-0.3.0.137341-roborace',
-                 start_container=True, image_name='arrival-sim',
-                 container_name='racing-sim'):
+                 sim_version='ArrivalSim-linux-0.7.0-cmu4',
+                 start_container=False, image_name='arrival-sim',
+                 container_name='racing-sim', sim_path=False,
+                 user='ubuntu'):
         """Constructor method
         """
         self.start_container = start_container
+        self.sim_path = sim_path
         self.start = START_CMD + f'--name {container_name} {image_name}'
         self.kill = KILL_CMD + container_name
+        self.addr = f'{ip}:{port}'
+        self.user = user
 
-        if start_container:
+        if start_container or sim_path:
             _ = self.start_simulator()
 
-        self.addr = f'{ip}:{port}'
-        self.ws = create_connection(f'ws://{self.addr}')
+        try:
+            self.ws = create_connection(f'ws://{self.addr}')
+        except ConnectionRefusedError:
+            if start_container or sim_path:
+                print('Failed to connect to simulator. Trying again.')
+                self.restart_simulator()
+                self.ws = create_connection(f'ws://{self.addr}')
+            else:
+                print('Simulator is not running. Aborting.')
+                exit(1)
+
         self.sim_version = sim_version
         self.drive_mode_param = ('bIsManulMode'
                                  if sim_version.startswith('RoboraceMaps')
@@ -75,16 +90,42 @@ class SimulatorController(object):
         """Starts the simulator container, and briefly waits. If a connection
         error occurs, you may need to increase this delay.
         """
-        with open('/tmp/sim_log.txt', 'w') as out:
-            Popen(self.start, shell=True, stdout=out, stderr=out)
+        assert not (self.start_container and self.sim_path)
+
+        if self.start_container:
+            print('Starting simulator container')
+            with open('/tmp/sim_log.txt', 'w') as out:
+                subprocess.Popen(self.start, shell=True, stdout=out, stderr=out)
+
+        elif self.sim_path:
+            print('Starting simulator')
+            pth = os.path.join(self.sim_path, 'ArrivalSim.sh')
+            cmd = ['sudo', '-u', self.user, pth, '-openGL']
+            with open('/tmp/sim_log.txt', 'w') as out:
+                self.simproc = subprocess.Popen(cmd, stdout=out)
 
         time.sleep(MEDIUM_DELAY)
         return
 
-    def kill_simulator(self):
-        """Kill the simulator container.
+    def poll_sim(self):
+        """Periodically check the simulator process
         """
-        Popen(self.kill, shell=True)
+        if not self.sim_path:
+            return
+
+        while self.simproc.poll() is None:
+            time.sleep(POLL_DELAY)
+
+        raise Exception('Simulator process terminated.')
+
+    def kill_simulator(self):
+        """Kill the simulator
+        """
+        if self.start_container:
+            subproces.Popen(self.kill, shell=True)
+        elif self.sim_path:
+            self.simproc.kill()
+
         time.sleep(MEDIUM_DELAY)
 
     def restart_simulator(self):
@@ -208,7 +249,7 @@ class SimulatorController(object):
         :rtype: list of dictionaries
         """
         return self._send_msg(
-            method='get_vehicle_classes'
+            method='get_level_vehicles'
         )
 
     def get_vehicle_classes(self):
@@ -417,9 +458,16 @@ class SimulatorController(object):
         msg['method'] = method
         if params:
             msg['params'] = params
-        self.ws.send(json.dumps(msg))
-        msg = json.loads(self.ws.recv())
-        time.sleep(SHORT_DELAY)
+        try:
+            self.ws.send(json.dumps(msg))
+            msg = json.loads(self.ws.recv())
+            time.sleep(SHORT_DELAY)
+            return msg['result']
+        except:
+            print(msg)
+            print('Disconnected from simulator')
+            exit(-1)
+        
         return msg['result']
 
     def _print(self, msg, force=False):
