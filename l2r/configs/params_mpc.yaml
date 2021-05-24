@@ -19,9 +19,11 @@ env_kwargs:
     oob_penalty: 5.0
     min_oob_penalty: 25.0
   controller_kwargs:
-    sim_version: 'ArrivalSim-linux-0.3.0.137341-roborace'
+    sim_version: 'ArrivalSim-linux-0.7.0-cmu4'
     quiet: False
+    user: 'ubuntu'
     start_container: False
+    sim_path: '/home/ubuntu/ArrivalSim-linux-0.7.0-cmu4/ArrivalSim-linux-0.7.0.182276/LinuxNoEditor'
   action_if_kwargs:
     max_accel: 4.
     min_accel: -6.
@@ -35,13 +37,10 @@ env_kwargs:
   camera_if_kwargs:
     ip: 'tcp://127.0.0.1'
     port: 8008
-  logger_kwargs:
-    default: True
 
 sim_kwargs:
-  racetrack: 'Thruxton' # ['VegasNorthRoad', 'Thruxton']
+  racetrack: ['AngleseyNational']
   active_sensors:
-    - ImuOxtsSensor
     - CameraFrontRGB
   driver_params:
     DriverAPIClass: 'VApiUdp'

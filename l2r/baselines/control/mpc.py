@@ -163,6 +163,7 @@ class MPCAgent(AbstractAgent):
     @staticmethod
     def unpack_state(state):
         (state, _) = state
+        state, _ = state
         x = state[16]
         y = state[15]
         v = (state[4]**2 + state[3]**2 + state[5]**2)**0.5
@@ -190,8 +191,7 @@ class MPCAgent(AbstractAgent):
             action_if_kwargs=env_kwargs['action_if_kwargs'],
             camera_if_kwargs=env_kwargs['camera_if_kwargs'],
             pose_if_kwargs=env_kwargs['pose_if_kwargs'],
-            provide_waypoints=env_kwargs['provide_waypoints'],
-            logger_kwargs=env_kwargs['pose_if_kwargs']
+            provide_waypoints=env_kwargs['provide_waypoints']
         )
 
         self.env.make(
@@ -204,15 +204,13 @@ class MPCAgent(AbstractAgent):
 
         self.load_track(sim_kwargs['racetrack'])
 
-    def load_track(self, track_name='VegasNorthRoad'):
+    def load_track(self, track_name=['VegasNorthRoad']):
         """Load trace track
 
         :param str track_name: 'VegasNorthRoad' or 'Thruxton'
         """
-        map_file, _ = level_2_trackmap(track_name)
-
-        # with open(os.path.join(pathlib.Path().absolute(), map_file), 'r') as f:
-        #     original_map = json.load(f)
+        assert len(track_name) == 1
+        map_file, _ = level_2_trackmap(track_name[-1])
 
         # np.asarray(original_map['Racing'], dtype=np.float32).T
         raceline = self.env.centerline_arr
