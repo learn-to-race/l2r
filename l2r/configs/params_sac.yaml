@@ -3,23 +3,23 @@ sac_kwargs:
     hidden_sizes: [64, 64]
   seed: 0
   total_steps: 2_000_000
-  replay_size: 100_000
-  batch_size: 256
+  replay_size: 250_000
+  batch_size: 128
   start_steps: 1000
   update_after: 3000
-  num_updates: 5
-  max_ep_len: 5000
+  num_updates: 12
+  max_ep_len: 2000
   encoder_path: './baselines/models/vae-144hw-32l-thruxton.pt'
   latent_dims: 32
   im_w: 144
   im_h: 144
   checkpoint: './baselines/checkpoints/thruxton/sac_episode_1000.pt'
   inference_only: True
-  save_path: './results/sac/'
+  save_path: False
 
 env_kwargs:
   multimodal: False
-  max_timesteps: 5000
+  max_timesteps: 2000
   obs_delay: 0.1
   not_moving_timeout: 100
   reward_pol: 'custom'
@@ -27,9 +27,11 @@ env_kwargs:
     oob_penalty: 5.0
     min_oob_penalty: 25.0
   controller_kwargs:
-    sim_version: 'ArrivalSim-linux-0.3.0.137341-roborace'
-    quiet: False
-    start_container: False 
+    sim_version: 'ArrivalSim-linux-0.7.0-cmu4'
+    quiet: True
+    user: 'ubuntu'
+    start_container: False
+    sim_path: '/home/ubuntu/ArrivalSim-linux-0.7.0-cmu4/ArrivalSim-linux-0.7.0.182276/LinuxNoEditor'
   action_if_kwargs:
     max_accel: 4.
     min_accel: -1.
@@ -43,13 +45,10 @@ env_kwargs:
   camera_if_kwargs:
     ip: 'tcp://127.0.0.1'
     port: 8008
-  logger_kwargs:
-    default: True
 
 sim_kwargs:
-  racetrack: 'Thruxton' # ['VegasNorthRoad', 'Thruxton']
+  racetrack: ['Thruxton']
   active_sensors:
-    - ImuOxtsSensor
     - CameraFrontRGB
   driver_params:
     DriverAPIClass: 'VApiUdp'

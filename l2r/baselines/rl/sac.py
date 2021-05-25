@@ -20,7 +20,6 @@ import baselines.core as core
 
 DEVICE = torch.device('cuda') if torch.cuda.is_available() else 'cpu'
 
-
 class ReplayBuffer:
     """
     A simple FIFO experience replay buffer for SAC agents.
@@ -158,7 +157,6 @@ def sac(env, actor_critic=core.MLPActorCritic, ac_kwargs=dict(), seed=0,
         save_path (str): path to save model checkpoints
 
     """
-
     torch.manual_seed(seed)
     np.random.seed(seed)
 
@@ -287,11 +285,11 @@ def sac(env, actor_critic=core.MLPActorCritic, ac_kwargs=dict(), seed=0,
 
     def _step(a, test=False):
         o, r, d, info = test_env.step(a) if test else env.step(a)
-        return _encode(o), r, d, info
+        return _encode(o['CameraFrontRGB']), r, d, info
 
     def _reset(test=False):
         o = test_env.reset() if test else env.reset()
-        return _encode(o)
+        return _encode(o['CameraFrontRGB'])
 
     def _encode(o):
         o = torch.as_tensor(cv2.resize(o, (im_w, im_h)),
@@ -306,6 +304,7 @@ def sac(env, actor_critic=core.MLPActorCritic, ac_kwargs=dict(), seed=0,
             f.write(msg + '\n')
 
     def test_agent():
+        test_env.eval()
         for j in range(num_test_episodes):
             o, d, ep_ret, ep_len = _reset(test=True), False, 0, 0
             while not(d or (ep_len == max_ep_len)):
