@@ -218,7 +218,7 @@ class RacingEnv(gym.Env):
             self.pose_if.start()
             for (name, cam) in self.cameras:
                 cam.start(img_dims=(self.camera_dims[name]['width'],
-                                    self.camera_dims[name]['height'], 3))    
+                                    self.camera_dims[name]['height'], 3))
 
     def step(self, action):
         """The primary method of the environment. Executes the desired action,
@@ -282,7 +282,7 @@ class RacingEnv(gym.Env):
         # give the simulator time to reset
         time.sleep(MEDIUM_DELAY)
 
-        if random_pos:
+        if random_pos and self.training:
             coords, rot = self.random_start_location()
             self.controller.set_location(coords, rot)
             time.sleep(MEDIUM_DELAY)
@@ -361,18 +361,18 @@ class RacingEnv(gym.Env):
 
         if self._multimodal:
             _spaces['pose'] = Box(low=np.array(MIN_OBS_ARR),
-                                     high=np.array(MAX_OBS_ARR))
+                                  high=np.array(MAX_OBS_ARR))
         self.observation_space = Dict(_spaces)
 
     def eval(self):
         """If evaluation mode, do not use random start location.
         """
-        pass
+        self.training = False
 
     def train(self):
         """Use random starting locations on the track
         """
-        pass
+        self.training = True
 
     def _observe(self):
         """Perform an observation action by getting the most recent data from
