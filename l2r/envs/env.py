@@ -107,12 +107,15 @@ class RacingEnv(gym.Env):
       timesteps
     :param bool provide_waypoints: flag to provide ground-truth, future
       waypoints on the track in the info returned from **step()**
+    :param bool training: in training mode, vehicle starts episodes at 
+      random positions on the track
    """
     def __init__(self, max_timesteps, controller_kwargs, reward_kwargs,
                  action_if_kwargs, camera_if_kwargs, pose_if_kwargs,
                  reward_pol='default', obs_delay=0.10, segm_if_kwargs=False,
                  birdseye_if_kwargs=False, birdseye_segm_if_kwargs=False,
-                 not_moving_timeout=20, provide_waypoints=False):
+                 not_moving_timeout=20, provide_waypoints=False,
+                 training=True):
 
         self.controller = SimulatorController(**controller_kwargs)
         self.action_if = utils.ActionInterface(**action_if_kwargs)
@@ -140,6 +143,7 @@ class RacingEnv(gym.Env):
         self.observation_delay = obs_delay
         self.provide_waypoints = provide_waypoints
         self.last_restart = time.time()
+        self.training = training
 
         # openAI gym compliance - action space
         self.action_space = Box(low=-1., high=1., shape=(2,), dtype=np.float64)
@@ -214,33 +218,7 @@ class RacingEnv(gym.Env):
             self.pose_if.start()
             for (name, cam) in self.cameras:
                 cam.start(img_dims=(self.camera_dims[name]['width'],
-                                    self.camera_dims[name]['height'], 3))
-
-    def _restart_simulator(self):
-        """Periodically need to restart the container for long runtimes
-        """
-        print('[RacingEnv] Periodic simulator restart')
-        self.controller.restart_simulator()
-        self.make(
-            level=self.level,
-            multimodal=self.multimodal,
-            camera_params=self.camera_params,
-            sensors=self.sensors,
-            driver_params=self.driver_params,
-            vehicle_params=self.vehicle_params,
-            multi_agent=self.multi_agent,
-            remake=True
-        )
-
-    def _check_restart(self, done):
-        """Check if we should restart the simulator
-        """
-        if not done or not self.controller.start_container:
-            return
-
-        if time.time() - self.last_restart > SIM_RESET:
-            self.last_restart = time.time()
-            self._restart_simulator()
+                                    self.camera_dims[name]['height'], 3))    
 
     def step(self, action):
         """The primary method of the environment. Executes the desired action,
@@ -258,20 +236,25 @@ class RacingEnv(gym.Env):
         """
         self.action_if.act(action)
         _obs = self._observe()
-        _data, _imgs = _obs
-        obs = _obs if self.multimodal else _imgs
-        done, info = self._is_complete(_obs)
+        _pose, obs = _obs
+
+        obs['track_id'] = self.active_level_id
+
+        if self.multimodal:
+            obs['pose'] = _pose
+
+        done, info = self._is_complete()
         reward = self.reward.get_reward(
-            state=(_data, self.nearest_idx),
-            oob_flag=info['oob']
-        )
+            state=(_pose, self.nearest_idx),
+            oob_flag=info['oob'])
+
         _ = self._check_restart(done)
 
         if self.provide_waypoints:
             info['track_idx'] = self.nearest_idx
             info['waypoints'] = self._waypoints()
 
-        return (obs, self.active_level_id), reward, done, info
+        return obs, reward, done, info
 
     def reset(self, level=False, random_pos=True):
         """Resets the vehicle to start position. A small time delay is used
@@ -285,6 +268,7 @@ class RacingEnv(gym.Env):
         :rtype: see **step()** method
         """
         new_level = level if level else random.choice(self.levels)
+
         if new_level is self.active_level:
             self.controller.reset_level()
         else:
@@ -322,8 +306,13 @@ class RacingEnv(gym.Env):
         time.sleep(MEDIUM_DELAY)
 
         _obs = self._observe()
-        _data, _imgs = _obs
-        obs = _obs if self.multimodal else _imgs
+        _pose, obs = _obs
+
+        obs['track_id'] = self.active_level_id
+
+        if self.multimodal:
+            obs['pose'] = _pose
+
         self.tracker.reset(start_idx=self.nearest_idx)
 
         if self.provide_waypoints:
@@ -331,7 +320,7 @@ class RacingEnv(gym.Env):
             info['track_idx'] = self.nearest_idx
             return obs, info
 
-        return (obs, self.active_level_id)
+        return obs
 
     def render(self):
         """Not implmeneted. The simulator, by default, provides a graphical
@@ -363,7 +352,7 @@ class RacingEnv(gym.Env):
             raise TypeError('Multimodal property must be of type: bool')
 
         self._multimodal = value
-        _spaces = {}
+        _spaces = {'track_id': Box(low=0, high=99, shape=(1,), dtype=np.uint8)}
 
         for (name, cam) in self.cameras:
             _shape = (self.camera_dims[name]['width'],
@@ -371,9 +360,19 @@ class RacingEnv(gym.Env):
             _spaces[name] = Box(low=0, high=255, shape=_shape, dtype=np.uint8)
 
         if self._multimodal:
-            _spaces['sensors'] = Box(low=np.array(MIN_OBS_ARR),
+            _spaces['pose'] = Box(low=np.array(MIN_OBS_ARR),
                                      high=np.array(MAX_OBS_ARR))
         self.observation_space = Dict(_spaces)
+
+    def eval(self):
+        """If evaluation mode, do not use random start location.
+        """
+        pass
+
+    def train(self):
+        """Use random starting locations on the track
+        """
+        pass
 
     def _observe(self):
         """Perform an observation action by getting the most recent data from
@@ -406,7 +405,7 @@ class RacingEnv(gym.Env):
 
         return (pose, imgs)
 
-    def _is_complete(self, observation):
+    def _is_complete(self):
         """Determine if the episode is complete. Termination conditions include
         car out-of-bounds, 3-laps successfully complete, not-moving-timeout,
         and max timesteps reached
@@ -458,6 +457,32 @@ class RacingEnv(gym.Env):
             centre_path=self.centre_path,
             car_dims=CAR_DIMS
         )
+
+    def _restart_simulator(self):
+        """Periodically need to restart the container for long runtimes
+        """
+        print('[RacingEnv] Periodic simulator restart')
+        self.controller.restart_simulator()
+        self.make(
+            level=self.level,
+            multimodal=self.multimodal,
+            camera_params=self.camera_params,
+            sensors=self.sensors,
+            driver_params=self.driver_params,
+            vehicle_params=self.vehicle_params,
+            multi_agent=self.multi_agent,
+            remake=True
+        )
+
+    def _check_restart(self, done):
+        """Check if we should restart the simulator
+        """
+        if not done or not self.controller.start_container:
+            return
+
+        if time.time() - self.last_restart > SIM_RESET:
+            self.last_restart = time.time()
+            self._restart_simulator()
 
     def random_start_location(self):
         """Randomly selects an index on the centerline of the track and
