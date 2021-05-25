@@ -9,7 +9,6 @@
 from core.templates import AbstractAgent
 from envs.env import RacingEnv
 
-
 class RandomActionAgent(AbstractAgent):
     """Reinforcement learning agent that simply chooses random actions.
 
@@ -25,13 +24,7 @@ class RandomActionAgent(AbstractAgent):
             print(f'Episode {e+1} of {self.num_episodes}')
             ep_reward, ep_timestep = 0, 0
             state, done = self.env.reset(), False
-
-            obs, track = state
-            pose, imgs = obs
-            print(f'Track id: {track}')
-            print(f'Positional data shape: {pose.shape}')
-            for name, img in imgs.items():
-                print(f'{name} images have shape: {img.shape}')
+            print(f'Observation space: {self.env.observation_space}')
 
             while not done:
                 action = self.select_action()
