@@ -162,8 +162,7 @@ class MPCAgent(AbstractAgent):
 
     @staticmethod
     def unpack_state(state):
-        (state, _) = state
-        state, _ = state
+        state = state['pose']
         x = state[16]
         y = state[15]
         v = (state[4]**2 + state[3]**2 + state[5]**2)**0.5
