@@ -93,49 +93,26 @@ class RacingEnv(gym.Env):
     :param dict controller_kwargs: keyword args for the simulator controller
     :param dict reward_kwargs: keyword args the reward policy
     :param dict action_if_kwargs: keyword args for the action interface
-    :param dict camera_if_kwargs: keyword args for the camera interface
     :param dict pose_if_kwargs: keyword args for the position receive interface
-    :param str reward_pol: reward policy to use, defaults to GranTurismo
+    :param dict cameras: dictionary of camera keyword arguments
     :param float obs_delay: time delay between action and observation
-    :param dict segm_if_kwargs: keyword args for the segmentation camera
-      interface
-    :param dict birdseye_if_kwargs: keyword args for the birdseye camera
-      interface
-    :param dict birdseye_segm_if_kwargs: keyword args for the birdseye
-      segmentation camera interface
+    :param str reward_pol: reward policy to use, defaults to GranTurismo
+    :param bool training: in training mode, vehicle starts episodes at 
+      random positions on the track
     :param int not_moving_timeout: terminate if not moving for this many
       timesteps
     :param bool provide_waypoints: flag to provide ground-truth, future
       waypoints on the track in the info returned from **step()**
-    :param bool training: in training mode, vehicle starts episodes at 
-      random positions on the track
    """
     def __init__(self, max_timesteps, controller_kwargs, reward_kwargs,
-                 action_if_kwargs, camera_if_kwargs, pose_if_kwargs,
-                 reward_pol='default', obs_delay=0.10, segm_if_kwargs=False,
-                 birdseye_if_kwargs=False, birdseye_segm_if_kwargs=False,
-                 not_moving_timeout=20, provide_waypoints=False,
-                 training=True):
-
+                 action_if_kwargs, pose_if_kwargs, cameras, obs_delay=0.10,
+                 reward_pol='default', training=True,
+                 not_moving_timeout=20, provide_waypoints=False):
         self.controller = SimulatorController(**controller_kwargs)
         self.action_if = utils.ActionInterface(**action_if_kwargs)
         self.pose_if = utils.PoseInterface(**pose_if_kwargs)
-
-        self.cameras = [('CameraFrontRGB',
-                        utils.CameraInterface(**camera_if_kwargs))]
-
-        if segm_if_kwargs:
-            self.cameras.append(('CameraFrontSegm',
-                                 utils.CameraInterface(**segm_if_kwargs)))
-
-        if birdseye_if_kwargs:
-            self.cameras.append(('CameraBirdsEye',
-                                 utils.CameraInterface(**birdseye_if_kwargs)))
-
-        if birdseye_segm_if_kwargs:
-            birdseys_if = utils.CameraInterface(**birdseye_segm_if_kwargs)
-            self.cameras.append(('CameraBirdsEyeSegm', birdseys_if))
-
+        self.cameras = [(name, params, utils.CameraInterface(
+            addr=params['Addr'])) for name, params in cameras.items()]
         self.reward = GranTurismo(**reward_kwargs) if reward_pol == 'default' \
             else CustomReward(**reward_kwargs)
         self.max_timesteps = max_timesteps
@@ -148,10 +125,8 @@ class RacingEnv(gym.Env):
         # openAI gym compliance - action space
         self.action_space = Box(low=-1., high=1., shape=(2,), dtype=np.float64)
 
-    def make(self, level, multimodal, camera_params, sensors, driver_params,
-             segm_params=False, birdseye_params=False,
-             birdseye_segm_params=False, vehicle_params=None,
-             multi_agent=False, remake=False):
+    def make(self, level, multimodal, driver_params, vehicle_params=None,
+             sensors=None, multi_agent=False, remake=False):
         """Unlike many environments, make does not start the simulator process.
         It does, however, configure the simulator's settings. The simulator
         process must be running prior to calling this method otherwise an error
@@ -162,32 +137,12 @@ class RacingEnv(gym.Env):
         :param bool multimodal: if false, then the agent is 'visual only'
           and only receives image data, if true, the agent also has access
           to positional sensor data
-        :param dict camera_params: camera parameters to set
-        :param list sensors: sensors to enable for the simulation
         :param dict driver_params: driver parameters to modify
         :param dict vehicle_params: vehicle parameters to set
+        :param list sensors: sensors to enable
         :param multi_agent: not currently supported
-        :param bool remake: if remaking, reset the camera interface
+        :param bool remake: if remaking, reset the camera interfaces
         """
-        self.camera_dims = {'CameraFrontRGB': {
-            'width': camera_params['Width'],
-            'height': camera_params['Height']}}
-
-        if segm_params:
-            self.camera_dims['CameraFrontSegm'] = \
-                {'width': segm_params['Width'],
-                 'height': segm_params['Height']}
-
-        if birdseye_params:
-            self.camera_dims['CameraBirdsEye'] = \
-                {'width': birdseye_params['Width'],
-                 'height': birdseye_params['Height']}
-
-        if birdseye_segm_params:
-            self.camera_dims['CameraBirdsEyeSegm'] = \
-                {'width': birdseye_segm_params['Width'],
-                 'height': birdseye_segm_params['Height']}
-
         self.levels = level
         self.active_level = random.choice(self.levels)
         self.active_level_id = RACETRACKS[self.active_level]
@@ -195,30 +150,33 @@ class RacingEnv(gym.Env):
         self.multimodal = multimodal
         self.multi_agent = multi_agent
         self.vehicle_params = vehicle_params
-        self.camera_params = camera_params
         self.driver_params = driver_params
 
         self.controller.set_level(self.active_level)
         self.controller.set_api_udp()
         self._load_map()
 
-        for sensor in sensors:
-            self.controller.enable_sensor(sensor)
+        for cam_name, _, _ in self.cameras:
+            self.controller.enable_sensor(cam_name)
+
+        if sensors:
+            for sensor in sensors:
+                self.controller.enable_sensor(sensor)
 
         self.controller.set_sensor_params(sensor='ArrivalVehicleDriver',
                                           params=driver_params)
 
-        for name, params in self.camera_dims.items():
+        for name, params, _ in self.cameras:
+            params['ColorPublisher : Addr'] = params.pop('Addr')
             self.controller.set_sensor_params(sensor=name, params=params)
 
         if remake:
-            for (_, cam) in self.cameras:
+            for _, _, cam in self.cameras:
                 cam.reconnect()
         else:
             self.pose_if.start()
-            for (name, cam) in self.cameras:
-                cam.start(img_dims=(self.camera_dims[name]['width'],
-                                    self.camera_dims[name]['height'], 3))
+            for name, params, cam in self.cameras:
+                cam.start(img_dims=(params['Width'], params['Height'], 3))
 
     def step(self, action):
         """The primary method of the environment. Executes the desired action,
@@ -226,7 +184,7 @@ class RacingEnv(gym.Env):
         conditions. The returned observation is a tuple with the observation
         and a racetrack identifier.
 
-        :param dict action: the action and acceleration requests
+        :param array-like action: the action and acceleration requests
         :return: observation, reward, done, info
         :rtype: if multimodal, the observation is a tuple containing the
           positional sensor data and a dictionary of images with shapes (30,)
@@ -293,13 +251,14 @@ class RacingEnv(gym.Env):
         if self.vehicle_params:
             self.controller.set_vehicle_params(self.vehicle_params)
 
-        for sensor in self.sensors:
-            self.controller.enable_sensor(sensor)
+        if self.sensors:
+            for sensor in self.sensors:
+                self.controller.enable_sensor(sensor)
 
         self.reward.reset()
         self.pose_if.reset()
 
-        for (_, cam) in self.cameras:
+        for _, _, cam in self.cameras:
             cam.reset()
 
         # wait briefly for interfaces to reset
@@ -354,15 +313,15 @@ class RacingEnv(gym.Env):
         self._multimodal = value
         _spaces = {'track_id': Box(low=0, high=99, shape=(1,), dtype=np.uint8)}
 
-        for (name, cam) in self.cameras:
-            _shape = (self.camera_dims[name]['width'],
-                      self.camera_dims[name]['height'], 3)
+        for name, params, cam in self.cameras:
+            _shape = (params['Width'], params['Height'], 3)
             _spaces[name] = Box(low=0, high=255, shape=_shape, dtype=np.uint8)
 
         if self._multimodal:
             _spaces['pose'] = Box(low=np.array(MIN_OBS_ARR),
                                   high=np.array(MAX_OBS_ARR))
         self.observation_space = Dict(_spaces)
+
 
     def eval(self):
         """If evaluation mode, do not use random start location.
@@ -389,7 +348,7 @@ class RacingEnv(gym.Env):
         """
         time.sleep(self.observation_delay)
         pose = self.pose_if.get_data()
-        imgs = {name: cam.get_data() for (name, cam) in self.cameras}
+        imgs = {name: cam.get_data() for name, _, cam in self.cameras}
 
         yaw = pose[12]
         bp = pose[22:25]
@@ -466,7 +425,6 @@ class RacingEnv(gym.Env):
         self.make(
             level=self.level,
             multimodal=self.multimodal,
-            camera_params=self.camera_params,
             sensors=self.sensors,
             driver_params=self.driver_params,
             vehicle_params=self.vehicle_params,
@@ -494,7 +452,6 @@ class RacingEnv(gym.Env):
         """
         rand_idx = np.random.randint(0, len(self.random_poses))
         pos = self.random_poses[rand_idx]
-        print(f'setting random location to: {pos}')
         coords = {'x': pos[0], 'y': pos[1], 'z': pos[2]}
         rot = {'yaw': pos[3], 'pitch': 0.0, 'roll': 0.0}
         return coords, rot

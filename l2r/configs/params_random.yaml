@@ -15,7 +15,7 @@ env_kwargs:
   controller_kwargs:
     sim_version: 'ArrivalSim-linux-0.7.0-cmu4'
     quiet: False
-    user: 'ubuntu'
+    user: ubuntu'
     start_container: False
     sim_path: '/home/ubuntu/ArrivalSim-linux-0.7.0-cmu4/ArrivalSim-linux-0.7.0.182276/LinuxNoEditor'
   action_if_kwargs:
@@ -28,50 +28,38 @@ env_kwargs:
   pose_if_kwargs:
     ip: '0.0.0.0'
     port: 7078
-  camera_if_kwargs:
-    ip: 'tcp://127.0.0.1'
-    port: 8008
-  segm_if_kwargs:
-    ip: 'tcp://127.0.0.1'
-    port: 8009
-  birdseye_if_kwargs:
-    ip: 'tcp://127.0.0.1'
-    port: 8010
-  birdseye_segm_if_kwargs:
-    ip: 'tcp://127.0.0.1'
-    port: 8011
+  cameras:
+    CameraFrontRGB:
+      Addr: 'tcp://0.0.0.0:8008'
+      Format: ColorBGR8
+      FOVAngle: 90
+      Width: 512
+      Height: 384
+      bAutoAdvertise: True
+    CameraLeftRGB:
+      Addr: 'tcp://0.0.0.0:8009'
+      Format: ColorBGR8
+      FOVAngle: 90
+      Width: 512
+      Height: 384
+      bAutoAdvertise: True
+    CameraRightRGB:
+      Addr: 'tcp://0.0.0.0:8010'
+      Format: ColorBGR8
+      FOVAngle: 90
+      Width: 512
+      Height: 384
+      bAutoAdvertise: True
+    CameraBirdsEye:
+      Addr: 'tcp://0.0.0.0:10008'
+      Format: HdrRGB8
+      FOVAngle: 90
+      Width: 512
+      Height: 384
+      bAutoAdvertise: True
 
 sim_kwargs:
   racetrack: ['Thruxton', 'AngleseyNational']
-  active_sensors:
-    - CameraFrontRGB
-    - CameraFrontSegm
-    - CameraBirdsEye
-    - CameraBirdsEyeSegm
   driver_params:
     DriverAPIClass: 'VApiUdp'
     DriverAPI_UDP_SendAddress: '0.0.0.0'
-  camera_params:
-    Format: ColorBGR8
-    FOVAngle: 90
-    Width: 512
-    Height: 384
-    bAutoAdvertise: True
-  segm_params:
-    Format: SegmBGR8
-    FOVAngle: 90
-    Width: 512
-    Height: 384
-    bAutoAdvertise: True
-  birdseye_params:
-    Format: HdrRGB8
-    FOVAngle: 90
-    Width: 512
-    Height: 384
-    bAutoAdvertise: True
-  birdseye_segm_params:
-    Format: SegmBGR8
-    FOVAngle: 90
-    Width: 512
-    Height: 384
-    bAutoAdvertise: True
