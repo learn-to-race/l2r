@@ -174,10 +174,8 @@ class PoseInterface(AbstractInterface):
 class CameraInterface(AbstractInterface):
     """Receives images from the simulator.
 
-    :param str ip: ip address to listen on
-    :param int port: system port
+    :param str addr: address to listen on
     """
-
     def __init__(self, addr='tcp://127.0.0.1:8008'):
         ctx = zmq.Context()
         self.sock = ctx.socket(zmq.SUB)
