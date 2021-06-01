@@ -15,7 +15,7 @@ env_kwargs:
   controller_kwargs:
     sim_version: 'ArrivalSim-linux-0.7.0-cmu4'
     quiet: False
-    user: ubuntu'
+    user: 'ubuntu'
     start_container: False
     sim_path: '/home/ubuntu/ArrivalSim-linux-0.7.0-cmu4/ArrivalSim-linux-0.7.0.182276/LinuxNoEditor'
   action_if_kwargs:
