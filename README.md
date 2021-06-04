@@ -17,7 +17,6 @@ Please visit our [official docs](http://learn-to-race.com/) for a comprehensive 
 
 While learning-based agents continue to demonstrate superhuman performance in many areas, we believe that they still lack in terms of generalization abilities and often require too many interactions. In summary, agents will have the ability to learn on training racetracks, but will be evaluated on their performance on an unseen evaluation track. However, the evaluation track is not *truly* unseen. Much like a Formula-1 driver, we will let agents interact with the new track for 60 minutes during a pre-evaluation stage before true evaluation.
 
-
 ## Baseline Agents
 
 We provide multiple baseline agents to demonstrate how to use Learn-to-Race including both classical and learning-based controllers. The first is a ``RandomActionAgent`` to show basic functionality. We also include a [Soft Actor-Critic](https://arxiv.org/abs/1801.01290v1) agent, *tabula rasa*, trained for 1000 epsiodes. On the Las Vegas track, it is able to consistently complete laps in under 2 minutes each using only visual features from the virtual camera as input.
@@ -36,24 +35,42 @@ We provide multiple baseline agents to demonstrate how to use Learn-to-Race incl
 </div>
 
 
+## Customizable Sensor Configurations
+
+One of the key features of this environment is the ability to create arbitrary configurations of vehicle sensors. This provides users a rich sandbox for multimodal, learning based approaches. The following sensors are supported and can be placed, if applicable, at any location relative to the vehicle:
+
+- RGB cameras
+- Depth cameras
+- Ground truth segmentation cameras
+- Fisheye cameras
+- Ray trace LiDARs
+- Depth 2D LiDARs
+- Radars
+
+Additionally, these sensors are parameterized and can be customized further; for example, cameras have modifiable image size, field-of-view, and exposure. We provide a sample configuration below which has front, birdseye, and side facing cameras both in RGB mode and with ground truth segmentation. 
+
+Left Facing                |  Front Facing             |  Right Facing             |  Birdseye
+:-------------------------:|:-------------------------:|:-------------------------:|:-------------------------:
+![LeftRGB](./assets/imgs/sample_vehicle_imgs/CameraLeftRGB.png)  | ![FrontRGB](./assets/imgs/sample_vehicle_imgs/CameraFrontRGB.png)  |  ![RightRGB](./assets/imgs/sample_vehicle_imgs/CameraRightRGB.png)  |  ![Front](./assets/imgs/sample_vehicle_imgs/CameraBirdsEye.png)
+![Left, Segmented](./assets/imgs/sample_vehicle_imgs/CameraLeftSegm.png) | ![Front, Segmented](./assets/imgs/sample_vehicle_imgs/CameraFrontSegm.png) |  ![Right, Segmented](./assets/imgs/sample_vehicle_imgs/CameraRightSegm.png) | ![Birdseye, Segmented](./assets/imgs/sample_vehicle_imgs/CameraBirdsSegm.png) 
+
+Please visit our documentation for more information about sensor customization.
+
 ## Requirements
 
 **Python:** We use Learn-to-Race with Python 3.6 or 3.7.
 
-**Graphics Hardware:** The racing simulator runs in a container, but it requires a GPU with Nvidia drivers installed. An Nvidia 970 GTX graphics card is minimally sufficient to simply run the simulator.
+**Graphics Hardware:** An Nvidia graphics card & associated drives is required. An Nvidia 970 GTX graphics card is minimally sufficient to simply run the simulator, but a better card is recommended.
 
-**Docker:** The racing simulator runs in a [Docker](https://www.docker.com/get-started) container.
+**Docker:** Commonly, the racing simulator runs in a [Docker](https://www.docker.com/get-started) container.
 
-**Container GPU Access:** The container needs access to the GPU, so [nvidia-container-runtime](https://github.com/NVIDIA/nvidia-container-runtime) is also required.
+**Container GPU Access:** If running the simulator in a container, the container needs access to the GPU, so [nvidia-container-runtime](https://github.com/NVIDIA/nvidia-container-runtime) is also required.
 
 ## Installation
 
-| :exclamation:  The racing simulator has not yet been released. Please visit our docs for more information. |
-|------------------------------------------------------------------------------------------------------------|
-
 Due to the container GPU access requirement, this installation assumes a Linux operating system. If you do not have a Linux OS, we recommend running Learn-to-Race on a public cloud instance that has a sufficient GPU.
 
-1. Request access to the Racing simulator. Once obtained, you can load the docker image:
+1. Request access to the Racing simulator. We recommmend running the simulator as a Python subprocess which simply requires that you specify the path of the simulator in the ```env_kwargs.controller_kwargs.sim_path``` of your configuration file. Alternatively, you can run the simulator as a Docker container by setting ```env_kwargs.controller_kwargs.start_container``` to True. If you prefer the latter, you can load the docker image as follows:
 
 ```bash
 $ docker load < arrival-sim-image.tar.gz
