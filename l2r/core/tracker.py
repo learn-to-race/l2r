@@ -323,7 +323,7 @@ class ProgressTracker(object):
             info['total_time'] = round(sum(self.lap_times), 2)
 
         if len(self.transitions) > self.not_moving_ct:
-            if self.transitions[-1] == self.transitions[-self.not_moving_ct]:
+            if self.transitions[-1][3] == self.transitions[-self.not_moving_ct][3]:
                 info['stuck'] = True
 
         total_idxs = self.last_idx + self.n_indices * len(self.lap_times)
