@@ -54,6 +54,19 @@
 				"Ternois": "../../../ArrivalSim/Content/RaceTrack_Kit_Pack_1/Maps/TernoisTrack.umap",
 				"WinterTrack": "../../../ArrivalSim/Content/racing_track/Maps/WinterTrack.umap"
 			}
+		},
+		{
+			"version": "ArrivalSim-linux-0.7.1.188691",
+			"levels": {
+				"VegasNorthRoad": "../../../ArrivalSim/Content/Ribbon/VegasNorthRoad/VegasNorthRoad.umap",
+				"AngleseyNational": "../../../ArrivalSim/Content/Ribbon/anglesey_national/anglesey_national.umap",
+				"Thruxton": "../../../ArrivalSim/Content/Ribbon/thruxton/thruxton.umap",
+				"Banbury": "../../../ArrivalSim/Content/SelfDriveProject/Maps/Banbury_map.umap",
+				"UPP_UDRV": "../../../ArrivalSim/Content/GeneratedTracks/Maps/Arr_UPP_UDRV.umap",
+				"RaceTrack": "../../../ArrivalSim/Content/RaceTrack_Kit_Pack_1/Maps/RaceTrack.umap", 
+				"Ternois": "../../../ArrivalSim/Content/RaceTrack_Kit_Pack_1/Maps/TernoisTrack.umap",
+				"WinterTrack": "../../../ArrivalSim/Content/racing_track/Maps/WinterTrack.umap"
+			}
 		}
 	],
 	"racetracks": [

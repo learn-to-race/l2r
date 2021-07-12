@@ -39,16 +39,21 @@ class SimulatorController(object):
     :param boolean quiet: flag to show print statements about changes being
       made to the simulator
     :param str sim_version: version of the simulator
+    :param str sim_path: path of the simulator, if launching as a subprocess
     :param boolean start_container: start simulator container. Assumes
       unix-based os
     :param str image_name: name of the simulator's docker image
+    :param str container_name: name of the container to create
+    :param str user: username is required because simulator cannot be started
+      with root privileges
+    :param boolean evaluation: if evaluation mode, restrict certain sensors
     """
 
     def __init__(self, ip='0.0.0.0', port='16000', quiet=False,
-                 sim_version='ArrivalSim-linux-0.7.0-cmu4',
+                 sim_version='ArrivalSim-linux-0.7.1.188691',
                  start_container=False, image_name='arrival-sim',
                  container_name='racing-sim', sim_path=False,
-                 user='ubuntu'):
+                 user='ubuntu', evaluation=False):
         """Constructor method
         """
         self.start_container = start_container
@@ -57,6 +62,7 @@ class SimulatorController(object):
         self.kill = KILL_CMD + container_name
         self.addr = f'{ip}:{port}'
         self.user = user
+        self.evaluation = evaluation
 
         if start_container or sim_path:
             _ = self.start_simulator()
@@ -66,7 +72,7 @@ class SimulatorController(object):
         except ConnectionRefusedError:
             if start_container or sim_path:
                 print('Failed to connect to simulator. Trying again.')
-                self.restart_simulator()
+                time.sleep(MEDIUM_DELAY//2)
                 self.ws = create_connection(f'ws://{self.addr}')
             else:
                 print('Simulator is not running. Aborting.')
@@ -302,6 +308,11 @@ class SimulatorController(object):
         :rtype: int
         """
         self._print(f'Setting: {name} to: {value} for vehicle: {veh_id}')
+
+        if self.evaluation:
+            if name == 'Format' and value.startswith('Segm'):
+                raise ValueError('Illegal parameters detected')
+
         return self._send_msg(
             method='set_sensor_param',
             params={
@@ -322,6 +333,12 @@ class SimulatorController(object):
         """
         self._print(f'Setting: {sensor} parameters for vehicle: {veh_id}')
         parameters = [{'name': k, 'value': v} for k, v in params.items()]
+
+        if self.evaluation:
+            for p in parameters:
+                if p['name'] == 'Format' and p['value'].startswith('Segm'):
+                    raise ValueError('Illegal parameters detected')
+
         _ = self._send_msg(
             method='set_sensor_params',
             params={
@@ -329,7 +346,7 @@ class SimulatorController(object):
                 'sensor_name': sensor,
                 'parameters': parameters
             }
-        )
+        )   
 
     def get_vehicle_driver_params(self, veh_id=0):
         """Get the parameters of the sensor 'ArrivalVehicleDriver'.
