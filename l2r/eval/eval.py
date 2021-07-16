@@ -33,9 +33,7 @@ class IllegalEvaluation(Exception):
     pass
 
 class Evaluator(object):
-    """Do not modify.
-
-    Evaluator class which consists of a 1-hour pre-evaluation phase
+    """Evaluator class which consists of a 1-hour pre-evaluation phase
     followed by an evaluation phase.
 
     :param dict config: yaml configuation which must be compatible with this
@@ -44,6 +42,8 @@ class Evaluator(object):
     :param int eval_episodes: number of evaluation episodes
     """
     def __init__(self, config, pre_eval_time, eval_episodes):
+        """Do not modify.
+        """
         self.conf = config
         self.pre_eval_time = pre_eval_time
         self.eval_episodes = eval_episodes
