@@ -1,4 +1,4 @@
-# Documentation (not to be included in public repo?)
+# Documentation
 
 The documentation was built with [Sphinx 3.4.2](https://www.sphinx-doc.org/en/master/index.html). To build the docs, navigate to the ```docs``` directory and run the following:
 
