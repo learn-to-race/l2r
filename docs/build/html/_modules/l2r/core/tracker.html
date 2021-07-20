@@ -1,0 +1,585 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>l2r.core.tracker &mdash; Learn-to-Race  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/katex-math.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/contrib/auto-render.min.js"></script>
+        <script src="../../../_static/katex_autorenderer.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Learn-to-Race
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Introduction:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../env_overview.html">Environment Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../baselines.html">Baselines</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Learn-to-Race Task:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tasks_overview.html">Task Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../vision.html">Default Camera Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../multimodal.html">Multimodal</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../racetracks.html">Racetracks &amp; L2R Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../sensors.html">Creating Custom Sensor Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../l2r.core.html">Core Package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../l2r.envs.html">Envs Package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Learn-to-Race</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>l2r.core.tracker</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for l2r.core.tracker</h1><div class="highlight"><pre>
+<span></span><span class="c1"># ========================================================================= #</span>
+<span class="c1"># Filename:                                                                 #</span>
+<span class="c1">#    tracker.py                                                             #</span>
+<span class="c1">#                                                                           #</span>
+<span class="c1"># Description:                                                              #</span>
+<span class="c1">#    Tracks the vehicle and evaluates metrics on the path taken             #</span>
+<span class="c1"># ========================================================================= #</span>
+
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">envs.utils</span> <span class="kn">import</span> <span class="n">GeoLocation</span>
+
+<span class="c1"># Assumed max progression, in number of indicies, in one RacingEnv.step()</span>
+<span class="n">MAX_PROGRESSION</span> <span class="o">=</span> <span class="mi">100</span>
+
+<span class="c1"># Early termination for very poor performance</span>
+<span class="n">PROGRESS_THRESHOLD</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">CHECK_PROGRESS_AT</span> <span class="o">=</span> <span class="mi">299</span>
+
+<span class="c1"># constants</span>
+<span class="n">MPS_TO_KPH</span> <span class="o">=</span> <span class="mf">3.6</span>
+<span class="n">EPSILON</span> <span class="o">=</span> <span class="mf">1e-6</span>
+<span class="n">GRAVITY</span> <span class="o">=</span> <span class="mf">9.81</span>
+
+
+<div class="viewcode-block" id="ProgressTracker"><a class="viewcode-back" href="../../../l2r.core.html#l2r.core.tracker.ProgressTracker">[docs]</a><span class="k">class</span> <span class="nc">ProgressTracker</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Progress tracker for the vehicle. This class serves to track the number</span>
+<span class="sd">    of laps that the vehicle has completed and how long each one took. It also</span>
+<span class="sd">    evaluates for termination conditions.</span>
+
+<span class="sd">    :param int n_indices: number of indicies of the centerline of the track</span>
+<span class="sd">    :param matplotlib.path inner_track: path of the inner track boundary</span>
+<span class="sd">    :param matplotlib.path outer_track: path of the outer track boundary</span>
+<span class="sd">    :param numpy.array centerline: path of the centerline</span>
+<span class="sd">    :param list car_dims: dimensions of the vehicle in meters [len, width]</span>
+<span class="sd">    :param float obs_delay: time delay between a RacingEnv action and</span>
+<span class="sd">      observation</span>
+<span class="sd">    :param int max_timesteps: maximum number of timesteps in an episode</span>
+<span class="sd">    :param int not_moving_ct: maximum number of vehicle can be stationary before</span>
+<span class="sd">      being considered stuck</span>
+<span class="sd">    :param boolean debug: debugging print statement flag</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_indices</span><span class="p">,</span> <span class="n">inner_track</span><span class="p">,</span> <span class="n">outer_track</span><span class="p">,</span> <span class="n">centerline</span><span class="p">,</span>
+                 <span class="n">car_dims</span><span class="p">,</span> <span class="n">obs_delay</span><span class="p">,</span> <span class="n">max_timesteps</span><span class="p">,</span> <span class="n">not_moving_ct</span><span class="p">,</span>
+                 <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_indices</span> <span class="o">=</span> <span class="n">n_indices</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inner_track</span> <span class="o">=</span> <span class="n">inner_track</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outer_track</span> <span class="o">=</span> <span class="n">outer_track</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">centerline</span> <span class="o">=</span> <span class="n">centerline</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">car_dims</span> <span class="o">=</span> <span class="n">car_dims</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">obs_delay</span> <span class="o">=</span> <span class="n">obs_delay</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_timesteps</span> <span class="o">=</span> <span class="n">max_timesteps</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">not_moving_ct</span> <span class="o">=</span> <span class="n">not_moving_ct</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span> <span class="o">=</span> <span class="n">debug</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ProgressTracker.reset"><a class="viewcode-back" href="../../../l2r.core.html#l2r.core.tracker.ProgressTracker.reset">[docs]</a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start_idx</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Reset the tracker for the next episode.</span>
+
+<span class="sd">        :param int start_idx: index on the track&#39;s centerline which the vehicle</span>
+<span class="sd">          is nearest to</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_idx</span> <span class="o">=</span> <span class="n">start_idx</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lap_start</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_update_time</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lap_times</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">halfway_flag</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ep_step_ct</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transitions</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">start_idx</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">last_idx</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">halfway_idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_indices</span> <span class="o">//</span> <span class="mi">2</span></div>
+
+<div class="viewcode-block" id="ProgressTracker.update"><a class="viewcode-back" href="../../../l2r.core.html#l2r.core.tracker.ProgressTracker.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">yaw</span><span class="p">,</span> <span class="n">ac</span><span class="p">,</span> <span class="n">bp</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Update the tracker based on current position. The tracker also keeps</span>
+<span class="sd">        track of the yaw, brake pressure, centerline displacement, and</span>
+<span class="sd">        calculates the offical metrics for the environment.</span>
+
+<span class="sd">        :param int idx: index on the track&#39;s centerline which the vehicle is</span>
+<span class="sd">          nearest to</span>
+<span class="sd">        :param float e: east coordinate</span>
+<span class="sd">        :param float n: north coordinate</span>
+<span class="sd">        :param float u: up coordinate</span>
+<span class="sd">        :param float yaw: vehicle heading, in radians</span>
+<span class="sd">        :param numpy.array ac: directional acceleration, shape of (3,)</span>
+<span class="sd">        :param numpy.array bp: brake pressure, per wheel, shape of (4,)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">now</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lap_start</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">start_time</span> <span class="o">=</span> <span class="n">now</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">last_update_time</span> <span class="o">=</span> <span class="n">now</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lap_start</span> <span class="o">=</span> <span class="n">now</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">obs_delay</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="n">idx</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_indices</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Index out of bounds&#39;</span><span class="p">)</span>
+
+        <span class="n">n_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_count_wheels_oob</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">yaw</span><span class="p">)</span>
+        <span class="n">c_dist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dist_to_segment</span><span class="p">([</span><span class="n">e</span><span class="p">,</span> <span class="n">n</span><span class="p">],</span> <span class="n">idx</span><span class="p">)</span>
+        <span class="n">dt</span> <span class="o">=</span> <span class="n">now</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_update_time</span>
+
+        <span class="c1"># shift idx such that the start index is at 0</span>
+        <span class="n">idx</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_idx</span>
+        <span class="n">idx</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_indices</span> <span class="k">if</span> <span class="n">idx</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">0</span>
+
+        <span class="c1"># validate vehicle isn&#39;t just oscillating near the starting point</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_idx</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">halfway_idx</span> <span class="ow">and</span> <span class="n">idx</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">halfway_idx</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">halfway_flag</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_store</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">yaw</span><span class="p">,</span> <span class="n">c_dist</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">ac</span><span class="p">,</span> <span class="n">bp</span><span class="p">,</span> <span class="n">n_out</span><span class="p">)</span>
+
+        <span class="c1"># set halfway flag, if necessary</span>
+        <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_lap_completion</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">now</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ep_step_ct</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_update_time</span> <span class="o">=</span> <span class="n">now</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_idx</span> <span class="o">=</span> <span class="n">idx</span></div>
+
+    <span class="k">def</span> <span class="nf">_store</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">yaw</span><span class="p">,</span> <span class="n">c_dist</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">ac</span><span class="p">,</span> <span class="n">bp</span><span class="p">,</span> <span class="n">n_out</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Transitions are stored as a list of lists</span>
+
+<span class="sd">        :param float e: east coordinate</span>
+<span class="sd">        :param float n: north coordinate</span>
+<span class="sd">        :param float u: up coordinate</span>
+<span class="sd">        :param int idx: nearest centerline index to current position (shifted)</span>
+<span class="sd">        :param float yaw: vehicle heading, in radians</span>
+<span class="sd">        :param float c_dist: distance to centerline</span>
+<span class="sd">        :param float dt: time delta, in seconds, from last update</span>
+<span class="sd">        :param float ac: magnitude of the vehicles acceleration, adjusted for</span>
+<span class="sd">          gravity</span>
+<span class="sd">        :param numpy.array bp: brake pressure, per wheel, shape of (4,)</span>
+<span class="sd">        :param int n_out: number of wheels out-of-bounds</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">bp</span><span class="p">)</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">ac</span><span class="p">)</span> <span class="o">-</span> <span class="n">GRAVITY</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transitions</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">e</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">c_dist</span><span class="p">,</span> <span class="n">yaw</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">n_out</span><span class="p">])</span>
+
+<div class="viewcode-block" id="ProgressTracker.check_lap_completion"><a class="viewcode-back" href="../../../l2r.core.html#l2r.core.tracker.ProgressTracker.check_lap_completion">[docs]</a>    <span class="k">def</span> <span class="nf">check_lap_completion</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shifted_idx</span><span class="p">,</span> <span class="n">now</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check if we completed a lap. To prevent vehicles from oscillating</span>
+<span class="sd">        near the start line, the vehicle must first cross the halfway mark of</span>
+<span class="sd">        the track. If the vehicle has cross the halfway mark, we then check if</span>
+<span class="sd">        the vehicle has crossed the index that it started at. If the vehicle</span>
+<span class="sd">        crosses multiple indicies in one time step when this happens, the lap&#39;s</span>
+<span class="sd">        end time is a linear interpolation between the time of the prior</span>
+<span class="sd">        update and the current time</span>
+
+<span class="sd">        :param int shifted_idx: index on the track&#39;s centerline which the</span>
+<span class="sd">          vehicle is nearest to shifted based on the starting index on the</span>
+<span class="sd">          track</span>
+<span class="sd">        :param float now: time of the update</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">halfway_flag</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="n">shifted_idx</span> <span class="o">&lt;</span> <span class="n">MAX_PROGRESSION</span><span class="p">:</span>
+            <span class="n">ct</span> <span class="o">=</span> <span class="n">shifted_idx</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_indices</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_idx</span><span class="p">)</span>
+            <span class="n">lap_end</span> <span class="o">=</span> <span class="n">now</span> <span class="o">-</span> <span class="p">(</span><span class="n">now</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_update_time</span><span class="p">)</span> <span class="o">/</span> <span class="n">ct</span> <span class="o">*</span> <span class="n">shifted_idx</span>
+            <span class="n">lap_time</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">lap_end</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">lap_start</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lap_times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lap_time</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lap_start</span> <span class="o">=</span> <span class="n">lap_end</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">halfway_flag</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="ProgressTracker.is_complete"><a class="viewcode-back" href="../../../l2r.core.html#l2r.core.tracker.ProgressTracker.is_complete">[docs]</a>    <span class="k">def</span> <span class="nf">is_complete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Determine if the episode is complete due to finishing 3 laps,</span>
+<span class="sd">        remaining in the same position for too long (stuck), exceeding the</span>
+<span class="sd">        maximum number of timestepsor, or going out-of-bounds. If all 3 laps</span>
+<span class="sd">        were successfully completed, the total time is also returned.</span>
+
+<span class="sd">        :return: complete, info which includes metrics if successful</span>
+<span class="sd">        :rtype: boolean, str, list of floats, float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_terminal</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;stuck&#39;</span><span class="p">]</span> <span class="ow">or</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;not_progressing&#39;</span><span class="p">]</span> <span class="ow">or</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;dnf&#39;</span><span class="p">]</span> <span class="ow">or</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;oob&#39;</span><span class="p">]</span> <span class="ow">or</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;success&#39;</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">append_metrics</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="n">info</span></div>
+
+<div class="viewcode-block" id="ProgressTracker.append_metrics"><a class="viewcode-back" href="../../../l2r.core.html#l2r.core.tracker.ProgressTracker.append_metrics">[docs]</a>    <span class="k">def</span> <span class="nf">append_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">info</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculate metrics and append to info</span>
+
+<span class="sd">        :param dict info: episode information</span>
+<span class="sd">        :return: info with appended metrics</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">transitions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">transitions</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">transitions</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">total_distance</span> <span class="o">=</span> <span class="n">ProgressTracker</span><span class="o">.</span><span class="n">_path_length</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">total_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_update_time</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_time</span>
+        <span class="n">total_idxs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_idx</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_indices</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lap_times</span><span class="p">)</span>
+        <span class="n">avg_speed</span> <span class="o">=</span> <span class="n">total_distance</span> <span class="o">/</span> <span class="n">total_time</span> <span class="o">*</span> <span class="n">MPS_TO_KPH</span>
+        <span class="n">avg_cline_displacement</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">transitions</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span>
+        <span class="n">avg_curvature</span> <span class="o">=</span> <span class="n">ProgressTracker</span><span class="o">.</span><span class="n">_path_curvature</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">track_curvature</span> <span class="o">=</span> <span class="n">ProgressTracker</span><span class="o">.</span><span class="n">_path_curvature</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">centerline</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+        <span class="c1"># brake_pressure = transitions[-2]</span>
+        <span class="n">accel</span> <span class="o">=</span> <span class="n">transitions</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span>
+        <span class="n">sampling_freq</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">transitions</span><span class="p">)</span> <span class="o">/</span> <span class="n">total_time</span>
+        <span class="n">ms</span> <span class="o">=</span> <span class="n">ProgressTracker</span><span class="o">.</span><span class="n">_log_dimensionless_jerk</span><span class="p">(</span><span class="n">accel</span><span class="p">,</span> <span class="n">sampling_freq</span><span class="p">)</span>
+        <span class="n">proportion_unsafe</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">transitions</span><span class="p">[</span><span class="o">-</span><span class="mi">4</span><span class="p">],</span> <span class="n">transitions</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="n">total_time</span>
+
+        <span class="n">metrics</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">metrics</span><span class="p">[</span><span class="s1">&#39;pct_complete&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="mi">100</span> <span class="o">*</span> <span class="n">total_idxs</span> <span class="o">/</span> <span class="p">(</span><span class="mi">3</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_indices</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">metrics</span><span class="p">[</span><span class="s1">&#39;total_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">total_time</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">metrics</span><span class="p">[</span><span class="s1">&#39;total_distance&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">total_distance</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">metrics</span><span class="p">[</span><span class="s1">&#39;average_speed_kph&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">avg_speed</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">metrics</span><span class="p">[</span><span class="s1">&#39;average_displacement_error&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">avg_cline_displacement</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">metrics</span><span class="p">[</span><span class="s1">&#39;trajectory_efficiency&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">track_curvature</span> <span class="o">/</span> <span class="n">avg_curvature</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">metrics</span><span class="p">[</span><span class="s1">&#39;trajectory_admissibility&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">proportion_unsafe</span><span class="o">**</span><span class="mf">0.5</span><span class="p">),</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">metrics</span><span class="p">[</span><span class="s1">&#39;movement_smoothness&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ms</span>
+        <span class="n">info</span><span class="p">[</span><span class="s1">&#39;metrics&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">metrics</span>
+        <span class="k">return</span> <span class="n">info</span></div>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_path_length</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculate length of a path.</span>
+
+<span class="sd">        :param numpy.array path: set of (x,y) pairs with shape (2, N)</span>
+<span class="sd">        :return: path length in meters</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">path</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">x</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+        <span class="n">_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">y</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">y</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">_x</span> <span class="o">+</span> <span class="n">_y</span><span class="p">))</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_path_curvature</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the root mean square of the curvature of the path where</span>
+<span class="sd">        curvature is calculate parametrically using finite differences.</span>
+
+<span class="sd">        :param numpy.array path: set of (x,y) pairs with shape (2, N)</span>
+<span class="sd">        :return: RMS of the path&#39;s curvature</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">path</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">dx</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span> <span class="o">-</span> <span class="n">x</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span>
+        <span class="n">dy</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span> <span class="o">-</span> <span class="n">y</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span>
+        <span class="n">d2x</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">d2y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">y</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="p">(</span><span class="n">dx</span> <span class="o">*</span> <span class="n">d2y</span> <span class="o">-</span> <span class="n">dy</span> <span class="o">*</span> <span class="n">d2x</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">dx</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">dy</span><span class="p">)</span> <span class="o">+</span> <span class="n">EPSILON</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="mf">3.0</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">)</span>
+        <span class="n">k_rms</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">k</span><span class="p">)))</span>
+
+        <span class="k">return</span> <span class="n">k_rms</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_log_dimensionless_jerk</span><span class="p">(</span><span class="n">movement</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="n">data_type</span><span class="o">=</span><span class="s1">&#39;accl&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sivakumar Balasubramanian&#39;s implmentation of log dimensionless</span>
+<span class="sd">        jerk.</span>
+
+<span class="sd">        Source: https://github.com/siva82kb/SPARC/blob/master/scripts/smoothness.py</span>
+
+<span class="sd">        :param numpy.array movement: movement speed profile of t data points</span>
+<span class="sd">          with shape (t,)</span>
+<span class="sd">        :param float freq: the sampling frequency of the data</span>
+<span class="sd">        :param str data_type: type of movement data provided. must be in</span>
+<span class="sd">          [&#39;speed&#39;,&#39;accl&#39;,&#39;jerk&#39;]</span>
+<span class="sd">        :return: dimensionless jerk, a smoothness metric</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">data_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;speed&#39;</span><span class="p">,</span> <span class="s1">&#39;accl&#39;</span><span class="p">,</span> <span class="s1">&#39;jerk&#39;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="s2">&quot;The argument data_type must be either&quot;</span><span class="p">,</span>
+                                        <span class="s2">&quot;&#39;speed&#39;, &#39;accl&#39; or &#39;jerk&#39;.&quot;</span><span class="p">)))</span>
+
+        <span class="n">movement</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">movement</span><span class="p">)</span>
+        <span class="n">movement_peak</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">movement</span><span class="p">))</span>
+        <span class="n">dt</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">/</span> <span class="n">freq</span>
+        <span class="n">movement_dur</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">movement</span><span class="p">)</span> <span class="o">*</span> <span class="n">dt</span>
+        <span class="n">_p</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;speed&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+            <span class="s1">&#39;accl&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s1">&#39;jerk&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="p">}</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">_p</span><span class="p">[</span><span class="n">data_type</span><span class="p">]</span>
+        <span class="n">scale</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="n">movement_dur</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span> <span class="o">/</span> <span class="nb">pow</span><span class="p">(</span><span class="n">movement_peak</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="c1"># estimate jerk</span>
+        <span class="k">if</span> <span class="n">data_type</span> <span class="o">==</span> <span class="s1">&#39;speed&#39;</span><span class="p">:</span>
+            <span class="n">jerk</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">movement</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="nb">pow</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">data_type</span> <span class="o">==</span> <span class="s1">&#39;accl&#39;</span><span class="p">:</span>
+            <span class="n">jerk</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">movement</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="nb">pow</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">jerk</span> <span class="o">=</span> <span class="n">movement</span>
+
+        <span class="c1"># estimate dj</span>
+        <span class="n">dim_jerk</span> <span class="o">=</span> <span class="o">-</span> <span class="n">scale</span> <span class="o">*</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">pow</span><span class="p">(</span><span class="n">jerk</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span> <span class="o">*</span> <span class="n">dt</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">dim_jerk</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_dist_to_segment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the shortest distance between point p a line segment</span>
+<span class="sd">        between the two nearest points on the centerline of the track.</span>
+
+<span class="sd">        :param array-like p: (x,y) reference point</span>
+<span class="sd">        :param idx: centerline index to compare to</span>
+<span class="sd">        :type idx: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="k">else</span> <span class="n">p</span>
+        <span class="n">l1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">centerline</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+        <span class="n">l2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">centerline</span><span class="p">[(</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">centerline</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="nb">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">l2</span> <span class="o">-</span> <span class="n">l1</span><span class="p">,</span> <span class="n">p</span> <span class="o">-</span> <span class="n">l1</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">l2</span> <span class="o">-</span> <span class="n">l1</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_is_terminal</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Determine if the environment is in a terminal state</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;stuck&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s1">&#39;oob&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s1">&#39;success&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s1">&#39;dnf&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s1">&#39;not_progressing&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s1">&#39;lap_times&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">lap_times</span>
+        <span class="p">}</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lap_times</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">info</span><span class="p">[</span><span class="s1">&#39;success&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">info</span><span class="p">[</span><span class="s1">&#39;total_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lap_times</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">transitions</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">not_moving_ct</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">transitions</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">transitions</span><span class="p">[</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">not_moving_ct</span><span class="p">]:</span>
+                <span class="n">info</span><span class="p">[</span><span class="s1">&#39;stuck&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="n">total_idxs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_idx</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_indices</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lap_times</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ep_step_ct</span> <span class="o">==</span> <span class="n">CHECK_PROGRESS_AT</span> <span class="ow">and</span> <span class="n">total_idxs</span> <span class="o">&lt;</span> <span class="n">PROGRESS_THRESHOLD</span><span class="p">:</span>
+            <span class="n">info</span><span class="p">[</span><span class="s1">&#39;not_progressing&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ep_step_ct</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_timesteps</span><span class="p">:</span>
+            <span class="n">info</span><span class="p">[</span><span class="s1">&#39;dnf&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_car_out_of_bounds</span><span class="p">():</span>
+            <span class="n">info</span><span class="p">[</span><span class="s1">&#39;oob&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">return</span> <span class="n">info</span>
+
+    <span class="k">def</span> <span class="nf">_car_out_of_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;At most 1 wheel can be outside of the driveable area</span>
+
+<span class="sd">        :return: True if vehicle out-of-bounds</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">transitions</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">transitions</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span>
+
+    <span class="k">def</span> <span class="nf">_count_wheels_oob</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">yaw</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Count number of wheels that are out of the drivable area</span>
+
+<span class="sd">        :param float e: east coordinate</span>
+<span class="sd">        :param float n: north coordinate</span>
+<span class="sd">        :param float yaw: vehicle heading, in radians</span>
+<span class="sd">        :return: Number of wheels out of drivable area</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">car_corners</span> <span class="o">=</span> <span class="n">GeoLocation</span><span class="o">.</span><span class="n">get_corners</span><span class="p">((</span><span class="n">e</span><span class="p">,</span> <span class="n">n</span><span class="p">),</span> <span class="n">yaw</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">car_dims</span><span class="p">)</span>
+
+        <span class="c1"># At most 1 wheel can be out-of-track</span>
+        <span class="n">n_out_inside</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inner_track</span><span class="o">.</span><span class="n">contains_points</span><span class="p">(</span><span class="n">car_corners</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">n_out_inside</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">n_out_inside</span>
+
+        <span class="k">return</span> <span class="mi">4</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outer_track</span><span class="o">.</span><span class="n">contains_points</span><span class="p">(</span><span class="n">car_corners</span><span class="p">))</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Jimmy Herman.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

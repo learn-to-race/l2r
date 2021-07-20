@@ -1,0 +1,696 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>l2r.core.controller &mdash; Learn-to-Race  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/katex-math.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/contrib/auto-render.min.js"></script>
+        <script src="../../../_static/katex_autorenderer.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Learn-to-Race
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Introduction:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../env_overview.html">Environment Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../baselines.html">Baselines</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Learn-to-Race Task:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tasks_overview.html">Task Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../vision.html">Default Camera Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../multimodal.html">Multimodal</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../racetracks.html">Racetracks &amp; L2R Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../sensors.html">Creating Custom Sensor Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../l2r.core.html">Core Package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../l2r.envs.html">Envs Package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Learn-to-Race</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>l2r.core.controller</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for l2r.core.controller</h1><div class="highlight"><pre>
+<span></span><span class="c1"># ========================================================================= #</span>
+<span class="c1"># Filename:                                                                 #</span>
+<span class="c1">#    controller.py                                                          #</span>
+<span class="c1">#                                                                           #</span>
+<span class="c1"># Description:                                                              #</span>
+<span class="c1">#    Contains the SimulatorController class to interface with the           #</span>
+<span class="c1">#    simulator&#39;s via the API.                                               #</span>
+<span class="c1"># ========================================================================= #</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">from</span> <span class="nn">websocket</span> <span class="kn">import</span> <span class="n">create_connection</span>
+
+<span class="kn">from</span> <span class="nn">racetracks.mapping</span> <span class="kn">import</span> <span class="n">level_2_simlevel</span>
+
+<span class="n">SHORT_DELAY</span> <span class="o">=</span> <span class="mf">0.05</span>
+<span class="n">POLL_DELAY</span> <span class="o">=</span> <span class="mf">0.5</span>
+<span class="n">MEDIUM_DELAY</span> <span class="o">=</span> <span class="mi">12</span>
+
+<span class="c1"># Shell commands to launch and kill container</span>
+<span class="n">START_CMD</span> <span class="o">=</span> <span class="s1">&#39;docker run -t --rm &#39;</span> \
+            <span class="s1">&#39;--user=ubuntu --gpus all &#39;</span> \
+            <span class="s1">&#39;--entrypoint=&quot;./ArrivalSim.sh&quot; &#39;</span> \
+            <span class="s1">&#39;--net=host &#39;</span>
+
+<span class="n">KILL_CMD</span> <span class="o">=</span> <span class="s1">&#39;docker kill &#39;</span>
+
+
+<div class="viewcode-block" id="SimulatorController"><a class="viewcode-back" href="../../../l2r.core.html#l2r.core.controller.SimulatorController">[docs]</a><span class="k">class</span> <span class="nc">SimulatorController</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;This class is used to communicate with the simulator which is</span>
+<span class="sd">    accessible via Websocket. The methods in this class allow one to change</span>
+<span class="sd">    the position of the vehicle, set the map, reset the map, change the</span>
+<span class="sd">    settings (such as turning the camera on), etc.</span>
+
+<span class="sd">    :param str ip: IP address of the simulator</span>
+<span class="sd">    :param str port: port to connect to</span>
+<span class="sd">    :param boolean quiet: flag to show print statements about changes being</span>
+<span class="sd">      made to the simulator</span>
+<span class="sd">    :param str sim_version: version of the simulator</span>
+<span class="sd">    :param boolean start_container: start simulator container. Assumes</span>
+<span class="sd">      unix-based os</span>
+<span class="sd">    :param str image_name: name of the simulator&#39;s docker image</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ip</span><span class="o">=</span><span class="s1">&#39;0.0.0.0&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="s1">&#39;16000&#39;</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">sim_version</span><span class="o">=</span><span class="s1">&#39;ArrivalSim-linux-0.7.0-cmu4&#39;</span><span class="p">,</span>
+                 <span class="n">start_container</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">image_name</span><span class="o">=</span><span class="s1">&#39;arrival-sim&#39;</span><span class="p">,</span>
+                 <span class="n">container_name</span><span class="o">=</span><span class="s1">&#39;racing-sim&#39;</span><span class="p">,</span> <span class="n">sim_path</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">user</span><span class="o">=</span><span class="s1">&#39;ubuntu&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Constructor method</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_container</span> <span class="o">=</span> <span class="n">start_container</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sim_path</span> <span class="o">=</span> <span class="n">sim_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="n">START_CMD</span> <span class="o">+</span> <span class="sa">f</span><span class="s1">&#39;--name </span><span class="si">{</span><span class="n">container_name</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">image_name</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kill</span> <span class="o">=</span> <span class="n">KILL_CMD</span> <span class="o">+</span> <span class="n">container_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addr</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">ip</span><span class="si">}</span><span class="s1">:</span><span class="si">{</span><span class="n">port</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user</span> <span class="o">=</span> <span class="n">user</span>
+
+        <span class="k">if</span> <span class="n">start_container</span> <span class="ow">or</span> <span class="n">sim_path</span><span class="p">:</span>
+            <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_simulator</span><span class="p">()</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ws</span> <span class="o">=</span> <span class="n">create_connection</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;ws://</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">addr</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ConnectionRefusedError</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">start_container</span> <span class="ow">or</span> <span class="n">sim_path</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Failed to connect to simulator. Trying again.&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">restart_simulator</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ws</span> <span class="o">=</span> <span class="n">create_connection</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;ws://</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">addr</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Simulator is not running. Aborting.&#39;</span><span class="p">)</span>
+                <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">sim_version</span> <span class="o">=</span> <span class="n">sim_version</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">drive_mode_param</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;bIsManulMode&#39;</span>
+                                 <span class="k">if</span> <span class="n">sim_version</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;RoboraceMaps&#39;</span><span class="p">)</span>
+                                 <span class="k">else</span> <span class="s1">&#39;bADModeInput&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">quiet</span> <span class="o">=</span> <span class="n">quiet</span>
+
+    <span class="k">def</span> <span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Stop the simulator on exit</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_container</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Controller destroyed. Tearing down simulator.&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">kill_simulator</span><span class="p">()</span>
+
+<div class="viewcode-block" id="SimulatorController.start_simulator"><a class="viewcode-back" href="../../../l2r.core.html#l2r.core.controller.SimulatorController.start_simulator">[docs]</a>    <span class="k">def</span> <span class="nf">start_simulator</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Starts the simulator container, and briefly waits. If a connection</span>
+<span class="sd">        error occurs, you may need to increase this delay.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start_container</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim_path</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_container</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Starting simulator container&#39;</span><span class="p">)</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;/tmp/sim_log.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">out</span><span class="p">:</span>
+                <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">out</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim_path</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Starting simulator&#39;</span><span class="p">)</span>
+            <span class="n">pth</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sim_path</span><span class="p">,</span> <span class="s1">&#39;ArrivalSim.sh&#39;</span><span class="p">)</span>
+            <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;sudo&#39;</span><span class="p">,</span> <span class="s1">&#39;-u&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">pth</span><span class="p">,</span> <span class="s1">&#39;-openGL&#39;</span><span class="p">]</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;/tmp/sim_log.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">out</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">simproc</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
+
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">MEDIUM_DELAY</span><span class="p">)</span>
+        <span class="k">return</span></div>
+
+<div class="viewcode-block" id="SimulatorController.poll_sim"><a class="viewcode-back" href="../../../l2r.core.html#l2r.core.controller.SimulatorController.poll_sim">[docs]</a>    <span class="k">def</span> <span class="nf">poll_sim</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Periodically check the simulator process</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim_path</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">simproc</span><span class="o">.</span><span class="n">poll</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">POLL_DELAY</span><span class="p">)</span>
+
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Simulator process terminated.&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SimulatorController.kill_simulator"><a class="viewcode-back" href="../../../l2r.core.html#l2r.core.controller.SimulatorController.kill_simulator">[docs]</a>    <span class="k">def</span> <span class="nf">kill_simulator</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Kill the simulator</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_container</span><span class="p">:</span>
+            <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kill</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim_path</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">simproc</span><span class="o">.</span><span class="n">kill</span><span class="p">()</span>
+
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">MEDIUM_DELAY</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SimulatorController.restart_simulator"><a class="viewcode-back" href="../../../l2r.core.html#l2r.core.controller.SimulatorController.restart_simulator">[docs]</a>    <span class="k">def</span> <span class="nf">restart_simulator</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Restarts the simulator container</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kill_simulator</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_simulator</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="s1">&#39;Reconnecting&#39;</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ws</span> <span class="o">=</span> <span class="n">create_connection</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;ws://</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">addr</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SimulatorController.set_level"><a class="viewcode-back" href="../../../l2r.core.html#l2r.core.controller.SimulatorController.set_level">[docs]</a>    <span class="k">def</span> <span class="nf">set_level</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets the simulator to a specified level (map).</span>
+
+<span class="sd">        :param string level: name of the racetrack</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">level_name</span> <span class="o">=</span> <span class="n">level_2_simlevel</span><span class="p">(</span><span class="n">level</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim_version</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Setting level to </span><span class="si">{</span><span class="n">level</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span>
+            <span class="n">method</span><span class="o">=</span><span class="s1">&#39;open_level&#39;</span><span class="p">,</span>
+            <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;level_name&#39;</span><span class="p">:</span> <span class="n">level_name</span><span class="p">}</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="SimulatorController.set_location"><a class="viewcode-back" href="../../../l2r.core.html#l2r.core.controller.SimulatorController.set_location">[docs]</a>    <span class="k">def</span> <span class="nf">set_location</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">rot</span><span class="p">,</span> <span class="n">veh_id</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets a vehicle to a specific location on track.</span>
+
+<span class="sd">        :param dict coords: desired ENU coordinates with keys [x, y, z]</span>
+<span class="sd">        :param dict rot: rotation of the vehicle in degrees with keys</span>
+<span class="sd">          [yaw, pitch, roll]</span>
+<span class="sd">        :param int veh_id: identifier of the vehicle, defaults to 0</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span>
+            <span class="n">method</span><span class="o">=</span><span class="s1">&#39;set_vehicle_position&#39;</span><span class="p">,</span>
+            <span class="n">params</span><span class="o">=</span><span class="p">{</span>
+                <span class="s1">&#39;veh_id&#39;</span><span class="p">:</span> <span class="n">veh_id</span><span class="p">,</span>
+                <span class="s1">&#39;location&#39;</span><span class="p">:</span> <span class="n">coords</span><span class="p">,</span>
+                <span class="s1">&#39;rotation&#39;</span><span class="p">:</span> <span class="n">rot</span>
+            <span class="p">}</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="SimulatorController.reset_level"><a class="viewcode-back" href="../../../l2r.core.html#l2r.core.controller.SimulatorController.reset_level">[docs]</a>    <span class="k">def</span> <span class="nf">reset_level</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Resets the map to its default configuration. This does not reset</span>
+<span class="sd">        the vehicle parameters, but it does set the vehicle to it&#39;s default</span>
+<span class="sd">        pose.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="s1">&#39;Resetting level&#39;</span><span class="p">)</span>
+        <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;reset_level&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SimulatorController.get_level"><a class="viewcode-back" href="../../../l2r.core.html#l2r.core.controller.SimulatorController.get_level">[docs]</a>    <span class="k">def</span> <span class="nf">get_level</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the active level of the simulator.</span>
+
+<span class="sd">        :return: name of the simulator&#39;s active racetrack</span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;get_level&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SimulatorController.get_levels"><a class="viewcode-back" href="../../../l2r.core.html#l2r.core.controller.SimulatorController.get_levels">[docs]</a>    <span class="k">def</span> <span class="nf">get_levels</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Gets the levels available in the simulator.</span>
+
+<span class="sd">        :return: list of the levels available in the simulator</span>
+<span class="sd">        :rtype: list of str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;get_levels&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SimulatorController.get_position"><a class="viewcode-back" href="../../../l2r.core.html#l2r.core.controller.SimulatorController.get_position">[docs]</a>    <span class="k">def</span> <span class="nf">get_position</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">veh_id</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get vehicle&#39;s current position.</span>
+
+<span class="sd">        :param int veh_id: identifier of the vehicle, defaults to 0</span>
+<span class="sd">        :return: ENU coordinates of the vehicle [East, North, Up], vehicle</span>
+<span class="sd">          heading</span>
+<span class="sd">        :rtype: list of floats, float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span>
+            <span class="n">method</span><span class="o">=</span><span class="s1">&#39;get_vehicle_state&#39;</span><span class="p">,</span>
+            <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;veh_id&#39;</span><span class="p">:</span> <span class="n">veh_id</span><span class="p">}</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;pos_xyz&#39;</span><span class="p">],</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;yaw&#39;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="SimulatorController.get_vehicle_params"><a class="viewcode-back" href="../../../l2r.core.html#l2r.core.controller.SimulatorController.get_vehicle_params">[docs]</a>    <span class="k">def</span> <span class="nf">get_vehicle_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">veh_id</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the active parameters of a vehicle.</span>
+
+<span class="sd">        :param int veh_id: identifier of the vehicle, defaults to 0</span>
+<span class="sd">        :return: a dictionary of the vehicle&#39;s parameters</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span>
+            <span class="n">method</span><span class="o">=</span><span class="s1">&#39;get_vehicle_params&#39;</span><span class="p">,</span>
+            <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;veh_id&#39;</span><span class="p">:</span> <span class="n">veh_id</span><span class="p">}</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="SimulatorController.set_vehicle_params"><a class="viewcode-back" href="../../../l2r.core.html#l2r.core.controller.SimulatorController.set_vehicle_params">[docs]</a>    <span class="k">def</span> <span class="nf">set_vehicle_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">veh_id</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set parameters of a vehicle.</span>
+
+<span class="sd">        :param list parameters: name value pairs, list of dictionaries</span>
+<span class="sd">        :param int veh_id: identifier of the vehicle, defaults to 0</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Setting vehicle parameters for vehicle: </span><span class="si">{</span><span class="n">veh_id</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span>
+            <span class="n">method</span><span class="o">=</span><span class="s1">&#39;set_vehicle_params&#39;</span><span class="p">,</span>
+            <span class="n">params</span><span class="o">=</span><span class="p">{</span>
+                <span class="s1">&#39;veh_id&#39;</span><span class="p">:</span> <span class="n">veh_id</span><span class="p">,</span>
+                <span class="s1">&#39;parameters&#39;</span><span class="p">:</span> <span class="n">parameters</span>
+            <span class="p">}</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="SimulatorController.reset_vehicle_params"><a class="viewcode-back" href="../../../l2r.core.html#l2r.core.controller.SimulatorController.reset_vehicle_params">[docs]</a>    <span class="k">def</span> <span class="nf">reset_vehicle_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">veh_id</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Reset a vehicle&#39;s parameters to default.</span>
+
+<span class="sd">        :param int veh_id: identifier of the vehicle, defaults to 0</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Resetting vehicle parameters for vehicle: </span><span class="si">{</span><span class="n">veh_id</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span>
+            <span class="n">method</span><span class="o">=</span><span class="s1">&#39;reset_default_vehicle_params&#39;</span><span class="p">,</span>
+            <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;veh_id&#39;</span><span class="p">:</span> <span class="n">veh_id</span><span class="p">}</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="SimulatorController.get_active_vehicles"><a class="viewcode-back" href="../../../l2r.core.html#l2r.core.controller.SimulatorController.get_active_vehicles">[docs]</a>    <span class="k">def</span> <span class="nf">get_active_vehicles</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a list of the active vehicles in the simulator.</span>
+
+<span class="sd">        :return: list of active vehicles in the following format:</span>
+<span class="sd">          {&quot;veh_id&quot;: &lt;veh_id&gt;, &quot;vehicle_class_name&quot;: &lt;vehicle_class_name&gt;}</span>
+<span class="sd">        :rtype: list of dictionaries</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span>
+            <span class="n">method</span><span class="o">=</span><span class="s1">&#39;get_level_vehicles&#39;</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="SimulatorController.get_vehicle_classes"><a class="viewcode-back" href="../../../l2r.core.html#l2r.core.controller.SimulatorController.get_vehicle_classes">[docs]</a>    <span class="k">def</span> <span class="nf">get_vehicle_classes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a list of the vehicle classes.</span>
+
+<span class="sd">        :return: list of the vehicle classes</span>
+<span class="sd">        :rtype: list</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span>
+            <span class="n">method</span><span class="o">=</span><span class="s1">&#39;get_vehicle_classes&#39;</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="SimulatorController.get_sensors_params"><a class="viewcode-back" href="../../../l2r.core.html#l2r.core.controller.SimulatorController.get_sensors_params">[docs]</a>    <span class="k">def</span> <span class="nf">get_sensors_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">veh_id</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the parameters of each sensor for a specified vehicle.</span>
+
+<span class="sd">        :param int veh_id: identifier of the vehicle, defaults to 0</span>
+<span class="sd">        :return: parameters for each sensor</span>
+<span class="sd">        :rtype: list</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span>
+            <span class="n">method</span><span class="o">=</span><span class="s1">&#39;get_sensors_params&#39;</span><span class="p">,</span>
+            <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;veh_id&#39;</span><span class="p">:</span> <span class="n">veh_id</span><span class="p">}</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="SimulatorController.get_sensor_params"><a class="viewcode-back" href="../../../l2r.core.html#l2r.core.controller.SimulatorController.get_sensor_params">[docs]</a>    <span class="k">def</span> <span class="nf">get_sensor_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sensor</span><span class="p">,</span> <span class="n">veh_id</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the parameters of a specified sensor of a specified vehicle.</span>
+
+<span class="sd">        :param str sensor: name of sensor to get the params for</span>
+<span class="sd">        :param int veh_id: identifier of the vehicle, defaults to 0</span>
+<span class="sd">        :return: the sensor&#39;s parameters</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span>
+            <span class="n">method</span><span class="o">=</span><span class="s1">&#39;get_sensor_params&#39;</span><span class="p">,</span>
+            <span class="n">params</span><span class="o">=</span><span class="p">{</span>
+                <span class="s1">&#39;veh_id&#39;</span><span class="p">:</span> <span class="n">veh_id</span><span class="p">,</span>
+                <span class="s1">&#39;sensor_name&#39;</span><span class="p">:</span> <span class="n">sensor</span>
+            <span class="p">}</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="SimulatorController.set_sensor_param"><a class="viewcode-back" href="../../../l2r.core.html#l2r.core.controller.SimulatorController.set_sensor_param">[docs]</a>    <span class="k">def</span> <span class="nf">set_sensor_param</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sensor</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">veh_id</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set a specified parameter to a specified value of a specified</span>
+<span class="sd">        sensor on a specified vehicle.</span>
+
+<span class="sd">        :param str sensor: name of sensor to set</span>
+<span class="sd">        :param str name: name of the parameter to set</span>
+<span class="sd">        :param str value: value of the parameter to set</span>
+<span class="sd">        :param int veh_id: identifier of the vehicle, defaults to 0</span>
+<span class="sd">        :return: 0, if successful</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Setting: </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1"> to: </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s1"> for vehicle: </span><span class="si">{</span><span class="n">veh_id</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span>
+            <span class="n">method</span><span class="o">=</span><span class="s1">&#39;set_sensor_param&#39;</span><span class="p">,</span>
+            <span class="n">params</span><span class="o">=</span><span class="p">{</span>
+                <span class="s1">&#39;veh_id&#39;</span><span class="p">:</span> <span class="n">veh_id</span><span class="p">,</span>
+                <span class="s1">&#39;sensor_name&#39;</span><span class="p">:</span> <span class="n">sensor</span><span class="p">,</span>
+                <span class="s1">&#39;parameter_name&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span>
+                <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">value</span>
+            <span class="p">}</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="SimulatorController.set_sensor_params"><a class="viewcode-back" href="../../../l2r.core.html#l2r.core.controller.SimulatorController.set_sensor_params">[docs]</a>    <span class="k">def</span> <span class="nf">set_sensor_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sensor</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">veh_id</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set specified parameters of a specified sensor on a specified</span>
+<span class="sd">        vehicle.</span>
+
+<span class="sd">        :param str sensor: name of sensor to set</span>
+<span class="sd">        :param dict parameters: name value pairs of the parameters to set</span>
+<span class="sd">        :param int veh_id: identifier of the vehicle, defaults to 0</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Setting: </span><span class="si">{</span><span class="n">sensor</span><span class="si">}</span><span class="s1"> parameters for vehicle: </span><span class="si">{</span><span class="n">veh_id</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">parameters</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">k</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">v</span><span class="p">}</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span>
+        <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span>
+            <span class="n">method</span><span class="o">=</span><span class="s1">&#39;set_sensor_params&#39;</span><span class="p">,</span>
+            <span class="n">params</span><span class="o">=</span><span class="p">{</span>
+                <span class="s1">&#39;veh_id&#39;</span><span class="p">:</span> <span class="n">veh_id</span><span class="p">,</span>
+                <span class="s1">&#39;sensor_name&#39;</span><span class="p">:</span> <span class="n">sensor</span><span class="p">,</span>
+                <span class="s1">&#39;parameters&#39;</span><span class="p">:</span> <span class="n">parameters</span>
+            <span class="p">}</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="SimulatorController.get_vehicle_driver_params"><a class="viewcode-back" href="../../../l2r.core.html#l2r.core.controller.SimulatorController.get_vehicle_driver_params">[docs]</a>    <span class="k">def</span> <span class="nf">get_vehicle_driver_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">veh_id</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the parameters of the sensor &#39;ArrivalVehicleDriver&#39;.</span>
+
+<span class="sd">        :param int veh_id: identifier of the vehicle, defaults to 0</span>
+<span class="sd">        :return: parameters of the vehicle driver</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span>
+            <span class="n">method</span><span class="o">=</span><span class="s1">&#39;get_sensor_params&#39;</span><span class="p">,</span>
+            <span class="n">params</span><span class="o">=</span><span class="p">{</span>
+                <span class="s1">&#39;veh_id&#39;</span><span class="p">:</span> <span class="n">veh_id</span><span class="p">,</span>
+                <span class="s1">&#39;sensor_name&#39;</span><span class="p">:</span> <span class="s1">&#39;ArrivalVehicleDriver&#39;</span>
+            <span class="p">}</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="SimulatorController.get_driver_mode"><a class="viewcode-back" href="../../../l2r.core.html#l2r.core.controller.SimulatorController.get_driver_mode">[docs]</a>    <span class="k">def</span> <span class="nf">get_driver_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">veh_id</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the mode of a specified vehicle.</span>
+
+<span class="sd">        :param int veh_id: identifier of the vehicle, defaults to 0</span>
+<span class="sd">        :return: true if manual mode, false if AI mode</span>
+<span class="sd">        :rtype: boolean</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span>
+            <span class="n">method</span><span class="o">=</span><span class="s1">&#39;get_sensor_param&#39;</span><span class="p">,</span>
+            <span class="n">params</span><span class="o">=</span><span class="p">{</span>
+                <span class="s1">&#39;veh_id&#39;</span><span class="p">:</span> <span class="n">veh_id</span><span class="p">,</span>
+                <span class="s1">&#39;sensor_name&#39;</span><span class="p">:</span> <span class="s1">&#39;ArrivalVehicleDriver&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;parameter_name&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">drive_mode_param</span>
+            <span class="p">}</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="SimulatorController.set_mode_ai"><a class="viewcode-back" href="../../../l2r.core.html#l2r.core.controller.SimulatorController.set_mode_ai">[docs]</a>    <span class="k">def</span> <span class="nf">set_mode_ai</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">veh_id</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets a specified vehicle mode to &quot;AI&quot;.</span>
+
+<span class="sd">        :param int veh_id: identifier of the vehicle, defaults to 0</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Setting to AI mode for vehicle: </span><span class="si">{</span><span class="n">veh_id</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span>
+            <span class="n">method</span><span class="o">=</span><span class="s1">&#39;set_sensor_param&#39;</span><span class="p">,</span>
+            <span class="n">params</span><span class="o">=</span><span class="p">{</span>
+                <span class="s1">&#39;veh_id&#39;</span><span class="p">:</span> <span class="n">veh_id</span><span class="p">,</span>
+                <span class="s1">&#39;sensor_name&#39;</span><span class="p">:</span> <span class="s1">&#39;ArrivalVehicleDriver&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;parameter_name&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">drive_mode_param</span><span class="p">,</span>
+                <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="kc">True</span>
+            <span class="p">}</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="SimulatorController.set_mode_manual"><a class="viewcode-back" href="../../../l2r.core.html#l2r.core.controller.SimulatorController.set_mode_manual">[docs]</a>    <span class="k">def</span> <span class="nf">set_mode_manual</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">veh_id</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets a specified vehicle mode to &quot;manual&quot;.</span>
+
+<span class="sd">        :param int veh_id: identifier of the vehicle, defaults to 0</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Setting to manual mode for vehicle: </span><span class="si">{</span><span class="n">veh_id</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span>
+            <span class="n">method</span><span class="o">=</span><span class="s1">&#39;set_sensor_param&#39;</span><span class="p">,</span>
+            <span class="n">params</span><span class="o">=</span><span class="p">{</span>
+                <span class="s1">&#39;veh_id&#39;</span><span class="p">:</span> <span class="n">veh_id</span><span class="p">,</span>
+                <span class="s1">&#39;sensor_name&#39;</span><span class="p">:</span> <span class="s1">&#39;ArrivalVehicleDriver&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;parameter_name&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">drive_mode_param</span><span class="p">,</span>
+                <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="kc">False</span>
+            <span class="p">}</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="SimulatorController.set_api_udp"><a class="viewcode-back" href="../../../l2r.core.html#l2r.core.controller.SimulatorController.set_api_udp">[docs]</a>    <span class="k">def</span> <span class="nf">set_api_udp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">veh_id</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set a specified vehicle API class to VApiUdp to allow the RL</span>
+<span class="sd">        agent to control it.</span>
+
+<span class="sd">        :param int veh_id: identifier of the vehicle, defaults to 0</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Setting to RL mode for vehicle: </span><span class="si">{</span><span class="n">veh_id</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span>
+            <span class="n">method</span><span class="o">=</span><span class="s1">&#39;set_sensor_param&#39;</span><span class="p">,</span>
+            <span class="n">params</span><span class="o">=</span><span class="p">{</span>
+                <span class="s1">&#39;veh_id&#39;</span><span class="p">:</span> <span class="n">veh_id</span><span class="p">,</span>
+                <span class="s1">&#39;sensor_name&#39;</span><span class="p">:</span> <span class="s1">&#39;ArrivalVehicleDriver&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;parameter_name&#39;</span><span class="p">:</span> <span class="s1">&#39;DriverAPIClass&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="s1">&#39;VApiUdp&#39;</span>
+            <span class="p">}</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="SimulatorController.enable_sensor"><a class="viewcode-back" href="../../../l2r.core.html#l2r.core.controller.SimulatorController.enable_sensor">[docs]</a>    <span class="k">def</span> <span class="nf">enable_sensor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sensor_name</span><span class="p">,</span> <span class="n">veh_id</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Activates a specified sensor on a specified vehicle.</span>
+
+<span class="sd">        :param str sensor_name: sensor to be activated</span>
+<span class="sd">        :param int veh_id: identifier of the vehicle, defaults to 0</span>
+<span class="sd">        :return: 0, if successful</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Enabling </span><span class="si">{</span><span class="n">sensor_name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span>
+            <span class="n">method</span><span class="o">=</span><span class="s1">&#39;enable_sensor&#39;</span><span class="p">,</span>
+            <span class="n">params</span><span class="o">=</span><span class="p">{</span>
+                <span class="s1">&#39;veh_id&#39;</span><span class="p">:</span> <span class="n">veh_id</span><span class="p">,</span>
+                <span class="s1">&#39;sensor_name&#39;</span><span class="p">:</span> <span class="n">sensor_name</span>
+            <span class="p">}</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="SimulatorController.disable_sensor"><a class="viewcode-back" href="../../../l2r.core.html#l2r.core.controller.SimulatorController.disable_sensor">[docs]</a>    <span class="k">def</span> <span class="nf">disable_sensor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sensor_name</span><span class="p">,</span> <span class="n">veh_id</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Disables a specified sensor on a specified vehicle.</span>
+
+<span class="sd">        :param str sensor_name: sensor to be deactivated</span>
+<span class="sd">        :param int veh_id: identifier of the vehicle, defaults to 0</span>
+<span class="sd">        :return: 0, if successful</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Disabling </span><span class="si">{</span><span class="n">sensor_name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_msg</span><span class="p">(</span>
+            <span class="n">method</span><span class="o">=</span><span class="s1">&#39;disable_sensor&#39;</span><span class="p">,</span>
+            <span class="n">params</span><span class="o">=</span><span class="p">{</span>
+                <span class="s1">&#39;veh_id&#39;</span><span class="p">:</span> <span class="n">veh_id</span><span class="p">,</span>
+                <span class="s1">&#39;sensor_name&#39;</span><span class="p">:</span> <span class="n">sensor_name</span>
+            <span class="p">}</span>
+        <span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_send_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Helper routine to send jsonprc messages.</span>
+
+<span class="sd">        :param str method: specified method</span>
+<span class="sd">        :param dict params: parameters to send</span>
+<span class="sd">        :return: response from the simulator</span>
+<span class="sd">        :rtype: varies</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;jsonrpc&quot;</span><span class="p">:</span> <span class="s2">&quot;2.0&quot;</span><span class="p">,</span> <span class="s2">&quot;params&quot;</span><span class="p">:</span> <span class="p">{},</span> <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">}</span>
+        <span class="n">msg</span><span class="p">[</span><span class="s1">&#39;method&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">method</span>
+        <span class="k">if</span> <span class="n">params</span><span class="p">:</span>
+            <span class="n">msg</span><span class="p">[</span><span class="s1">&#39;params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">params</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ws</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">msg</span><span class="p">))</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ws</span><span class="o">.</span><span class="n">recv</span><span class="p">())</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">SHORT_DELAY</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">msg</span><span class="p">[</span><span class="s1">&#39;result&#39;</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Disconnected from simulator&#39;</span><span class="p">)</span>
+            <span class="n">exit</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">msg</span><span class="p">[</span><span class="s1">&#39;result&#39;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_print</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Helper print routine</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">quiet</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">force</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;[SimulatorController] </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Jimmy Herman.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

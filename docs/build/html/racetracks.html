@@ -1,0 +1,292 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Racetracks &amp; L2R Datasets &mdash; Learn-to-Race  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="_static/katex-math.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/contrib/auto-render.min.js"></script>
+        <script src="_static/katex_autorenderer.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Creating Custom Sensor Configurations" href="sensors.html" />
+    <link rel="prev" title="Multimodal" href="multimodal.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Learn-to-Race
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Introduction:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="env_overview.html">Environment Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="baselines.html">Baselines</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Learn-to-Race Task:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tasks_overview.html">Task Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vision.html">Default Camera Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="multimodal.html">Multimodal</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Racetracks &amp; L2R Datasets</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#changing-the-track">Changing the Track</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#l2r-dataset">L2R Dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#racetrack-file-format">Racetrack File Format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#basic-visualization-of-tracks">Basic Visualization of Tracks</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="sensors.html">Creating Custom Sensor Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="l2r.core.html">Core Package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="l2r.envs.html">Envs Package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Learn-to-Race</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Racetracks &amp; L2R Datasets</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="racetracks-l2r-datasets">
+<h1>Racetracks &amp; L2R Datasets<a class="headerlink" href="#racetracks-l2r-datasets" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="changing-the-track">
+<h2>Changing the Track<a class="headerlink" href="#changing-the-track" title="Permalink to this headline">¶</a></h2>
+<p>Our environment uses three racetracks in the racing simulator, all of which are modeled off of real-world racetracks. The first is the <a class="reference external" href="https://www.lvms.com/business/track-rentals/#images-6">North Road track</a> at Las Vegas Motor Speedway located in the United States. The second is modeled off of the <a class="reference external" href="https://en.wikipedia.org/wiki/Thruxton_Circuit">Thruxton Circuit</a> track located in the United Kingdom. The third is Anglesey National based off the track at the <a class="reference external" href="https://www.angleseycircuit.com/venue/circuit-configurations/national/">Anglesey Circuit</a>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The LVMS track is currently used as an evaluation track, so its map will remain unavailable.</p>
+</div>
+<p>In the parameters file, you can specify the track you would like to use in the <code class="docutils literal notranslate"><span class="pre">params.yaml</span></code> file located in <code class="docutils literal notranslate"><span class="pre">sim_kwargs</span></code> as follows:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">sim_kwargs</span><span class="p">:</span>
+        <span class="nt">racetrack</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="s">&#39;Thruxton&#39;</span><span class="p p-Indicator">,</span> <span class="s">&#39;AngleseyNational&#39;</span><span class="p p-Indicator">]</span>  <span class="c1"># &#39;VegasNorthRoad&#39; is used for evaluation</span>
+        <span class="l l-Scalar l-Scalar-Plain">...</span>
+</pre></div>
+</div>
+<p>If more than one track is specified, the environment will randomly select a track at the beginning of each episode by default. Furthermore, the beginning of each episode will be a randomly selected point on the track unless the environment is in evaluation mode.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">env</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>  <span class="c1"># start episodes at the finish line</span>
+<span class="n">env</span><span class="o">.</span><span class="n">training</span><span class="p">()</span>  <span class="c1"># start episodes at a random location</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="l2r-dataset">
+<h2>L2R Dataset<a class="headerlink" href="#l2r-dataset" title="Permalink to this headline">¶</a></h2>
+<p>Some users may wish to pre-train models, such as an encoder or segmentation model, on a sample of images from the vehicle’s camera. While you can collect your own data from the environment, we provide datasets of each training track for such purposes. The Thruxton dataset includes 10,600 complete transitions including the sensor data, camera image, and action executed by the <cite>MPC agent &lt;baselines.html#Model-Predictive-Control&gt;</cite>, so it can also be used for immitation based approaches. This data was collected across 9 full laps around the Thruxton circuit track.</p>
+<p>Images were saved using <code class="docutils literal notranslate"><span class="pre">`numpy.savez_compressed()`</span></code> with arrays <code class="docutils literal notranslate"><span class="pre">pose_data</span></code> and <code class="docutils literal notranslate"><span class="pre">image</span></code>. The images are in RGB format with a width of 512 pixels, height of 384 pixels, and a field of view of 90 degrees. Loading the images into a numpy array can be done as follows:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="c1"># load transition 100</span>
+<span class="n">filename</span> <span class="o">=</span> <span class="s1">&#39;./transitions_100&#39;</span>
+<span class="n">transition</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">filename</span> <span class="o">+</span> <span class="s1">&#39;.npz&#39;</span><span class="p">)</span>
+
+<span class="c1"># view files, output is: [&#39;image&#39;, &#39;multimodal_data&#39;, &#39;action&#39;]</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">loaded</span><span class="o">.</span><span class="n">files</span><span class="p">)</span>
+
+<span class="c1"># pose_data is of shape (30,), image (384, 512, 3), and action (2,)</span>
+<span class="n">sensor_data</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">action</span> <span class="o">=</span> <span class="n">transition</span><span class="p">[</span><span class="s1">&#39;multimodal_data&#39;</span><span class="p">],</span> <span class="n">transition</span><span class="p">[</span><span class="s1">&#39;image&#39;</span><span class="p">],</span> <span class="n">transition</span><span class="p">[</span><span class="s1">&#39;action&#39;</span><span class="p">]</span>
+
+<span class="c1"># save the image</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imsave</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s1">.png&#39;</span><span class="p">,</span> <span class="n">transition</span><span class="p">[</span><span class="s1">&#39;image&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="racetrack-file-format">
+<h2>Racetrack File Format<a class="headerlink" href="#racetrack-file-format" title="Permalink to this headline">¶</a></h2>
+<p>The racetrack files are in JSON format. Each contains coordinates of the inside, outside, and center lines of the track in East, North, Up convention. The ENU coordinate system is a <em>local</em> coordinate system that requires a reference point, which is also included in the racetrack files. Our RL environment converts the coordinates of the vehicle to ENU before returning them from the <code class="docutils literal notranslate"><span class="pre">step()</span></code> method.</p>
+</div>
+<div class="section" id="basic-visualization-of-tracks">
+<h2>Basic Visualization of Tracks<a class="headerlink" href="#basic-visualization-of-tracks" title="Permalink to this headline">¶</a></h2>
+<p><em>VegasNorthRoad</em> has an expert trajectory included which some users may find useful for immitation learning approaches. Users are certainly welcome to generate their own expert trajectories.</p>
+<a class="reference internal image-reference" href="_images/lv_trackmap.png"><img alt="_images/lv_trackmap.png" class="align-center" src="_images/lv_trackmap.png" style="width: 80%;" /></a>
+<p>The Thruxton Circuit track is known for its high speeds which will present unique challenges to drivers.</p>
+<a class="reference internal image-reference" href="_images/tr_trackmap.png"><img alt="_images/tr_trackmap.png" class="align-center" src="_images/tr_trackmap.png" style="width: 80%;" /></a>
+<p>The following figure is from the <a class="reference external" href="https://www.angleseycircuit.com/venue/circuit-configurations/national/">Anglesey Circuit website</a> highlighting the highly technical features of this exciting track.</p>
+<div style="text-align: center;">
+  <figure style="display:inline-block;">
+    <img src='https://www.angleseycircuit.com/wp-content/uploads/2016/01/national.svg' alt='missing'/>
+    <figcaption style="padding: 10px 10px 10px;"><i>Anglesey National Circuit</i></figcaption>
+  </figure>
+</div></div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="sensors.html" class="btn btn-neutral float-right" title="Creating Custom Sensor Configurations" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="multimodal.html" class="btn btn-neutral float-left" title="Multimodal" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Jimmy Herman.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,361 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Environment Overview &mdash; Learn-to-Race  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="_static/katex-math.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/contrib/auto-render.min.js"></script>
+        <script src="_static/katex_autorenderer.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Getting Started" href="getting_started.html" />
+    <link rel="prev" title="Welcome to Learn-to-Race’s documentation!" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Learn-to-Race
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Introduction:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Environment Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#baseline-models">Baseline Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#action-space">Action Space</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#observation-space">Observation Space</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#customizable-sensor-configurations">Customizable Sensor Configurations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#racetracks">Racetracks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#research-citation">Research Citation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="baselines.html">Baselines</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Learn-to-Race Task:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tasks_overview.html">Task Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vision.html">Default Camera Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="multimodal.html">Multimodal</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="racetracks.html">Racetracks &amp; L2R Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sensors.html">Creating Custom Sensor Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="l2r.core.html">Core Package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="l2r.envs.html">Envs Package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Learn-to-Race</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Environment Overview</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="environment-overview">
+<h1>Environment Overview<a class="headerlink" href="#environment-overview" title="Permalink to this headline">¶</a></h1>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The L2R framework is coupled with the Arrival Racing simulator which has not yet been released. To gain access to the racing simulator, you must sign a licensing agreement with Arrival, the creator and owner of the simulation software. The simulator is expected to be available in May, 2021. Please complete this <a class="reference external" href="https://forms.gle/PXNM6hHkEgiAzhoa8">form</a> to be notified of its release.</p>
+</div>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="https://github.com/hermgerm29/learn-to-race">Learn-to-Race</a> (L2R) is an <a class="reference external" href="https://gym.openai.com/">OpenAI gym</a> compliant, multimodal control environment where agents learn how to race. Unlike many simplistic learning environments, ours is built around Arrival’s high-fidelity racing simulator featuring full software-in-the-loop (SIL), and even hardware-in-the-loop (HIL), simulation capabilities. This simulator has played a key role in bringing autonomous racing technology to real life in the <a class="reference external" href="https://roborace.com/">Roborace series</a>, the world’s first extreme competition of teams developing self-driving AI. Racing is an extreme challenge where agents must make real-time, high-risk decisions while finely controlling hardware operating near its physical limits. The L2R framework presents <em>objective-centric</em> tasks, rather than providing abstract rewards, and provides numerous quantitative metrics to measure the racing performance and trajectory quality of various agents.</p>
+<p>For more information, please read our <a class="reference external" href="https://arxiv.org/abs/2103.11575">paper</a> on arXiv.</p>
+</div>
+<div class="section" id="baseline-models">
+<h2>Baseline Models<a class="headerlink" href="#baseline-models" title="Permalink to this headline">¶</a></h2>
+<p>We provide ‘out-of-the-box’ baseline models to demonstrate how to use the environment including a <code class="docutils literal notranslate"><span class="pre">RandomActionAgent</span></code> as a starting point. We also provide a model predictive control (MPC) agent, which is non-learning, as well as a <a class="reference external" href="https://arxiv.org/abs/1801.01290v1">Soft Actor-Critic</a> agent, which only relies on the vehicle’s camera as input, and finally, an imitation learning implementation based on the MPC’s demonstrations.</p>
+<div class="sidebar">
+<p class="sidebar-title">Untrained Policy</p>
+<p>Our <a class="reference external" href="getting_started.html#basic-example">RandomActionAgent</a>
+completes a handful of episodes on the Las Vegas North Road track (with little success)</p>
+</div>
+<a class="reference internal image-reference" href="_images/untrained.gif"><img alt="_images/untrained.gif" src="_images/untrained.gif" style="width: 55%;" /></a>
+</div>
+<div class="section" id="action-space">
+<h2>Action Space<a class="headerlink" href="#action-space" title="Permalink to this headline">¶</a></h2>
+<p>While you <em>can</em> change the gear, in practice we suggest forcing the agent to stay in drive since the others would not be advantageous in completing the tasks we present (we don’t include it as a part of the action space). Note that negative acceleration values will brake the vehicle.</p>
+<table class="colwidths-auto docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Action</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Range</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Steering</p></td>
+<td><p>Continuous</p></td>
+<td><p>[-1.0, 1.0]</p></td>
+</tr>
+<tr class="row-odd"><td><p>Acceleration</p></td>
+<td><p>Continuous</p></td>
+<td><p>[-1.0, 1.0]</p></td>
+</tr>
+</tbody>
+</table>
+<p>The scaled action space is [-1.0, 1.0] for steering and [-16.0, 6.0] for acceleration. You can modify the boundaries of the action space, limiting acceleration, for example, if you would like by changing the parameters in <code class="docutils literal notranslate"><span class="pre">action_if_kwargs</span></code> in <code class="docutils literal notranslate"><span class="pre">params.yaml</span></code>.</p>
+</div>
+<div class="section" id="observation-space">
+<h2>Observation Space<a class="headerlink" href="#observation-space" title="Permalink to this headline">¶</a></h2>
+<p>We offer two high-level settings for the observation space: <a class="reference external" href="vision.html">vision-only</a> and <a class="reference external" href="multimodal.html">multimodal</a>. In both, the agent receives RGB images from the vehicle’s front-facing camera, examples below. The latter, however, also provides sensor data, including pose data from the vehicle’s IMU sensor.</p>
+<div style="text-align: center;">
+  <figure style="display:inline-block; width:42%;">
+    <img src='_static/sample_image_lvms.png' alt='missing'/ width=92%>
+    <figcaption style="padding: 10px 15px 15px;"><i>Sample image from the Las Vegas track</i></figcaption>
+  </figure>
+  <figure style="display:inline-block; width:42%;">
+    <img src='_static/sample_image_thruxton.png' alt='missing' width=92%/>
+    <figcaption style="padding: 10px 15px 15px;"><i>Sample image from the Thruxton track</i></figcaption>
+  </figure>
+</div></div>
+<div class="section" id="customizable-sensor-configurations">
+<h2>Customizable Sensor Configurations<a class="headerlink" href="#customizable-sensor-configurations" title="Permalink to this headline">¶</a></h2>
+<p>One of the key features of this environment is the ability to create arbitrary configurations of vehicle sensors. This provides users a rich sandbox for multimodal, learning based approaches. The following sensors are supported and can be placed, if applicable, at any location relative to the vehicle:</p>
+<ul class="simple">
+<li><p>RGB cameras</p></li>
+<li><p>Depth cameras</p></li>
+<li><p>Ground truth segmentation cameras</p></li>
+<li><p>Fisheye cameras</p></li>
+<li><p>Ray trace LiDARs</p></li>
+<li><p>Depth 2D LiDARs</p></li>
+<li><p>Radars</p></li>
+</ul>
+<p>Additionally, these sensors are parameterized and can be customized further; for example, cameras have modifiable image size, field-of-view, and exposure. We provide a sample configuration below which has front and side facing cameras in both RGB mode and with ground truth segmentation.</p>
+<div style="text-align: center;">
+  <figure style="display:inline-block; width:32%;">
+    <img src='_static/sample_vehicle_imgs/CameraLeftRGB.png' alt='missing'/ width=92%>
+    <figcaption style="padding: 3px 3px 3px;"><i>Left facing</i></figcaption>
+  </figure>
+  <figure style="display:inline-block; width:32%;">
+    <img src='_static/sample_vehicle_imgs/CameraFrontRGB.png' alt='missing'/ width=92%>
+    <figcaption style="padding: 3px 3px 3px;"><i>Front facing</i></figcaption>
+  </figure>
+  <figure style="display:inline-block; width:32%;">
+    <img src='_static/sample_vehicle_imgs/CameraRightRGB.png' alt='missing'/ width=92%>
+    <figcaption style="padding: 3px 3px 3px;"><i>Right facing</i></figcaption>
+  </figure>
+</div><div style="text-align: center;">
+  <figure style="display:inline-block; width:32%;">
+    <img src='_static/sample_vehicle_imgs/CameraLeftSegm.png' alt='missing'/ width=92%>
+    <figcaption style="padding: 3px 3px 3px;"></figcaption>
+  </figure>
+  <figure style="display:inline-block; width:32%;">
+    <img src='_static/sample_vehicle_imgs/CameraFrontSegm.png' alt='missing'/ width=92%>
+    <figcaption style="padding: 3px 3px 3px;"></figcaption>
+  </figure>
+  <figure style="display:inline-block; width:32%;">
+    <img src='_static/sample_vehicle_imgs/CameraRightSegm.png' alt='missing'/ width=92%>
+    <figcaption style="padding: 3px 3px 20px;"></figcaption>
+  </figure>
+</div><p>You can create cameras anywhere relative to the vehicle, allowing unique points-of-view such as a birdseye perspective which we include in the vehicle configuration file.</p>
+<div style="text-align: center;">
+  <figure style="display:inline-block; width:42%;">
+    <img src='_static/sample_vehicle_imgs/CameraBirdsEye.png' alt='missing'/ width=92%>
+    <figcaption style="padding: 3px 3px 3px;"></figcaption>
+  </figure>
+  <figure style="display:inline-block; width:42%;">
+    <img src='_static/sample_vehicle_imgs/CameraBirdsSegm.png' alt='missing'/ width=92%>
+    <figcaption style="padding: 3px 3px 20px;"></figcaption>
+  </figure>
+</div><p>For more information, see <a class="reference external" href="sensors.html#creating-custom-sensor-configurations">Creating Custom Sensor Configurations</a></p>
+</div>
+<div class="section" id="racetracks">
+<h2>Racetracks<a class="headerlink" href="#racetracks" title="Permalink to this headline">¶</a></h2>
+<p>We currently support three racetracks in our environment, both of which emulate real tracks. The first is the Vegas North Road track which is located at Las Vegas Motor Speedway in the United States. This track is used as the evaluation track, so users will only have access to this during evaluation. The second is the Thruxton Circuit, modeled off the track at the Thruxton Motorsport Centre in the United Kingdom. We will continue to add more racetracks in the future.</p>
+</div>
+<div class="section" id="research-citation">
+<h2>Research Citation<a class="headerlink" href="#research-citation" title="Permalink to this headline">¶</a></h2>
+<p>Please cite this work if you use L2R as a part of your research.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>@misc{herman2021learntorace,
+      title={Learn-to-Race: A Multimodal Control Environment for Autonomous Racing},
+      author={James Herman and Jonathan Francis and Siddha Ganju and Bingqing Chen and Anirudh Koul and Abhinav Gupta and Alexey Skabelkin and Ivan Zhukov and Andrey Gostev and Max Kumskoy and Eric Nyberg},
+      year={2021},
+      eprint={2103.11575},
+      archivePrefix={arXiv},
+      primaryClass={cs.RO}
+}
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="getting_started.html" class="btn btn-neutral float-right" title="Getting Started" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to Learn-to-Race’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Jimmy Herman.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

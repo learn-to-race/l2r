@@ -1,0 +1,361 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Baselines &mdash; Learn-to-Race  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="_static/katex-math.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/contrib/auto-render.min.js"></script>
+        <script src="_static/katex_autorenderer.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Task Overview" href="tasks_overview.html" />
+    <link rel="prev" title="Getting Started" href="getting_started.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Learn-to-Race
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Introduction:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="env_overview.html">Environment Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Baselines</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#demonstration-against-human-experts">Demonstration Against Human Experts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#random-action-agent">Random Action Agent</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#usage">Usage</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#soft-actor-critic">Soft Actor-Critic</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#training-performance">Training Performance</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#evaluation-performance">Evaluation Performance</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id2">Usage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#vision-only-perception-control">Vision-Only Perception &amp; Control</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#restriction-of-the-action-space">Restriction of the Action Space</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#custom-reward-policy">Custom Reward Policy</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#model-predictive-control">Model Predictive Control</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#performance">Performance</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id3">Usage</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Learn-to-Race Task:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tasks_overview.html">Task Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vision.html">Default Camera Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="multimodal.html">Multimodal</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="racetracks.html">Racetracks &amp; L2R Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sensors.html">Creating Custom Sensor Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="l2r.core.html">Core Package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="l2r.envs.html">Envs Package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Learn-to-Race</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Baselines</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="baselines">
+<h1>Baselines<a class="headerlink" href="#baselines" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="demonstration-against-human-experts">
+<h2>Demonstration Against Human Experts<a class="headerlink" href="#demonstration-against-human-experts" title="Permalink to this headline">¶</a></h2>
+<div style="text-align: center;">
+  <iframe width="640" height="360" src="https://www.youtube.com/embed/lrTeirwUeMk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</div>
+<br></div>
+<div class="section" id="random-action-agent">
+<h2>Random Action Agent<a class="headerlink" href="#random-action-agent" title="Permalink to this headline">¶</a></h2>
+<p>Our <code class="docutils literal notranslate"><span class="pre">RandomActionAgent</span></code> is a basic demonstration of an agent interacting with the environment which we explain in the <a class="reference external" href="getting_started.html#basic-example">Getting Started</a> section of the docs. This agent simply takes random actions in the environment with an action space that is restricted to only take non-negative acceleration values.</p>
+<div class="section" id="usage">
+<h3>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h3>
+<p>As mentioned previously, you need to have the docker image with the simulator to use the environment. Simply add the <code class="docutils literal notranslate"><span class="pre">-b</span></code> flag and argument <code class="docutils literal notranslate"><span class="pre">random</span></code> as a command line argument to <code class="docutils literal notranslate"><span class="pre">./run.bash</span></code> to use this agent.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ chmod +x run.bash  <span class="c1"># make our script executable</span>
+$ ./run.bash -b random
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="soft-actor-critic">
+<h2>Soft Actor-Critic<a class="headerlink" href="#soft-actor-critic" title="Permalink to this headline">¶</a></h2>
+<p>We also provide a more detailed demonstration of how to use the environment with our <a class="reference external" href="https://arxiv.org/abs/1801.01290v1">Soft Actor-Critic</a> agent using  <a class="reference external" href="https://spinningup.openai.com/en/latest/algorithms/sac.html#documentation-pytorch-version">OpenAI’s Spinning Up Pytorch implementation</a> with minor adjustments. Specifically these adjustments include wrapping methods which returned observations from the environment to first encode the raw images into a latent representation, waiting until the end of the episode to make gradient updates, and removing unused functionality.</p>
+<div class="section" id="training-performance">
+<h3>Training Performance<a class="headerlink" href="#training-performance" title="Permalink to this headline">¶</a></h3>
+<p>For both tracks, we provide our agent’s model after 1000 episodes which was slightly less than 1 million environment steps for the Las Vegas Track and slightly more for the Thruxton track.</p>
+<div style="text-align: center;">
+  <h4>Las Vegas Track</h4>
+  <span style="display:inline-block; text-align: center; width: 50%">
+    <p>Our agent is able to consistently, but not always, complete laps in under
+    2 minutes each.</p>
+  </span>
+  <figure style="display:inline-block; width:60%;">
+    <img src='_static/lvms_1_.gif' alt='missing'/ width=92%>
+    <figcaption style="padding: 10px 15px 15px;"><i>Episode 1</i></figcaption>
+  </figure>
+  <figure style="display:inline-block; width:60%;">
+    <img src='_static/lvms_100_.gif' alt='missing' width=92%/>
+    <figcaption style="padding: 10px 15px 15px;"><i>Episode 100</i></figcaption>
+  </figure>
+  <figure style="display:inline-block; width:60%;">
+    <img src='_static/lvms_1000_.gif' alt='missing' width=92%/>
+    <figcaption style="padding: 10px 15px 15px;"><i>Episode 1000</i></figcaption>
+  </figure>
+</div>
+
+<br>
+
+<div style="text-align: center;">
+  <h4>Thruxton</h4>
+  <span style="display:inline-block; text-align: center; width: 50%">
+    <p>The agent demonstrates control but fails to ever complete a lap due to the
+    trap near the end of the course which requires multiple sharp turns.</p>
+  </span>
+  <figure style="display:inline-block; width:60%;">
+    <img src='_static/thruxton_1_.gif' alt='missing'/ width=92%>
+    <figcaption style="padding: 10px 15px 15px;"><i>Episode 1</i></figcaption>
+  </figure>
+  <figure style="display:inline-block; width:60%;">
+    <img src='_static/thruxton_100_.gif' alt='missing' width=92%/>
+    <figcaption style="padding: 10px 15px 15px;"><i>Episode 100</i></figcaption>
+  </figure>
+  <figure style="display:inline-block; width:60%;">
+    <img src='_static/thruxton_1000_.gif' alt='missing' width=92%/>
+    <figcaption style="padding: 10px 15px 15px;"><i>Episode 1000</i></figcaption>
+  </figure>
+</div></div>
+<div class="section" id="evaluation-performance">
+<h3>Evaluation Performance<a class="headerlink" href="#evaluation-performance" title="Permalink to this headline">¶</a></h3>
+<p>The SAC agent struggles when transferring its learned experience from the Thruxton track to the Las Vegas evaluation track even after 60 minutes of exploration as it learns to simply stop in the middle of the track to avoid the penalty of going out-of-bounds.</p>
+</div>
+<div class="section" id="id2">
+<h3>Usage<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<p>To run the trained model, simply provide <code class="docutils literal notranslate"><span class="pre">-b</span></code> flag and argument <code class="docutils literal notranslate"><span class="pre">sac</span></code> to <code class="docutils literal notranslate"><span class="pre">run.bash</span></code>. Both the encoder and checkpoint models were trained separately for each track, so if you would like to switch to the Thruxton track, be sure to change the encoder and checkpoint paths in <code class="docutils literal notranslate"><span class="pre">configs/params_sac.yaml</span></code> in addition to the track name.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ chmod +x run.bash  <span class="c1"># make our script executable</span>
+$ ./run.bash -b sac
+</pre></div>
+</div>
+</div>
+<div class="section" id="vision-only-perception-control">
+<h3>Vision-Only Perception &amp; Control<a class="headerlink" href="#vision-only-perception-control" title="Permalink to this headline">¶</a></h3>
+<p>This agent learns non-trivial control of the race car exlusively from visual features. First, we pretrained a <a class="reference external" href="https://arxiv.org/abs/1312.6114v10">variational autoencoder</a> on the provided <a class="reference external" href="racetracks.html#sample-image-datasets">sample image datasets</a> to allow our agent to learn from a low-dimensional representation of the images. Our VAE is a slight modification of Shubham Chandel’s <a class="reference external" href="https://github.com/sksq96/pytorch-vae">implementation</a>.</p>
+</div>
+<div class="section" id="restriction-of-the-action-space">
+<h3>Restriction of the Action Space<a class="headerlink" href="#restriction-of-the-action-space" title="Permalink to this headline">¶</a></h3>
+<p>For this agent, we restricted the scaled action space to <code class="docutils literal notranslate"><span class="pre">[-0.1,</span> <span class="pre">4.0]</span></code> for acceleration and <code class="docutils literal notranslate"><span class="pre">[-0.3,</span> <span class="pre">0.3]</span></code> for steering to allow for faster convergence.</p>
+</div>
+<div class="section" id="custom-reward-policy">
+<h3>Custom Reward Policy<a class="headerlink" href="#custom-reward-policy" title="Permalink to this headline">¶</a></h3>
+<p>Additionally, we modified the default reward policy for the environment to include bonus if the agent is near the center of the track for each step in the environment but only if it had made progress down the track. Doing so has numerous consequences including:</p>
+<ul class="simple">
+<li><p>encouraging the agent to safely stay near the middle of the track</p></li>
+<li><p>disincentivizing the agent from engaging in corner cutting</p></li>
+<li><p>implicitly rewarding the agent to drive more slowly</p></li>
+</ul>
+<p>As such, this reward allows for faster convergence in terms of number of episodes before completing its first lap in the environment. However, we noticed that the agent learns to zig-zag; we believe this may be an intentional effort to slow down and gather more near-center bonuses.</p>
+</div>
+</div>
+<div class="section" id="model-predictive-control">
+<h2>Model Predictive Control<a class="headerlink" href="#model-predictive-control" title="Permalink to this headline">¶</a></h2>
+<p>We include a model predictive control (MPC), non-learning agent with the environment too. This reference implementation demonstrates a controller which attempts to minimize tracking error with respect to the centerline of the racetrack at a pre-specified reference speed.</p>
+<div class="section" id="performance">
+<h3>Performance<a class="headerlink" href="#performance" title="Permalink to this headline">¶</a></h3>
+<p>The MPC agent does well, completing laps consistently, on the Thruxton track by following a conservative trajectory. On the LVMS track, however, it seems to occasionally falter on the highest curvature points of the track.</p>
+</div>
+<div class="section" id="id3">
+<h3>Usage<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<p>To run the trained model, simply provide the <code class="docutils literal notranslate"><span class="pre">-b</span></code> flag and argument <code class="docutils literal notranslate"><span class="pre">mpc</span></code> to <code class="docutils literal notranslate"><span class="pre">run.bash</span></code>. Do note, however, that the MPC requires <code class="docutils literal notranslate"><span class="pre">torch&lt;=1.4</span></code> unlike the SAC baseline.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ chmod +x run.bash  <span class="c1"># make our script executable</span>
+$ ./run.bash -b mpc
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="tasks_overview.html" class="btn btn-neutral float-right" title="Task Overview" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="getting_started.html" class="btn btn-neutral float-left" title="Getting Started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Jimmy Herman.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,13 @@
+/* css overrides */
+
+.wy-side-nav-search, .wy-nav-top {
+	background: #001B20;
+}
+
+.wy-nav-side {
+	background: #3C7882;
+}
+
+.caption-text {
+	color: #001B20 !important;
+}

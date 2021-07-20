@@ -1,0 +1,366 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Task Overview &mdash; Learn-to-Race  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="_static/katex-math.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/contrib/auto-render.min.js"></script>
+        <script src="_static/katex_autorenderer.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Default Camera Configuration" href="vision.html" />
+    <link rel="prev" title="Baselines" href="baselines.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Learn-to-Race
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Introduction:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="env_overview.html">Environment Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="baselines.html">Baselines</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Learn-to-Race Task:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Task Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#task-definition">Task Definition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#input-modalities">Input Modalities</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#metrics">Metrics</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#basic-metrics">Basic Metrics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#trajectory-quality">Trajectory Quality</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#legal-modifications">Legal Modifications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#training-only">Training Only</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#illegal-modifications">Illegal Modifications</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="vision.html">Default Camera Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="multimodal.html">Multimodal</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="racetracks.html">Racetracks &amp; L2R Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sensors.html">Creating Custom Sensor Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="l2r.core.html">Core Package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="l2r.envs.html">Envs Package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Learn-to-Race</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Task Overview</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="task-overview">
+<h1>Task Overview<a class="headerlink" href="#task-overview" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>The task is to learn how to race using either vision-only or multiple input modalities. While Arrival’s racing simulator and the L2R framework is suitable for a wide variety of approaches including:</p>
+<ul class="simple">
+<li><p>classical control</p></li>
+<li><p>pre-planning trajectories</p></li>
+<li><p>reinforcement learning (RL)</p></li>
+<li><p>imiatation learning (IL)</p></li>
+</ul>
+<p>We are most interested in agents which learn how to perceive their surroundings and effectively control the race car. We are also familiar with the success of RL approaches and fully expect, and encourage, the community to create agents which are significantly better than our human benchmarks. However, learning-based approaches often have poor sample efficiency and fail at generalizing to new scenarios. Humans, on the other hand, are good at quickly adapting to new situations, such as racing on a new, unseen track after only a short warmup period. The L2R task will challenges agents’ ability race in such a way.</p>
+<div class="section" id="task-definition">
+<h3>Task Definition<a class="headerlink" href="#task-definition" title="Permalink to this headline">¶</a></h3>
+<p>Rather than giving agents an unbounded amount of time to perfectly overfit to a racetrack, the L2R task allows only a limited look at a new track, much like a Formula 1 driver gets only a brief practice session prior to the actual race. More concretely, agent assessment involves two stages:</p>
+<ol class="arabic simple">
+<li><p><strong>Pre-evaluation:</strong> agents will have access to an unseen, evaluation racetrack for 60 minutes with unfrozen weights. The agent is free to use this time for any purpose they deem necessary, but we generally expect agents to transfer their prior racing knowledge to the new environment after a brief exploration period.</p></li>
+<li><p><strong>Evaluation:</strong> to qualify for evaluation, the agent must demonstrate that it can complete at least 1 lap during the pre-evaluation stage, subject to a modest maximum time limit. Successful agents will be evaluated on the testing racetrack and their metrics, defined below, will be recorded and updated on a leaderboard. To prevent competitors from unfairly learning on the test track, submissions will only be able to see their agent’s results and will not have access to any model updates during the pre-evaluation stage.</p></li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>We currently only support single vehicle racing, but hope to introduce a multi-agent environment in the future.</p>
+</div>
+</div>
+<div class="section" id="input-modalities">
+<h3>Input Modalities<a class="headerlink" href="#input-modalities" title="Permalink to this headline">¶</a></h3>
+<p>We present two distinct sets of information available to agents. All information available to agents use virtual sensors that emulate their real counterparts, so the agent does not have access to any privileged information. A separate leadboard will be used for agent’s using the more restricted <em>vision-only</em> input mode.</p>
+<dl class="simple">
+<dt><a class="reference external" href="vision.html">Vision-Only</a></dt><dd><p><em>The agent only has access to raw pixel values from the vehicle’s cameras</em></p>
+</dd>
+<dt><a class="reference external" href="multimodal.html">Multimodal</a></dt><dd><p><em>In addition to the cameras, we provide the agent with sensor data, primarily from the vehicle’s IMU sensor</em></p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="section" id="metrics">
+<h2>Metrics<a class="headerlink" href="#metrics" title="Permalink to this headline">¶</a></h2>
+<p>Learn-to-Race defines numerous metrics for the assessment of an agent’s performance listed below. These are
+provided to agents upon episode termination in the <em>info</em> of the last environment step.</p>
+<table class="colwidths-given docutils align-default">
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 75%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Metric</p></th>
+<th class="head"><p>Definition</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><em>Episode Completion Percentage</em></p></td>
+<td><p>Percentage of the 3-lap episode completed</p></td>
+</tr>
+<tr class="row-odd"><td><p><em>Episode Duration</em></p></td>
+<td><p>Duration of the episode, in seconds</p></td>
+</tr>
+<tr class="row-even"><td><p><em>Average Adjusted Track Speed</em></p></td>
+<td><p>Average speed, adjusted for environmental conditions, in km/h</p></td>
+</tr>
+<tr class="row-odd"><td><p><em>Average Displacement Error</em></p></td>
+<td><p>Euclidean displacement from the track centerline, in meters</p></td>
+</tr>
+<tr class="row-even"><td><p><em>Trajectory Admissibility</em></p></td>
+<td><p>Measurement of the safety of the trajectory</p></td>
+</tr>
+<tr class="row-odd"><td><p><em>Trajectory Efficiency</em></p></td>
+<td><p>Ratio of track curvature to trajectory curvature</p></td>
+</tr>
+<tr class="row-even"><td><p><em>Movement Smoothness</em></p></td>
+<td><p>Log dimensionless jerk based on accelerometer data</p></td>
+</tr>
+</tbody>
+</table>
+<div class="section" id="basic-metrics">
+<h3>Basic Metrics<a class="headerlink" href="#basic-metrics" title="Permalink to this headline">¶</a></h3>
+<p>A successful episode is defined as completing 3 laps, from a standing start, without 2 wheels going out-of-bounds at any point in time (1 is permissable, but considered <em>unsafe</em>). L2R provides basic metrics like the percentage of the 3 laps completed, the lap times for each successfully completed lap, the total time of the episode, and the average speed of the vehicle.</p>
+</div>
+<div class="section" id="trajectory-quality">
+<h3>Trajectory Quality<a class="headerlink" href="#trajectory-quality" title="Permalink to this headline">¶</a></h3>
+<p>To understand the quality of an agent’s trajectories, L2R also includes metrics like <em>average displacement error</em> which is simply the agent’s average distance from the centerline which is particularly useful measuring a controllers ability to stay near its target. We also include <em>trajectory admissibility</em> or <span class="math">\(\alpha\)</span>, shown below, where <span class="math">\(t_{u}\)</span> is the cumulative time spent unsafely with 1 wheel out-of-bounds and <span class="math">\(t_{e}\)</span> is the total length of the episode.</p>
+<div class="math">
+\[\alpha = 1 - \sqrt{\frac{t_{\text{u}}}{t_{e}}}
+
+\]</div>
+<p>A perfectly admissable trajectory is 1.0 with no time spent outside of the drivable area. Furthermore, we provide a <em>trajectory efficiency</em> ratio which is the ratio of curvature of the racetrack’s centerline to the curvature of the trajectory, measured parametrically using the root mean square. Strong racing agents should minimize their curvature to maintain high speeds, for example, by cutting corners, and have an efficiency of at least 1.0.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>If the agent doesn’t complete the entire episode, the trajectory efficiency metric will likely be distorted since it would be comparing a partial trajectory, which may exclude high curvature areas of the track, to the entire racetrack.</p>
+</div>
+<p>Good racing agents should also be able to anticipate the need for changes in velocity and have the ability to smoothly control such changes. L2R also includes a <em>movement smoothness</em> measure, the negated log dimensionless jerk, <span class="math">\(\eta_{ldj}\)</span>, which quantifies the smoothness of the agent’s acceleration profile.</p>
+<div class="math">
+\[\eta_{ldj} = \ln \left( \frac{(t_{2}-t_{1})^{3}}{v_{peak}^{2}} \int_{t_{1}}^{t_{2}}\left\lvert\frac{d^{2}v}{dt^{2}}\right\rvert^{2} dt \right)
+
+\]</div>
+<p>Agents that tend to jerk the vehicle or brake violently, both dangerous maneuvers, will have a worse movement smoothness measure.</p>
+</div>
+</div>
+<div class="section" id="legal-modifications">
+<h2>Legal Modifications<a class="headerlink" href="#legal-modifications" title="Permalink to this headline">¶</a></h2>
+<p>For the purpose of benchmarking, we require that you adhere to some degree of requirements. There are no restrictions in the modification or usage of:</p>
+<ul class="simple">
+<li><p>exploration or learning method</p></li>
+<li><p>incentive method (reward function)</p></li>
+<li><p>network architecture</p></li>
+<li><p>pre-trained perception models</p></li>
+<li><p>the delay between action and observation</p></li>
+<li><p>changing the action space</p></li>
+</ul>
+</div>
+<div class="section" id="training-only">
+<h2>Training Only<a class="headerlink" href="#training-only" title="Permalink to this headline">¶</a></h2>
+<p>Certain camera settings must be considered training-only if they are realistically accessible to a physical racecar. The following camera settings are not available during evaluation:</p>
+<ul class="simple">
+<li><p>Segmentation cameras</p></li>
+<li><p>Cameras not touching the vehicle (for example, birdseye views)</p></li>
+</ul>
+</div>
+<div class="section" id="illegal-modifications">
+<h2>Illegal Modifications<a class="headerlink" href="#illegal-modifications" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Not using the default vehicle in the simulator (DevBot 2.0)</p></li>
+<li><p>Changing any physical parameters of the simulator such as the friction settings; we are <em>not</em> concerned about sim2real transfer</p></li>
+<li><p>Modifying the tracker method that would influence termination conditions or lap timing</p></li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="vision.html" class="btn btn-neutral float-right" title="Default Camera Configuration" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="baselines.html" class="btn btn-neutral float-left" title="Baselines" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Jimmy Herman.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

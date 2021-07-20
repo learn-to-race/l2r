@@ -1,0 +1,573 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>l2r.envs.utils &mdash; Learn-to-Race  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/katex-math.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/contrib/auto-render.min.js"></script>
+        <script src="../../../_static/katex_autorenderer.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Learn-to-Race
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Introduction:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../env_overview.html">Environment Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../baselines.html">Baselines</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Learn-to-Race Task:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tasks_overview.html">Task Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../vision.html">Default Camera Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../multimodal.html">Multimodal</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../racetracks.html">Racetracks &amp; L2R Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../sensors.html">Creating Custom Sensor Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../l2r.core.html">Core Package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../l2r.envs.html">Envs Package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Learn-to-Race</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>l2r.envs.utils</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for l2r.envs.utils</h1><div class="highlight"><pre>
+<span></span><span class="c1"># ========================================================================= #</span>
+<span class="c1"># Filename:                                                                 #</span>
+<span class="c1">#    utils.py                                                               #</span>
+<span class="c1">#                                                                           #</span>
+<span class="c1"># Description:                                                              #</span>
+<span class="c1">#    environment utilities                                                  #</span>
+<span class="c1"># ========================================================================= #</span>
+
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">socket</span>
+<span class="kn">import</span> <span class="nn">struct</span>
+<span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">sqrt</span><span class="p">,</span> <span class="n">cos</span><span class="p">,</span> <span class="n">sin</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">zmq</span>
+
+<span class="kn">from</span> <span class="nn">core.templates</span> <span class="kn">import</span> <span class="n">AbstractInterface</span>
+
+<span class="c1"># Message byte formats</span>
+<span class="n">OUT_MSG_HEADER_FMT</span> <span class="o">=</span> <span class="s1">&#39;=ffb&#39;</span>
+<span class="n">OUT_MSG_HEADER_LENGTH</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">calcsize</span><span class="p">(</span><span class="n">OUT_MSG_HEADER_FMT</span><span class="p">)</span>
+<span class="n">IN_MSG_HEADER_FMT</span> <span class="o">=</span> <span class="s1">&#39;=fbbffffffffffffdddffffffffffff&#39;</span>
+<span class="n">IN_MSG_HEADER_LENGTH</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">calcsize</span><span class="p">(</span><span class="n">IN_MSG_HEADER_FMT</span><span class="p">)</span>
+<span class="n">IMG_MSG_HEADER_FMT</span> <span class="o">=</span> <span class="s1">&#39;iiiiiqq&#39;</span>
+<span class="n">HEADER_LENGTH</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">calcsize</span><span class="p">(</span><span class="n">IMG_MSG_HEADER_FMT</span><span class="p">)</span>
+
+<span class="c1"># Image Type Declarations</span>
+<span class="n">CV_8U</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">CV_8S</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">CV_16U</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">CV_16S</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">CV_32S</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">CV_32F</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">CV_64F</span> <span class="o">=</span> <span class="mi">6</span>
+
+<span class="c1"># Socket receive size</span>
+<span class="n">BUFFER</span> <span class="o">=</span> <span class="mi">1024</span>
+
+<span class="c1"># Valid gear actions</span>
+<span class="n">NEUTRAL_GEAR</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">DRIVE_GEAR</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">REVERSE_GEAR</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">PARK_GEAR</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">GEAR_REQ_RANGE</span> <span class="o">=</span> <span class="mi">4</span>
+
+<span class="c1"># Acceleration request boundaries</span>
+<span class="n">MIN_ACC_REQ</span> <span class="o">=</span> <span class="o">-</span><span class="mf">16.</span>
+<span class="n">MAX_ACC_REQ</span> <span class="o">=</span> <span class="mf">6.</span>
+
+<span class="c1"># Steering request boundaries</span>
+<span class="n">MIN_STEER_REQ</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.</span>
+<span class="n">MAX_STEER_REQ</span> <span class="o">=</span> <span class="mf">1.</span>
+
+
+<div class="viewcode-block" id="InvalidActionException"><a class="viewcode-back" href="../../../l2r.envs.html#l2r.envs.utils.InvalidActionException">[docs]</a><span class="k">class</span> <span class="nc">InvalidActionException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ActionInterface"><a class="viewcode-back" href="../../../l2r.envs.html#l2r.envs.utils.ActionInterface">[docs]</a><span class="k">class</span> <span class="nc">ActionInterface</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Action send interface. This class communicates with the simulator and</span>
+<span class="sd">    sends action requests from the agent.</span>
+
+<span class="sd">    :param str ip: ip address</span>
+<span class="sd">    :param int port: port to bind to</span>
+<span class="sd">    :param float max_steer: maximum steering request, bounded by 1.</span>
+<span class="sd">    :param float min_steer: minimum steering request, bounded by -1.</span>
+<span class="sd">    :param flaot max_accel: maximum acceleration request, bounded by 6.</span>
+<span class="sd">    :param float min_accel: minimum acceleration request, bounded by -16.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ip</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">7077</span><span class="p">,</span> <span class="n">max_steer</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">min_steer</span><span class="o">=-</span><span class="mf">1.</span><span class="p">,</span>
+                 <span class="n">max_accel</span><span class="o">=</span><span class="n">MAX_ACC_REQ</span><span class="p">,</span> <span class="n">min_accel</span><span class="o">=</span><span class="n">MIN_ACC_REQ</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addr</span> <span class="o">=</span> <span class="p">(</span><span class="n">ip</span><span class="p">,</span> <span class="n">port</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sock</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">SOCK_DGRAM</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_steer</span> <span class="o">=</span> <span class="n">max_steer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_steer</span> <span class="o">=</span> <span class="n">min_steer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_accel</span> <span class="o">=</span> <span class="n">max_accel</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_accel</span> <span class="o">=</span> <span class="n">min_accel</span>
+        <span class="k">if</span> <span class="n">max_steer</span> <span class="o">&gt;</span> <span class="n">MAX_STEER_REQ</span> <span class="ow">or</span> <span class="n">min_steer</span> <span class="o">&lt;</span> <span class="n">MIN_ACC_REQ</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidActionException</span><span class="p">(</span><span class="s1">&#39;Invalid steering boundaries&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">max_accel</span> <span class="o">&gt;</span> <span class="n">MAX_ACC_REQ</span> <span class="ow">or</span> <span class="n">min_accel</span> <span class="o">&lt;</span> <span class="n">MIN_ACC_REQ</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidActionException</span><span class="p">(</span><span class="s1">&#39;Invalid acceleration boundaries&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ActionInterface.act"><a class="viewcode-back" href="../../../l2r.envs.html#l2r.envs.utils.ActionInterface.act">[docs]</a>    <span class="k">def</span> <span class="nf">act</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Send action request to the simulator.</span>
+
+<span class="sd">        :param array-like action: action to send to the simulator in the form:</span>
+<span class="sd">          [steering, acceleration], expected to be in the range (-1., 1.)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_action</span><span class="p">(</span><span class="n">action</span><span class="p">)</span>
+        <span class="n">steer</span><span class="p">,</span> <span class="n">acc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scale_action</span><span class="p">(</span><span class="n">action</span><span class="p">)</span>
+        <span class="nb">bytes</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">OUT_MSG_HEADER_FMT</span><span class="p">,</span> <span class="n">steer</span><span class="p">,</span> <span class="n">acc</span><span class="p">,</span> <span class="n">DRIVE_GEAR</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sock</span><span class="o">.</span><span class="n">sendto</span><span class="p">(</span><span class="nb">bytes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">addr</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_scale_action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Scale the action</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">steer</span><span class="p">,</span> <span class="n">acc</span> <span class="o">=</span> <span class="n">action</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">action</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">steer</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_steer</span> <span class="k">if</span> <span class="n">steer</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="p">(</span><span class="o">-</span><span class="mf">1.</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_steer</span><span class="p">)</span>
+        <span class="n">acc</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_accel</span> <span class="k">if</span> <span class="n">acc</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="p">(</span><span class="o">-</span><span class="mf">1.</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_accel</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">steer</span><span class="p">,</span> <span class="n">acc</span>
+
+    <span class="k">def</span> <span class="nf">_check_action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check that the action is valid with reference to the action space.</span>
+
+<span class="sd">        :param array-like action: action to send to the simulator in the form:</span>
+<span class="sd">          [steering, acceleration], expected to be in the range (-1., 1.)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">action</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mf">1.0</span> <span class="ow">or</span> <span class="n">action</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">1.0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidActionException</span><span class="p">(</span><span class="s1">&#39;Invalid steering request&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">action</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mf">1.0</span> <span class="ow">or</span> <span class="n">action</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">1.0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidActionException</span><span class="p">(</span><span class="s1">&#39;Invalid acceleration request&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PoseInterface"><a class="viewcode-back" href="../../../l2r.envs.html#l2r.envs.utils.PoseInterface">[docs]</a><span class="k">class</span> <span class="nc">PoseInterface</span><span class="p">(</span><span class="n">AbstractInterface</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Receives sensor data from the simulator. The data received is in the</span>
+<span class="sd">    following format:</span>
+
+<span class="sd">    [0,1,2] steering, gear, mode \n</span>
+<span class="sd">    [3,4,5] velocity \n</span>
+<span class="sd">    [6,7,8] acceleration \n</span>
+<span class="sd">    [9,10,11] angular velocity \n</span>
+<span class="sd">    [12,13,14] yaw, pitch, roll \n</span>
+<span class="sd">    [15,16,17] location coordinates in the format (y, x, z) \n</span>
+<span class="sd">    [18,19,20 21] rpm (by wheel) \n</span>
+<span class="sd">    [22,23,24,25] brake (by wheel) \n</span>
+<span class="sd">    [26,27,28,29] torq (by wheel)</span>
+
+<span class="sd">    :param str ip: ip address</span>
+<span class="sd">    :param int port: port to bind to</span>
+<span class="sd">    :param int data_elems: number of elements to listen for, elements are</span>
+<span class="sd">      assumed to be of type float</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ip</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">7078</span><span class="p">,</span> <span class="n">data_elems</span><span class="o">=</span><span class="mi">30</span><span class="p">):</span>
+        <span class="n">addr</span> <span class="o">=</span> <span class="p">(</span><span class="n">ip</span><span class="p">,</span> <span class="n">port</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sock</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">SOCK_DGRAM</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sock</span><span class="o">.</span><span class="n">setsockopt</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">SOL_SOCKET</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">SO_REUSEADDR</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sock</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="n">addr</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_elems</span> <span class="o">=</span> <span class="n">data_elems</span>
+
+<div class="viewcode-block" id="PoseInterface.start"><a class="viewcode-back" href="../../../l2r.envs.html#l2r.envs.utils.PoseInterface.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Starts a thread to listen for data from the simulator.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">thread</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_receive</span><span class="p">,</span> <span class="n">daemon</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="PoseInterface.get_data"><a class="viewcode-back" href="../../../l2r.envs.html#l2r.envs.utils.PoseInterface.get_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the most recent data received from the simulator.</span>
+
+<span class="sd">        :return: data from the simulator</span>
+<span class="sd">        :rtype: array of length self.data_elems</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PoseInterface.reset"><a class="viewcode-back" href="../../../l2r.envs.html#l2r.envs.utils.PoseInterface.reset">[docs]</a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Allocates memory for data receive.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_elems</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_receive</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Indefinitely wait for data from the simulator and unpack into an</span>
+<span class="sd">        array.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="nb">bytes</span><span class="p">,</span> <span class="n">addr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sock</span><span class="o">.</span><span class="n">recvfrom</span><span class="p">(</span><span class="n">BUFFER</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="nb">bytes</span><span class="p">)</span> <span class="o">==</span> <span class="n">IN_MSG_HEADER_LENGTH</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="n">IN_MSG_HEADER_FMT</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="CameraInterface"><a class="viewcode-back" href="../../../l2r.envs.html#l2r.envs.utils.CameraInterface">[docs]</a><span class="k">class</span> <span class="nc">CameraInterface</span><span class="p">(</span><span class="n">AbstractInterface</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Receives images from the simulator.</span>
+
+<span class="sd">    :param str addr: address to listen on</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">addr</span><span class="o">=</span><span class="s1">&#39;tcp://127.0.0.1:8008&#39;</span><span class="p">):</span>
+        <span class="n">ctx</span> <span class="o">=</span> <span class="n">zmq</span><span class="o">.</span><span class="n">Context</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sock</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">zmq</span><span class="o">.</span><span class="n">SUB</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sock</span><span class="o">.</span><span class="n">setsockopt</span><span class="p">(</span><span class="n">zmq</span><span class="o">.</span><span class="n">SUBSCRIBE</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sock</span><span class="o">.</span><span class="n">setsockopt</span><span class="p">(</span><span class="n">zmq</span><span class="o">.</span><span class="n">CONFLATE</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sock</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">addr</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addr</span> <span class="o">=</span> <span class="n">addr</span>
+
+<div class="viewcode-block" id="CameraInterface.start"><a class="viewcode-back" href="../../../l2r.envs.html#l2r.envs.utils.CameraInterface.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">img_dims</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Starts a thread to listen for images on.</span>
+
+<span class="sd">        :param tuple img_dims: dimensions of the image to listen for in the</span>
+<span class="sd">          form: (width, height, depth)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">img_dims</span> <span class="o">=</span> <span class="p">(</span><span class="n">img_dims</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">img_dims</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">img_dims</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">thread</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_receive</span><span class="p">,</span> <span class="n">daemon</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="CameraInterface.get_data"><a class="viewcode-back" href="../../../l2r.envs.html#l2r.envs.utils.CameraInterface.get_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the most recent image(s) received from the simulator.</span>
+
+<span class="sd">        :return: RGB image of shape (height, width, 3)</span>
+<span class="sd">        :rtype: numpy.array</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CameraInterface.reset"><a class="viewcode-back" href="../../../l2r.envs.html#l2r.envs.utils.CameraInterface.reset">[docs]</a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Allocates memory for data receive.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">img</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">img_dims</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CameraInterface.reconnect"><a class="viewcode-back" href="../../../l2r.envs.html#l2r.envs.utils.CameraInterface.reconnect">[docs]</a>    <span class="k">def</span> <span class="nf">reconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Reconnect to the socket</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sock</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">addr</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_receive</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Indefinitely wait for data from the simulator and unpack into an</span>
+<span class="sd">        array. Supports RGB images only.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">rawbuf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sock</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">zmq</span><span class="o">.</span><span class="n">ZMQError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">errno</span> <span class="o">!=</span> <span class="n">zmq</span><span class="o">.</span><span class="n">EAGAIN</span><span class="p">:</span>
+                    <span class="k">raise</span>
+
+            <span class="n">head</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="n">IMG_MSG_HEADER_FMT</span><span class="p">,</span> <span class="n">rawbuf</span><span class="p">[:</span><span class="n">HEADER_LENGTH</span><span class="p">])</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">rawbuf</span><span class="p">[</span><span class="n">HEADER_LENGTH</span><span class="p">:]</span>
+            <span class="n">im</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ocv2np_type</span><span class="p">(</span><span class="n">head</span><span class="p">[</span><span class="mi">4</span><span class="p">]))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">img</span> <span class="o">=</span> <span class="n">im</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">head</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">4</span><span class="p">])[:,</span> <span class="p">:,</span> <span class="p">::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># BGR to RGB</span>
+
+    <span class="k">def</span> <span class="nf">_ocv2np_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ocv_type</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Utility to determine dtype of the image.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">ocv_type</span> <span class="o">==</span> <span class="n">CV_8U</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">uint8</span>
+        <span class="k">if</span> <span class="n">ocv_type</span> <span class="o">==</span> <span class="n">CV_8S</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">int8</span>
+        <span class="k">if</span> <span class="n">ocv_type</span> <span class="o">==</span> <span class="n">CV_16U</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">uint16</span>
+        <span class="k">if</span> <span class="n">ocv_type</span> <span class="o">==</span> <span class="n">CV_16S</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">int16</span>
+        <span class="k">if</span> <span class="n">ocv_type</span> <span class="o">==</span> <span class="n">CV_32S</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span>
+        <span class="k">if</span> <span class="n">ocv_type</span> <span class="o">==</span> <span class="n">CV_32F</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span>
+        <span class="k">if</span> <span class="n">ocv_type</span> <span class="o">==</span> <span class="n">CV_64F</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span></div>
+
+
+<div class="viewcode-block" id="GeoLocation"><a class="viewcode-back" href="../../../l2r.envs.html#l2r.envs.utils.GeoLocation">[docs]</a><span class="k">class</span> <span class="nc">GeoLocation</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Global to local coordinate conversion class.</span>
+
+<span class="sd">    :param tuple ref_point: local reference point which serves as the local</span>
+<span class="sd">      origin in the form (east, north, up)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ref_point</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ref_point</span> <span class="o">=</span> <span class="n">ref_point</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">D2R</span> <span class="o">=</span> <span class="mf">3.141592</span> <span class="o">/</span> <span class="mi">180</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">EARTHSEMIMAJOR</span> <span class="o">=</span> <span class="mi">6378137</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">EARTHECCEN2</span> <span class="o">=</span> <span class="mf">0.00669438</span>
+
+<div class="viewcode-block" id="GeoLocation.get_corners"><a class="viewcode-back" href="../../../l2r.envs.html#l2r.envs.utils.GeoLocation.get_corners">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">get_corners</span><span class="p">(</span><span class="n">center</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the corner&#39;s of the vehicle. Assumes the vehicle is perfectly</span>
+<span class="sd">        rectangular.</span>
+
+<span class="sd">        :param tuple center: the (x,y) coordinates of the center of the vehicle</span>
+<span class="sd">        :param float angle: heading of the vehicle in radians</span>
+<span class="sd">        :param list dimensions: [height, width] of the vehicle in meters</span>
+
+<span class="sd">        :return: array of (x,y) coordinates in the following order:</span>
+<span class="sd">          Top_right, Top_left, Bottom_right, Bottom_left</span>
+<span class="sd">        :rtype: numpy.array</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">length</span><span class="p">,</span> <span class="n">width</span> <span class="o">=</span> <span class="n">dimensions</span>
+
+        <span class="n">cos_val</span> <span class="o">=</span> <span class="n">cos</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span>
+        <span class="n">sin_val</span> <span class="o">=</span> <span class="n">sin</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span>
+        <span class="n">w_cos</span> <span class="o">=</span> <span class="p">(</span><span class="n">width</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">cos_val</span>
+        <span class="n">w_sin</span> <span class="o">=</span> <span class="p">(</span><span class="n">width</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">sin_val</span>
+
+        <span class="n">h_cos</span> <span class="o">=</span> <span class="p">(</span><span class="n">length</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">cos_val</span>
+        <span class="n">h_sin</span> <span class="o">=</span> <span class="p">(</span><span class="n">length</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">sin_val</span>
+
+        <span class="n">Top_Right_x</span> <span class="o">=</span> <span class="n">center</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">w_cos</span> <span class="o">-</span> <span class="n">h_sin</span>
+        <span class="n">Top_Right_y</span> <span class="o">=</span> <span class="n">center</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">w_sin</span> <span class="o">+</span> <span class="n">h_cos</span>
+
+        <span class="n">Top_Left_x</span> <span class="o">=</span> <span class="n">center</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">w_cos</span> <span class="o">-</span> <span class="n">h_sin</span>
+        <span class="n">Top_Left_y</span> <span class="o">=</span> <span class="n">center</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">w_sin</span> <span class="o">+</span> <span class="n">h_cos</span>
+
+        <span class="n">Bot_Left_x</span> <span class="o">=</span> <span class="n">center</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">w_cos</span> <span class="o">+</span> <span class="n">h_sin</span>
+        <span class="n">Bot_Left_y</span> <span class="o">=</span> <span class="n">center</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">w_sin</span> <span class="o">-</span> <span class="n">h_cos</span>
+
+        <span class="n">Bot_Right_x</span> <span class="o">=</span> <span class="n">center</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">w_cos</span> <span class="o">+</span> <span class="n">h_sin</span>
+        <span class="n">Bot_Right_y</span> <span class="o">=</span> <span class="n">center</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">w_sin</span> <span class="o">-</span> <span class="n">h_cos</span>
+
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="n">Top_Right_x</span><span class="p">,</span> <span class="n">Top_Right_y</span><span class="p">),</span> <span class="p">(</span><span class="n">Top_Left_x</span><span class="p">,</span> <span class="n">Top_Left_y</span><span class="p">),</span>
+                         <span class="p">(</span><span class="n">Bot_Right_x</span><span class="p">,</span> <span class="n">Bot_Right_y</span><span class="p">),</span> <span class="p">(</span><span class="n">Bot_Left_x</span><span class="p">,</span> <span class="n">Bot_Left_y</span><span class="p">)])</span></div>
+
+<div class="viewcode-block" id="GeoLocation.convert_to_ENU"><a class="viewcode-back" href="../../../l2r.envs.html#l2r.envs.utils.GeoLocation.convert_to_ENU">[docs]</a>    <span class="k">def</span> <span class="nf">convert_to_ENU</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">center</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Convert latitude/longitude coordinates to ENU coordinates.</span>
+
+<span class="sd">        :param list center: latitude/longitude coordinates of vehicle</span>
+<span class="sd">        :return: ENU coordinates of the center of the vehicle in the form:</span>
+<span class="sd">          [East, North, Up]</span>
+<span class="sd">        :rtype: numpy.array</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ref_x</span><span class="p">,</span> <span class="n">ref_y</span><span class="p">,</span> <span class="n">ref_z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ref_point</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">center</span>
+
+        <span class="c1"># Initialize sines and cosines</span>
+        <span class="n">clatRef</span> <span class="o">=</span> <span class="n">cos</span><span class="p">(</span><span class="n">ref_x</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">D2R</span><span class="p">)</span>
+        <span class="n">clonRef</span> <span class="o">=</span> <span class="n">cos</span><span class="p">(</span><span class="n">ref_y</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">D2R</span><span class="p">)</span>
+        <span class="n">slatRef</span> <span class="o">=</span> <span class="n">sin</span><span class="p">(</span><span class="n">ref_x</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">D2R</span><span class="p">)</span>
+        <span class="n">slonRef</span> <span class="o">=</span> <span class="n">sin</span><span class="p">(</span><span class="n">ref_y</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">D2R</span><span class="p">)</span>
+        <span class="n">clat</span> <span class="o">=</span> <span class="n">cos</span><span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">D2R</span><span class="p">)</span>
+        <span class="n">clon</span> <span class="o">=</span> <span class="n">cos</span><span class="p">(</span><span class="n">y</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">D2R</span><span class="p">)</span>
+        <span class="n">slat</span> <span class="o">=</span> <span class="n">sin</span><span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">D2R</span><span class="p">)</span>
+        <span class="n">slon</span> <span class="o">=</span> <span class="n">sin</span><span class="p">(</span><span class="n">y</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">D2R</span><span class="p">)</span>
+
+        <span class="c1"># Compute reference position vector in ECEF coordinates</span>
+        <span class="n">r0Ref</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">EARTHSEMIMAJOR</span> <span class="o">/</span> <span class="p">(</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">EARTHECCEN2</span> <span class="o">*</span> <span class="n">slatRef</span> <span class="o">*</span> <span class="n">slatRef</span><span class="p">))</span>
+        <span class="n">ecefRef</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">3</span>
+        <span class="n">ecefRef</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">ref_z</span> <span class="o">+</span> <span class="n">r0Ref</span><span class="p">)</span> <span class="o">*</span> <span class="n">clatRef</span> <span class="o">*</span> <span class="n">clonRef</span>
+        <span class="n">ecefRef</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">ref_z</span> <span class="o">+</span> <span class="n">r0Ref</span><span class="p">)</span> <span class="o">*</span> <span class="n">clatRef</span> <span class="o">*</span> <span class="n">slonRef</span>
+        <span class="n">ecefRef</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">ref_z</span> <span class="o">+</span> <span class="n">r0Ref</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">EARTHECCEN2</span><span class="p">))</span> <span class="o">*</span> <span class="n">slatRef</span>
+
+        <span class="c1"># Compute data position vectors relative to reference point in ECEF co-ordinates</span>
+        <span class="n">r0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">EARTHSEMIMAJOR</span> <span class="o">/</span> <span class="p">(</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">EARTHECCEN2</span> <span class="o">*</span> <span class="n">slat</span> <span class="o">*</span> <span class="n">slat</span><span class="p">))</span>
+        <span class="n">dECEF</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">3</span>
+        <span class="n">dECEF</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">z</span> <span class="o">+</span> <span class="n">r0</span><span class="p">)</span> <span class="o">*</span> <span class="n">clat</span> <span class="o">*</span> <span class="n">clon</span> <span class="o">-</span> <span class="n">ecefRef</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">dECEF</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">z</span> <span class="o">+</span> <span class="n">r0</span><span class="p">)</span> <span class="o">*</span> <span class="n">clat</span> <span class="o">*</span> <span class="n">slon</span> <span class="o">-</span> <span class="n">ecefRef</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">dECEF</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">z</span> <span class="o">+</span> <span class="n">r0</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">EARTHECCEN2</span><span class="p">))</span> <span class="o">*</span> <span class="n">slat</span> <span class="o">-</span> <span class="n">ecefRef</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+        <span class="c1"># Define rotation from ECEF to ENU</span>
+        <span class="n">R</span> <span class="o">=</span> <span class="p">[[</span><span class="o">-</span><span class="n">slonRef</span><span class="p">,</span> <span class="n">clonRef</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="n">slatRef</span> <span class="o">*</span> <span class="n">clonRef</span><span class="p">,</span> <span class="o">-</span><span class="n">slatRef</span> <span class="o">*</span> <span class="n">slonRef</span><span class="p">,</span> <span class="n">clatRef</span><span class="p">],</span>
+             <span class="p">[</span><span class="n">clatRef</span> <span class="o">*</span> <span class="n">clonRef</span><span class="p">,</span> <span class="n">clatRef</span> <span class="o">*</span> <span class="n">slonRef</span><span class="p">,</span> <span class="n">slatRef</span><span class="p">]]</span>
+
+        <span class="n">enu</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">3</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+            <span class="n">enu</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+                <span class="n">enu</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+=</span> <span class="n">R</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">dECEF</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+
+        <span class="c1"># Assign matrix multiplication outputs to custom message for publishing</span>
+        <span class="n">enu_east</span> <span class="o">=</span> <span class="n">enu</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">enu_north</span> <span class="o">=</span> <span class="n">enu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">enu_up</span> <span class="o">=</span> <span class="n">enu</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">enu_east</span><span class="p">,</span> <span class="n">enu_north</span><span class="p">,</span> <span class="n">enu_up</span><span class="p">])</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Jimmy Herman.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

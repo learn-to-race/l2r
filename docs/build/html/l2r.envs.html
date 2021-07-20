@@ -1,0 +1,630 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Envs Package &mdash; Learn-to-Race  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="_static/katex-math.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/contrib/auto-render.min.js"></script>
+        <script src="_static/katex_autorenderer.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Core Package" href="l2r.core.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Learn-to-Race
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Introduction:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="env_overview.html">Environment Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="baselines.html">Baselines</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Learn-to-Race Task:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tasks_overview.html">Task Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vision.html">Default Camera Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="multimodal.html">Multimodal</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="racetracks.html">Racetracks &amp; L2R Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sensors.html">Creating Custom Sensor Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="l2r.core.html">Core Package</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Envs Package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-l2r.envs.env">l2r.envs.env</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-l2r.envs.reward">l2r.envs.reward</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-l2r.envs.utils">l2r.envs.utils</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Learn-to-Race</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Envs Package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="envs-package">
+<h1>Envs Package<a class="headerlink" href="#envs-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-l2r.envs.env">
+<span id="l2r-envs-env"></span><h2>l2r.envs.env<a class="headerlink" href="#module-l2r.envs.env" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="l2r.envs.env.RacingEnv">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">l2r.envs.env.</span></code><code class="sig-name descname"><span class="pre">RacingEnv</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_timesteps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">controller_kwargs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reward_kwargs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action_if_kwargs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pose_if_kwargs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cameras</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_delay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reward_pol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'default'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">training</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">not_moving_timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">provide_waypoints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/l2r/envs/env.html#RacingEnv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#l2r.envs.env.RacingEnv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">gym.core.Env</span></code></p>
+<p>A reinforcement learning environment for autonomous racing. Certain
+features, including segmentation images, ground-truth waypoints, or
+birdseye cameras are not realistically accessible and should not be
+used in evalution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>max_timesteps</strong> (<em>int</em>) – maximimum number of timesteps per episode</p></li>
+<li><p><strong>controller_kwargs</strong> (<em>dict</em>) – keyword args for the simulator controller</p></li>
+<li><p><strong>reward_kwargs</strong> (<em>dict</em>) – keyword args the reward policy</p></li>
+<li><p><strong>action_if_kwargs</strong> (<em>dict</em>) – keyword args for the action interface</p></li>
+<li><p><strong>pose_if_kwargs</strong> (<em>dict</em>) – keyword args for the position receive interface</p></li>
+<li><p><strong>cameras</strong> (<em>dict</em>) – dictionary of camera keyword arguments</p></li>
+<li><p><strong>obs_delay</strong> (<em>float</em>) – time delay between action and observation</p></li>
+<li><p><strong>reward_pol</strong> (<em>str</em>) – reward policy to use, defaults to GranTurismo</p></li>
+<li><p><strong>training</strong> (<em>bool</em>) – in training mode, vehicle starts episodes at 
+random positions on the track</p></li>
+<li><p><strong>not_moving_timeout</strong> (<em>int</em>) – terminate if not moving for this many
+timesteps</p></li>
+<li><p><strong>provide_waypoints</strong> (<em>bool</em>) – flag to provide ground-truth, future
+waypoints on the track in the info returned from <strong>step()</strong></p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="l2r.envs.env.RacingEnv.eval">
+<code class="sig-name descname"><span class="pre">eval</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/l2r/envs/env.html#RacingEnv.eval"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#l2r.envs.env.RacingEnv.eval" title="Permalink to this definition">¶</a></dt>
+<dd><p>If evaluation mode, do not use random start location.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="l2r.envs.env.RacingEnv.make">
+<code class="sig-name descname"><span class="pre">make</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">level</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multimodal</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">driver_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vehicle_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sensors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multi_agent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remake</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/l2r/envs/env.html#RacingEnv.make"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#l2r.envs.env.RacingEnv.make" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unlike many environments, make does not start the simulator process.
+It does, however, configure the simulator’s settings. The simulator
+process must be running prior to calling this method otherwise an error
+will occur when trying to establish a connection with the simulator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>level</strong> (<em>str</em>) – the desired racetrack map in
+[‘VegasNorthRoad’, ‘Thruxton’, ‘AngleseyNational’]</p></li>
+<li><p><strong>multimodal</strong> (<em>bool</em>) – if false, then the agent is ‘visual only’
+and only receives image data, if true, the agent also has access
+to positional sensor data</p></li>
+<li><p><strong>driver_params</strong> (<em>dict</em>) – driver parameters to modify</p></li>
+<li><p><strong>vehicle_params</strong> (<em>dict</em>) – vehicle parameters to set</p></li>
+<li><p><strong>sensors</strong> (<em>list</em>) – sensors to enable</p></li>
+<li><p><strong>multi_agent</strong> – not currently supported</p></li>
+<li><p><strong>remake</strong> (<em>bool</em>) – if remaking, reset the camera interfaces</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="l2r.envs.env.RacingEnv.multimodal">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">multimodal</span></code><a class="headerlink" href="#l2r.envs.env.RacingEnv.multimodal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter method for the multimodal property. Changing this value will
+cause the environment’s observation space to include the positional
+sensor data in the observation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>true if the environment is set to multimodal, false otherwise</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="l2r.envs.env.RacingEnv.random_start_location">
+<code class="sig-name descname"><span class="pre">random_start_location</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/l2r/envs/env.html#RacingEnv.random_start_location"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#l2r.envs.env.RacingEnv.random_start_location" title="Permalink to this definition">¶</a></dt>
+<dd><p>Randomly selects an index on the centerline of the track and
+returns the ENU coordinates of the selected index along with the yaw of
+the centerline at that point.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>coordinates of a random index on centerline, yaw</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>np array, float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="l2r.envs.env.RacingEnv.render">
+<code class="sig-name descname"><span class="pre">render</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/l2r/envs/env.html#RacingEnv.render"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#l2r.envs.env.RacingEnv.render" title="Permalink to this definition">¶</a></dt>
+<dd><p>Not implmeneted. The simulator, by default, provides a graphical
+interface, but can also be run on a server.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="l2r.envs.env.RacingEnv.reset">
+<code class="sig-name descname"><span class="pre">reset</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_pos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/l2r/envs/env.html#RacingEnv.reset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#l2r.envs.env.RacingEnv.reset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resets the vehicle to start position. A small time delay is used
+allow for the simulator to reset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>level</strong> (<em>str</em>) – if specified, will set the simulator to this level,
+otherwise set to a random track</p></li>
+<li><p><strong>random_pos</strong> (<em>bool</em>) – true/false for random starting position on the
+track</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>an intial observation as in the <em>step</em> method</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>see <strong>step()</strong> method</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="l2r.envs.env.RacingEnv.step">
+<code class="sig-name descname"><span class="pre">step</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">action</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/l2r/envs/env.html#RacingEnv.step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#l2r.envs.env.RacingEnv.step" title="Permalink to this definition">¶</a></dt>
+<dd><p>The primary method of the environment. Executes the desired action,
+receives the observation from the simulator, and evaluates termination
+conditions. The returned observation is a tuple with the observation
+and a racetrack identifier.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>action</strong> (<em>array-like</em>) – the action and acceleration requests</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>observation, reward, done, info</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>if multimodal, the observation is a tuple containing the
+positional sensor data and a dictionary of images with shapes (30,)
+and (height, width, 3), respectively, otherwise the observation is
+just the dictionary of images. reward is of type float, done bool,
+and info dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="l2r.envs.env.RacingEnv.train">
+<code class="sig-name descname"><span class="pre">train</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/l2r/envs/env.html#RacingEnv.train"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#l2r.envs.env.RacingEnv.train" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use random starting locations on the track</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-l2r.envs.reward">
+<span id="l2r-envs-reward"></span><h2>l2r.envs.reward<a class="headerlink" href="#module-l2r.envs.reward" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="l2r.envs.reward.GranTurismo">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">l2r.envs.reward.</span></code><code class="sig-name descname"><span class="pre">GranTurismo</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">oob_penalty</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_oob_penalty</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">25.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/l2r/envs/reward.html#GranTurismo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#l2r.envs.reward.GranTurismo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">core.templates.AbstractReward</span></code></p>
+<p>This is the default reward for the environment. It is our interpretation
+of the work: Super-Human Performance in Gran Turismo Sport Using Deep
+Reinforcement Learning (<a class="reference external" href="https://arxiv.org/abs/2008.07971">https://arxiv.org/abs/2008.07971</a>). Rewarding the
+agent only for completing a lap is too sparse for learning. Instead, this
+is a dense reward function that rewards the agent for progressing down the
+track and penalizes the agent for going out-of-bounds.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>oob_penalty</strong> (<em>float</em>) – penalty factor for going out-of-bounds where the
+total penalty is this factor times the velocity of the vehicle</p></li>
+<li><p><strong>min_oob_penalty</strong> (<em>float</em>) – minimum penalty for going out-of-bounds</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="l2r.envs.reward.GranTurismo.get_reward">
+<code class="sig-name descname"><span class="pre">get_reward</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">oob_flag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/l2r/envs/reward.html#GranTurismo.get_reward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#l2r.envs.reward.GranTurismo.get_reward" title="Permalink to this definition">¶</a></dt>
+<dd><p>The reward for the given state is the sum of its progress reward
+and the penalty for going out-of-bounds.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>state</strong> (<em>varies</em>) – the current state of the environment</p></li>
+<li><p><strong>oob_flag</strong> (<em>boolean</em><em>, </em><em>optional</em>) – true if out-of-bounds, otherwise false</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="l2r.envs.reward.GranTurismo.reset">
+<code class="sig-name descname"><span class="pre">reset</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/l2r/envs/reward.html#GranTurismo.reset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#l2r.envs.reward.GranTurismo.reset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reset cached index representing the position on the track.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-l2r.envs.utils">
+<span id="l2r-envs-utils"></span><h2>l2r.envs.utils<a class="headerlink" href="#module-l2r.envs.utils" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="l2r.envs.utils.ActionInterface">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">l2r.envs.utils.</span></code><code class="sig-name descname"><span class="pre">ActionInterface</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">7077</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_steer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_steer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_accel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_accel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">16.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/l2r/envs/utils.html#ActionInterface"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#l2r.envs.utils.ActionInterface" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Action send interface. This class communicates with the simulator and
+sends action requests from the agent.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ip</strong> (<em>str</em>) – ip address</p></li>
+<li><p><strong>port</strong> (<em>int</em>) – port to bind to</p></li>
+<li><p><strong>max_steer</strong> (<em>float</em>) – maximum steering request, bounded by 1.</p></li>
+<li><p><strong>min_steer</strong> (<em>float</em>) – minimum steering request, bounded by -1.</p></li>
+<li><p><strong>max_accel</strong> (<em>flaot</em>) – maximum acceleration request, bounded by 6.</p></li>
+<li><p><strong>min_accel</strong> (<em>float</em>) – minimum acceleration request, bounded by -16.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="l2r.envs.utils.ActionInterface.act">
+<code class="sig-name descname"><span class="pre">act</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">action</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/l2r/envs/utils.html#ActionInterface.act"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#l2r.envs.utils.ActionInterface.act" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send action request to the simulator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>action</strong> (<em>array-like</em>) – action to send to the simulator in the form:
+[steering, acceleration], expected to be in the range (-1., 1.)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="l2r.envs.utils.CameraInterface">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">l2r.envs.utils.</span></code><code class="sig-name descname"><span class="pre">CameraInterface</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">addr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tcp://127.0.0.1:8008'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/l2r/envs/utils.html#CameraInterface"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#l2r.envs.utils.CameraInterface" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">core.templates.AbstractInterface</span></code></p>
+<p>Receives images from the simulator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>addr</strong> (<em>str</em>) – address to listen on</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="l2r.envs.utils.CameraInterface.get_data">
+<code class="sig-name descname"><span class="pre">get_data</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/l2r/envs/utils.html#CameraInterface.get_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#l2r.envs.utils.CameraInterface.get_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the most recent image(s) received from the simulator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>RGB image of shape (height, width, 3)</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>numpy.array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="l2r.envs.utils.CameraInterface.reconnect">
+<code class="sig-name descname"><span class="pre">reconnect</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/l2r/envs/utils.html#CameraInterface.reconnect"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#l2r.envs.utils.CameraInterface.reconnect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reconnect to the socket</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="l2r.envs.utils.CameraInterface.reset">
+<code class="sig-name descname"><span class="pre">reset</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/l2r/envs/utils.html#CameraInterface.reset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#l2r.envs.utils.CameraInterface.reset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Allocates memory for data receive.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="l2r.envs.utils.CameraInterface.start">
+<code class="sig-name descname"><span class="pre">start</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img_dims</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/l2r/envs/utils.html#CameraInterface.start"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#l2r.envs.utils.CameraInterface.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Starts a thread to listen for images on.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>img_dims</strong> (<em>tuple</em>) – dimensions of the image to listen for in the
+form: (width, height, depth)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="l2r.envs.utils.GeoLocation">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">l2r.envs.utils.</span></code><code class="sig-name descname"><span class="pre">GeoLocation</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref_point</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/l2r/envs/utils.html#GeoLocation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#l2r.envs.utils.GeoLocation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Global to local coordinate conversion class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>ref_point</strong> (<em>tuple</em>) – local reference point which serves as the local
+origin in the form (east, north, up)</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="l2r.envs.utils.GeoLocation.convert_to_ENU">
+<code class="sig-name descname"><span class="pre">convert_to_ENU</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">center</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/l2r/envs/utils.html#GeoLocation.convert_to_ENU"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#l2r.envs.utils.GeoLocation.convert_to_ENU" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert latitude/longitude coordinates to ENU coordinates.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>center</strong> (<em>list</em>) – latitude/longitude coordinates of vehicle</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>ENU coordinates of the center of the vehicle in the form:
+[East, North, Up]</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>numpy.array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="l2r.envs.utils.GeoLocation.get_corners">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">get_corners</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">center</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">angle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dimensions</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/l2r/envs/utils.html#GeoLocation.get_corners"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#l2r.envs.utils.GeoLocation.get_corners" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the corner’s of the vehicle. Assumes the vehicle is perfectly
+rectangular.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>center</strong> (<em>tuple</em>) – the (x,y) coordinates of the center of the vehicle</p></li>
+<li><p><strong>angle</strong> (<em>float</em>) – heading of the vehicle in radians</p></li>
+<li><p><strong>dimensions</strong> (<em>list</em>) – [height, width] of the vehicle in meters</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>array of (x,y) coordinates in the following order:
+Top_right, Top_left, Bottom_right, Bottom_left</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>numpy.array</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt id="l2r.envs.utils.InvalidActionException">
+<em class="property"><span class="pre">exception</span> </em><code class="sig-prename descclassname"><span class="pre">l2r.envs.utils.</span></code><code class="sig-name descname"><span class="pre">InvalidActionException</span></code><a class="reference internal" href="_modules/l2r/envs/utils.html#InvalidActionException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#l2r.envs.utils.InvalidActionException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="l2r.envs.utils.PoseInterface">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">l2r.envs.utils.</span></code><code class="sig-name descname"><span class="pre">PoseInterface</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">7078</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_elems</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/l2r/envs/utils.html#PoseInterface"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#l2r.envs.utils.PoseInterface" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">core.templates.AbstractInterface</span></code></p>
+<p>Receives sensor data from the simulator. The data received is in the
+following format:</p>
+<p>[0,1,2] steering, gear, mode</p>
+<p>[3,4,5] velocity</p>
+<p>[6,7,8] acceleration</p>
+<p>[9,10,11] angular velocity</p>
+<p>[12,13,14] yaw, pitch, roll</p>
+<p>[15,16,17] location coordinates in the format (y, x, z)</p>
+<p>[18,19,20 21] rpm (by wheel)</p>
+<p>[22,23,24,25] brake (by wheel)</p>
+<p>[26,27,28,29] torq (by wheel)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ip</strong> (<em>str</em>) – ip address</p></li>
+<li><p><strong>port</strong> (<em>int</em>) – port to bind to</p></li>
+<li><p><strong>data_elems</strong> (<em>int</em>) – number of elements to listen for, elements are
+assumed to be of type float</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="l2r.envs.utils.PoseInterface.get_data">
+<code class="sig-name descname"><span class="pre">get_data</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/l2r/envs/utils.html#PoseInterface.get_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#l2r.envs.utils.PoseInterface.get_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the most recent data received from the simulator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>data from the simulator</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>array of length self.data_elems</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="l2r.envs.utils.PoseInterface.reset">
+<code class="sig-name descname"><span class="pre">reset</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/l2r/envs/utils.html#PoseInterface.reset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#l2r.envs.utils.PoseInterface.reset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Allocates memory for data receive.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="l2r.envs.utils.PoseInterface.start">
+<code class="sig-name descname"><span class="pre">start</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/l2r/envs/utils.html#PoseInterface.start"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#l2r.envs.utils.PoseInterface.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Starts a thread to listen for data from the simulator.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="l2r.core.html" class="btn btn-neutral float-left" title="Core Package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Jimmy Herman.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

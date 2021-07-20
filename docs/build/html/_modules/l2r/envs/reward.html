@@ -1,0 +1,308 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>l2r.envs.reward &mdash; Learn-to-Race  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/katex-math.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/contrib/auto-render.min.js"></script>
+        <script src="../../../_static/katex_autorenderer.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Learn-to-Race
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Introduction:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../env_overview.html">Environment Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../baselines.html">Baselines</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Learn-to-Race Task:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tasks_overview.html">Task Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../vision.html">Default Camera Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../multimodal.html">Multimodal</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../racetracks.html">Racetracks &amp; L2R Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../sensors.html">Creating Custom Sensor Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../l2r.core.html">Core Package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../l2r.envs.html">Envs Package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Learn-to-Race</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>l2r.envs.reward</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for l2r.envs.reward</h1><div class="highlight"><pre>
+<span></span><span class="c1"># ========================================================================= #</span>
+<span class="c1"># Filename:                                                                 #</span>
+<span class="c1">#    reward.py                                                              #</span>
+<span class="c1">#                                                                           #</span>
+<span class="c1"># Description:                                                              #</span>
+<span class="c1">#    Dense incentive policy based off Super-Human Performance in Gran       #</span>
+<span class="c1">#    Turismo Sport Using Deep Reinforcement Learning                        #</span>
+<span class="c1">#    https://arxiv.org/abs/2008.07971                                       #</span>
+<span class="c1"># ========================================================================= #</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">core.templates</span> <span class="kn">import</span> <span class="n">AbstractReward</span>
+
+<span class="n">VELOCITY_IDX_LOW</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">VELOCITY_IDX_HIGH</span> <span class="o">=</span> <span class="mi">6</span>
+
+
+<div class="viewcode-block" id="GranTurismo"><a class="viewcode-back" href="../../../l2r.envs.html#l2r.envs.reward.GranTurismo">[docs]</a><span class="k">class</span> <span class="nc">GranTurismo</span><span class="p">(</span><span class="n">AbstractReward</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;This is the default reward for the environment. It is our interpretation</span>
+<span class="sd">    of the work: Super-Human Performance in Gran Turismo Sport Using Deep</span>
+<span class="sd">    Reinforcement Learning (https://arxiv.org/abs/2008.07971). Rewarding the</span>
+<span class="sd">    agent only for completing a lap is too sparse for learning. Instead, this</span>
+<span class="sd">    is a dense reward function that rewards the agent for progressing down the</span>
+<span class="sd">    track and penalizes the agent for going out-of-bounds.</span>
+
+<span class="sd">    :param float oob_penalty: penalty factor for going out-of-bounds where the</span>
+<span class="sd">      total penalty is this factor times the velocity of the vehicle</span>
+<span class="sd">    :param float min_oob_penalty: minimum penalty for going out-of-bounds</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oob_penalty</span><span class="o">=</span><span class="mf">5.0</span><span class="p">,</span> <span class="n">min_oob_penalty</span><span class="o">=</span><span class="mf">25.0</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">oob_penalty</span> <span class="o">=</span> <span class="n">oob_penalty</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_oob_penalty</span> <span class="o">=</span> <span class="n">min_oob_penalty</span>
+
+<div class="viewcode-block" id="GranTurismo.get_reward"><a class="viewcode-back" href="../../../l2r.envs.html#l2r.envs.reward.GranTurismo.get_reward">[docs]</a>    <span class="k">def</span> <span class="nf">get_reward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">oob_flag</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The reward for the given state is the sum of its progress reward</span>
+<span class="sd">        and the penalty for going out-of-bounds.</span>
+
+<span class="sd">        :param state: the current state of the environment</span>
+<span class="sd">        :type state: varies</span>
+<span class="sd">        :param oob_flag: true if out-of-bounds, otherwise false</span>
+<span class="sd">        :type oob_flag: boolean, optional</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="p">(</span><span class="n">pose_data</span><span class="p">,</span> <span class="n">race_idx</span><span class="p">)</span> <span class="o">=</span> <span class="n">state</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">pose_data</span><span class="p">[</span><span class="n">VELOCITY_IDX_LOW</span><span class="p">:</span><span class="n">VELOCITY_IDX_HIGH</span><span class="p">])</span>
+        <span class="n">oob_reward</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reward_oob</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">oob_flag</span><span class="p">)</span>
+        <span class="n">progress_reward</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reward_progress</span><span class="p">(</span><span class="n">race_idx</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">oob_reward</span> <span class="o">+</span> <span class="n">progress_reward</span></div>
+
+<div class="viewcode-block" id="GranTurismo.reset"><a class="viewcode-back" href="../../../l2r.envs.html#l2r.envs.reward.GranTurismo.reset">[docs]</a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Reset cached index representing the position on the track.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prior_idx</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+    <span class="k">def</span> <span class="nf">_reward_oob</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">velocity</span><span class="p">,</span> <span class="n">oob_flag</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Determine the reward for going out-of-bounds.</span>
+
+<span class="sd">        :param float velocity: magnitude of the velocity of the vehicle</span>
+<span class="sd">        :param bool oob_flag: true if out-of-bounds, otherwise false</span>
+<span class="sd">        :return: reward for going out-of-bounds</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">oob_flag</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">0.0</span>
+
+        <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_oob_penalty</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">oob_penalty</span> <span class="o">*</span> <span class="n">velocity</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_reward_progress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">race_idx</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Reward for progressing down the track. This is simply a reward of 1</span>
+<span class="sd">        for each index the vehicle has progressed since the previous step.</span>
+
+<span class="sd">        :param int race_idx: nearest index on the centerline of the racetrack</span>
+<span class="sd">        :return: reward for progressing down the track</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">prior_idx</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">prior_idx</span> <span class="o">=</span> <span class="n">race_idx</span>
+            <span class="k">return</span> <span class="mf">0.0</span>
+
+        <span class="n">rwd</span> <span class="o">=</span> <span class="n">race_idx</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">prior_idx</span>
+
+        <span class="sd">&quot;&quot;&quot; Check if vehicle has crossed back to index 0 &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">rwd</span> <span class="o">&lt;</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_centre</span> <span class="o">/</span> <span class="o">-</span><span class="mf">2.0</span><span class="p">):</span>
+            <span class="n">rwd</span> <span class="o">=</span> <span class="n">race_idx</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_centre</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">prior_idx</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">prior_idx</span> <span class="o">=</span> <span class="n">race_idx</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">rwd</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Jimmy Herman.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

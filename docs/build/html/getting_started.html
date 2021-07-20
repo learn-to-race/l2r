@@ -1,0 +1,401 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Getting Started &mdash; Learn-to-Race  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="_static/katex-math.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/contrib/auto-render.min.js"></script>
+        <script src="_static/katex_autorenderer.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Baselines" href="baselines.html" />
+    <link rel="prev" title="Environment Overview" href="env_overview.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Learn-to-Race
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Introduction:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="env_overview.html">Environment Overview</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#racing-simulator">Racing Simulator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#package-code-dependencies">Package Code &amp; Dependencies</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#environment-caveats">Environment Caveats</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#basic-example">Basic Example</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="baselines.html">Baselines</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Learn-to-Race Task:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tasks_overview.html">Task Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vision.html">Default Camera Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="multimodal.html">Multimodal</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="racetracks.html">Racetracks &amp; L2R Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sensors.html">Creating Custom Sensor Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="l2r.core.html">Core Package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="l2r.envs.html">Envs Package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Learn-to-Race</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Getting Started</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="getting-started">
+<h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The L2R framework is coupled with the Arrival racing simulator which has not yet been released. To gain access to the racing simulator, you must sign a licensing agreement with Arrival, the creator and owner of the simulation software. The simulator is expected to be available in May, 2021. Please complete this <a class="reference external" href="https://forms.gle/PXNM6hHkEgiAzhoa8">form</a> to be notified of its release.</p>
+</div>
+<div class="section" id="racing-simulator">
+<h2>Racing Simulator<a class="headerlink" href="#racing-simulator" title="Permalink to this headline">¶</a></h2>
+<p>To use our environment, you mst first complete a licensing agreement with Arrival. Our environment interfaces with the Arrival racing simulator via a <a class="reference external" href="l2r.core.html#l2r.core.controller.SimulatorController">SimulatorController</a> object which can launch, restart, and control the Arrival simulator. We recommend running the simulator as a Python subprocess by specifying the path of the simulator in your configuration file in the <code class="docutils literal notranslate"><span class="pre">env_kwargs.controller_kwargs.sim_path</span></code> field. Alternatively, you can specify that the controller start the simulator as a Docker container by setting <code class="docutils literal notranslate"><span class="pre">env_kwargs.controller_kwargs.start_container</span></code> to True. If you choose the latter, you can load the docker image:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ docker load &lt; arrival-sim-image.tar.gz
+</pre></div>
+</div>
+</div>
+<div class="section" id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
+<p><strong>Python</strong>: We use Learn-to-Race with Python 3.6 and 3.7</p>
+<p><strong>Graphics Hardware</strong>: The racing simulator runs in a container with a <a class="reference external" href="https://gitlab.com/nvidia/container-images/cudagl/-/tree/ubuntu18.04">Ubuntu 18.04 cudagl</a> base image. Running the container requires a GPU with Nvidia drivers installed. A Nvidia 970 GTX graphics card is minimally sufficient.</p>
+<p><strong>Docker</strong>: If you would like to run the racing simulator in a <a class="reference external" href="https://www.docker.com/">Docker</a> image, you will need Docker installed.</p>
+<p><strong>Container GPU Access</strong>: If using Docker, the container needs to access the GPU, so <a class="reference external" href="https://github.com/NVIDIA/nvidia-container-runtime">nvidia-container-runtime</a> is also required. For Ubuntu distributions:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ curl -s -L https://nvidia.github.io/nvidia-container-runtime/gpgkey <span class="p">|</span> <span class="se">\</span>
+  sudo apt-key add -
+$ <span class="nv">distribution</span><span class="o">=</span><span class="k">$(</span>. /etc/os-release<span class="p">;</span><span class="nb">echo</span> <span class="nv">$ID$VERSION_ID</span><span class="k">)</span>
+$ curl -s -L https://nvidia.github.io/nvidia-container-runtime/<span class="nv">$distribution</span>/nvidia-container-runtime.list <span class="p">|</span> <span class="se">\</span>
+  sudo tee /etc/apt/sources.list.d/nvidia-container-runtime.list
+$ sudo apt-get update
+</pre></div>
+</div>
+<p>And finally,</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ sudo apt-get install nvidia-container-runtime
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This documentation assumes a Debian-based operating system (Ubuntu), but this OS is not required.</p>
+</div>
+</div>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="package-code-dependencies">
+<h3>Package Code &amp; Dependencies<a class="headerlink" href="#package-code-dependencies" title="Permalink to this headline">¶</a></h3>
+<p>Simply download the source code from the <a class="reference external" href="https://github.com/hermgerm29/learn-to-race">Github repository</a>. We recommend using a <a class="reference external" href="https://docs.python.org/3.6/library/venv.html">virtual Python environment</a>. Once activated, install the package requirements located in the top-level directory of the repo.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ pip install virtualenv
+$ virtualenv venv                         <span class="c1"># create virtual environment</span>
+$ <span class="nb">source</span> venv/bin/activated               <span class="c1"># activate the environment</span>
+<span class="o">(</span>venv<span class="o">)</span> $ pip install -r requirements.txt
+</pre></div>
+</div>
+</div>
+<div class="section" id="environment-caveats">
+<h3>Environment Caveats<a class="headerlink" href="#environment-caveats" title="Permalink to this headline">¶</a></h3>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Our autonomous racing environment is <a class="reference external" href="https://gym.openai.com/">OpenAI gym</a> compliant with a few important notes:</p>
+<ul class="simple">
+<li><p>The simulator must be running to instantiate a <a class="reference external" href="l2r.envs.html#module-roboracer.envs.env">RacingEnv</a> which is, more or less, a set of interfaces which allow the agent to communicate with the simulator. When a RacingEnv object is constructed, it attempts to establish a connection with the simulator; if it is not running, you will see an error similiar to the one below:</p></li>
+</ul>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ ConnectionRefusedError: <span class="o">[</span>Errno <span class="m">111</span><span class="o">]</span> Connection refused
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Unlike many simplistic reinforcement learning baseline environments, the simulator that our environment uses is not time-invariant. If you, for example, run a gradient update step in the middle of an episode, the agent will continue to move, and perhaps slow down, which may result in unwanted additions to your replay buffer (assuming you are using one). This is clearly undesirable, so a <em>de-facto</em> restriction of the environment is that you treat each episode as if it were true inference.</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="basic-example">
+<h3>Basic Example<a class="headerlink" href="#basic-example" title="Permalink to this headline">¶</a></h3>
+<p>Let’s first get familiar with our environment by creating an agent the simply chooses random actions from the action space. We provide such an agent called a <code class="docutils literal notranslate"><span class="pre">RandomActionAgent</span></code> with the source code below:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">core.templates</span> <span class="kn">import</span> <span class="n">AbstractAgent</span>
+<span class="kn">from</span> <span class="nn">envs.env</span> <span class="kn">import</span> <span class="n">RacingEnv</span>
+
+<span class="k">class</span> <span class="nc">RandomActionAgent</span><span class="p">(</span><span class="n">AbstractAgent</span><span class="p">):</span>
+   <span class="sd">&quot;&quot;&quot;Reinforcement learning agent that simply chooses random actions.</span>
+
+<span class="sd">   :param dict training_kwargs: training keyword arguments</span>
+<span class="sd">   &quot;&quot;&quot;</span>
+   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">training_kwargs</span><span class="p">):</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">num_episodes</span> <span class="o">=</span> <span class="n">training_kwargs</span><span class="p">[</span><span class="s1">&#39;num_episodes&#39;</span><span class="p">]</span>
+
+   <span class="k">def</span> <span class="nf">race</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+      <span class="sd">&quot;&quot;&quot;Demonstrative training method.</span>
+<span class="sd">      &quot;&quot;&quot;</span>
+      <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_episodes</span><span class="p">):</span>
+         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Episode </span><span class="si">{</span><span class="n">e</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s1"> of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">num_episodes</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+         <span class="n">ep_reward</span> <span class="o">=</span> <span class="mi">0</span>
+         <span class="n">state</span><span class="p">,</span> <span class="n">done</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">(),</span> <span class="kc">False</span>
+
+         <span class="k">while</span> <span class="ow">not</span> <span class="n">done</span><span class="p">:</span>
+            <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">select_action</span><span class="p">()</span>
+            <span class="n">state</span><span class="p">,</span> <span class="n">reward</span><span class="p">,</span> <span class="n">done</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">action</span><span class="p">)</span>
+            <span class="n">ep_reward</span> <span class="o">+=</span> <span class="n">reward</span>
+
+      <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Completed episode with total reward: </span><span class="si">{</span><span class="n">ep_reward</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+      <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Episode info: </span><span class="si">{</span><span class="n">info</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+   <span class="k">def</span> <span class="nf">select_action</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+      <span class="sd">&quot;&quot;&quot;Select a random action from the action space.</span>
+
+<span class="sd">      :return: random action to take</span>
+<span class="sd">      :rtype: numpy array</span>
+<span class="sd">      &quot;&quot;&quot;</span>
+      <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">action_space</span><span class="o">.</span><span class="n">sample</span><span class="p">()</span>
+
+   <span class="k">def</span> <span class="nf">create_env</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env_kwargs</span><span class="p">,</span> <span class="n">sim_kwargs</span><span class="p">):</span>
+      <span class="sd">&quot;&quot;&quot;Instantiate a racing environment</span>
+
+<span class="sd">      :param dict env_kwargs: environment keyword arguments</span>
+<span class="sd">      :param dict sim_kwargs: simulator setting keyword arguments</span>
+<span class="sd">      &quot;&quot;&quot;</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">env</span> <span class="o">=</span> <span class="n">RacingEnv</span><span class="p">(</span>
+         <span class="n">max_timesteps</span><span class="o">=</span><span class="n">env_kwargs</span><span class="p">[</span><span class="s1">&#39;max_timesteps&#39;</span><span class="p">],</span>
+         <span class="n">obs_delay</span><span class="o">=</span><span class="n">env_kwargs</span><span class="p">[</span><span class="s1">&#39;obs_delay&#39;</span><span class="p">],</span>
+         <span class="n">not_moving_timeout</span><span class="o">=</span><span class="n">env_kwargs</span><span class="p">[</span><span class="s1">&#39;not_moving_timeout&#39;</span><span class="p">],</span>
+         <span class="n">controller_kwargs</span><span class="o">=</span><span class="n">env_kwargs</span><span class="p">[</span><span class="s1">&#39;controller_kwargs&#39;</span><span class="p">],</span>
+         <span class="n">reward_pol</span><span class="o">=</span><span class="n">env_kwargs</span><span class="p">[</span><span class="s1">&#39;reward_pol&#39;</span><span class="p">],</span>
+         <span class="n">reward_kwargs</span><span class="o">=</span><span class="n">env_kwargs</span><span class="p">[</span><span class="s1">&#39;reward_kwargs&#39;</span><span class="p">],</span>
+         <span class="n">action_if_kwargs</span><span class="o">=</span><span class="n">env_kwargs</span><span class="p">[</span><span class="s1">&#39;action_if_kwargs&#39;</span><span class="p">],</span>
+         <span class="n">pose_if_kwargs</span><span class="o">=</span><span class="n">env_kwargs</span><span class="p">[</span><span class="s1">&#39;pose_if_kwargs&#39;</span><span class="p">],</span>
+         <span class="n">cameras</span><span class="o">=</span><span class="n">env_kwargs</span><span class="p">[</span><span class="s1">&#39;cameras&#39;</span><span class="p">]</span>
+      <span class="p">)</span>
+
+      <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">make</span><span class="p">(</span>
+         <span class="n">level</span><span class="o">=</span><span class="n">sim_kwargs</span><span class="p">[</span><span class="s1">&#39;racetrack&#39;</span><span class="p">],</span>
+         <span class="n">multimodal</span><span class="o">=</span><span class="n">env_kwargs</span><span class="p">[</span><span class="s1">&#39;multimodal&#39;</span><span class="p">],</span>
+         <span class="n">driver_params</span><span class="o">=</span><span class="n">sim_kwargs</span><span class="p">[</span><span class="s1">&#39;driver_params&#39;</span><span class="p">]</span>
+      <span class="p">)</span>
+
+      <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Environment created with observation space: &#39;</span><span class="p">)</span>
+      <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">observation_space</span><span class="o">.</span><span class="n">spaces</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\t</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Step 1: Start the simulator (optional)</strong></p>
+<p>The <a class="reference external" href="l2r.core.html#l2r.core.controller.SimulatorController">SimulatorController</a> will run the simulator as Python subprocess if <code class="docutils literal notranslate"><span class="pre">env_kwargs.controller_kwargs.sim_path</span></code> is specified or start the container containing the simulator if <code class="docutils literal notranslate"><span class="pre">env_kwargs.controller_kwargs.start_container</span></code> is set to True. If you would like to run the container manually, you can do so as follows:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ docker run -it --rm <span class="se">\ </span>             <span class="c1"># interactive mode, clean-up on exit</span>
+    --user<span class="o">=</span>ubuntu <span class="se">\ </span>                 <span class="c1"># login to container as user &quot;ubuntu&quot;</span>
+    --gpus all <span class="se">\ </span>                    <span class="c1"># allow container to access all host GPUs</span>
+    --name racing-simulator <span class="se">\ </span>       <span class="c1"># name of the container</span>
+    --net<span class="o">=</span>host <span class="se">\ </span>                    <span class="c1"># allow container to share host&#39;s namespace</span>
+    --entrypoint<span class="o">=</span><span class="s2">&quot;./ArrivalSim.sh&quot;</span>   <span class="c1"># run the simulator start up script on entry</span>
+    arrival-sim                      <span class="c1"># name of the docker image</span>
+</pre></div>
+</div>
+<p>Please note that running the container, by default, will not render a display. Alternatively, you can run the launch script:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ ./ArrivalSim-linux-0.7.0.182276/LinuxNoEditor/ArrivalSim.sh -openGL
+</pre></div>
+</div>
+<p><strong>Step 2: Run the random agent baseline model</strong></p>
+<p>For convenience, we have provided a number of files to assist with training a model. To run the random agent baseline, you can simply run the script in the top level of the repository with the baseline flag <code class="docutils literal notranslate"><span class="pre">-b</span></code> with argument <code class="docutils literal notranslate"><span class="pre">random</span></code>:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ chmod +x run.bash  <span class="c1"># make our script executable</span>
+$ ./run.bash -b random
+</pre></div>
+</div>
+<p>The agent will begin randomly taking actions in the environment and will print the reward for each episode upon completion.</p>
+<p><strong>Convenience Scripts</strong></p>
+<p><code class="docutils literal notranslate"><span class="pre">run.bash</span></code> simply passes parameters files to Python scripts. The baseline configuration files contains a variety of parameters including:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>training parameters</p></li>
+<li><p>environment parameters (for the RL environment)</p></li>
+<li><p>simulator parameters (for the simulator)</p></li>
+</ol>
+</div></blockquote>
+<p>We recommend using this structure, or following a similar practice, to train models with the environment and keep track of different training runs.</p>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="baselines.html" class="btn btn-neutral float-right" title="Baselines" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="env_overview.html" class="btn btn-neutral float-left" title="Environment Overview" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Jimmy Herman.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
