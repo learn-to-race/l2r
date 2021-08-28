@@ -15,6 +15,7 @@ import cv2
 import numpy as np
 import torch
 from torch.optim import Adam
+from common.models.vae import VAE
 
 import baselines.core as core
 
@@ -162,8 +163,8 @@ def sac(env, actor_critic=core.MLPActorCritic, ac_kwargs=dict(), seed=0,
 
     # Load image encoder
     if encoder_path:
-        vae = torch.load(encoder_path)
-        vae.to(DEVICE)
+        vae = VAE().to(DEVICE)
+        vae.load_state_dict(torch.load(encoder_path, map_location=DEVICE))
 
     # Create run log file
     with open(f'{save_path}run_log.txt', 'w') as f:

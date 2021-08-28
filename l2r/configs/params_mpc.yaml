@@ -23,7 +23,8 @@ env_kwargs:
     quiet: False
     user: 'ubuntu'
     start_container: False
-    sim_path: '/home/ubuntu/ArrivalSim-linux-0.7.0-cmu4/ArrivalSim-linux-0.7.0.182276/LinuxNoEditor'
+    sim_path: '/mnt/ArrivalSim-linux-0.7.0-cmu4/ArrivalSim-linux-0.7.0.182276/LinuxNoEditor'
+    # sim_path: '/home/ubuntu/ArrivalSim-linux-0.7.0-cmu4/ArrivalSim-linux-0.7.0.182276/LinuxNoEditor'
   action_if_kwargs:
     max_accel: 4.
     min_accel: -6.

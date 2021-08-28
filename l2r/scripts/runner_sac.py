@@ -12,7 +12,6 @@ import sys
 from ruamel.yaml import YAML
 
 from baselines.rl.sac import sac
-from baselines.models.vae import *  # noqa: F401, F403
 from envs.env import RacingEnv
 
 if __name__ == "__main__":
@@ -34,15 +33,14 @@ if __name__ == "__main__":
         reward_pol=env_kwargs['reward_pol'],
         reward_kwargs=env_kwargs['reward_kwargs'],
         action_if_kwargs=env_kwargs['action_if_kwargs'],
-        camera_if_kwargs=env_kwargs['camera_if_kwargs'],
-        pose_if_kwargs=env_kwargs['pose_if_kwargs']
+        pose_if_kwargs=env_kwargs['pose_if_kwargs'],
+        cameras = env_kwargs['cameras']
     )
 
     env.make(
         level=sim_kwargs['racetrack'],
         multimodal=env_kwargs['multimodal'],
         driver_params=sim_kwargs['driver_params'],
-        camera_params=sim_kwargs['camera_params'],
         sensors=sim_kwargs['active_sensors'],
     )
 

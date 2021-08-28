@@ -9,13 +9,13 @@ sac_kwargs:
   update_after: 3000
   num_updates: 12
   max_ep_len: 2000
-  encoder_path: './baselines/models/vae-144hw-32l-thruxton.pt'
+  encoder_path: './common/models/vae-thruxton-anglesey.pth'
   latent_dims: 32
   im_w: 144
   im_h: 144
   checkpoint: './baselines/checkpoints/thruxton/sac_episode_1000.pt'
-  inference_only: True
-  save_path: False
+  inference_only: False
+  save_path: /mnt/results/
 
 env_kwargs:
   multimodal: False
@@ -31,7 +31,8 @@ env_kwargs:
     quiet: True
     user: 'ubuntu'
     start_container: False
-    sim_path: '/home/ubuntu/ArrivalSim-linux-0.7.0-cmu4/ArrivalSim-linux-0.7.0.182276/LinuxNoEditor'
+    sim_path: '/mnt/ArrivalSim-linux-0.7.0-cmu4/ArrivalSim-linux-0.7.0.182276/LinuxNoEditor'
+    # sim_path: '/home/ubuntu/ArrivalSim-linux-0.7.0-cmu4/ArrivalSim-linux-0.7.0.182276/LinuxNoEditor'
   action_if_kwargs:
     max_accel: 4.
     min_accel: -1.
@@ -42,9 +43,14 @@ env_kwargs:
   pose_if_kwargs:
     ip: '0.0.0.0'
     port: 7078
-  camera_if_kwargs:
-    ip: 'tcp://127.0.0.1'
-    port: 8008
+  cameras:
+        CameraFrontRGB:
+            Addr: 'tcp://0.0.0.0:8008'
+            Format: ColorBGR8
+            FOVAngle: 90
+            Width: 192
+            Height: 144
+            bAutoAdvertise: True
 
 sim_kwargs:
   racetrack: ['Thruxton']

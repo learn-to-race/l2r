@@ -11,3 +11,4 @@ stable-baselines
 torch==1.7.1
 torchvision
 websocket_client==0.57.0
+tqdm
