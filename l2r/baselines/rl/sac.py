@@ -21,6 +21,7 @@ import baselines.core as core
 
 DEVICE = torch.device('cuda') if torch.cuda.is_available() else 'cpu'
 
+
 class ReplayBuffer:
     """
     A simple FIFO experience replay buffer for SAC agents.

@@ -5,14 +5,13 @@ variational autoencoder in PyTorch.
 Source: https://github.com/sksq96/pytorch-vae
 """
 import os
-import sys
-
 import cv2
 import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import tqdm
+
 
 class VAE(nn.Module):
     """Expects input of (batch_size, C=3, H=144, W=144)
@@ -54,7 +53,7 @@ class VAE(nn.Module):
             nn.ReLU(),
             nn.ConvTranspose2d(32, image_channels, kernel_size=4, stride=2, padding=1),
             nn.Sigmoid()
-        )   
+        )
 
     def reparameterize(self, mu, logvar):
         std = logvar.mul(0.5).exp_()
@@ -128,7 +127,7 @@ if __name__ == '__main__':
     train_indices, test_indices = indices[:thres], indices[thres:]
     vae = VAE().to(device)
     optim = torch.optim.Adam(vae.parameters(), lr=lr)
-    
+
     for epoch in range(num_epochs):
         train_indices = np.random.permutation(train_indices)
         test_indices = np.random.permutation(test_indices)
@@ -185,8 +184,8 @@ if __name__ == '__main__':
         orig_img = cv2.resize(imgs[test_indices[0]] / 255., (144, 144))
         orig_img = torch.as_tensor(orig_img, device=device, dtype=torch.float)
         orig_img = orig_img.permute(2, 0, 1)
- 
+
         vae_img = vae(orig_img[None])[0][0]
         # (C, H, W)/RGB -> (H, W, C)/BGR
-        cv2.imwrite(f"/home/jimmy/track_imgs/orig.png", orig_img.detach().cpu().numpy()[::-1].transpose(1, 2, 0) * 255)
-        cv2.imwrite(f"/home/jimmy/track_imgs/vae.png", vae_img.detach().cpu().numpy()[::-1].transpose(1, 2, 0) * 255)
+        cv2.imwrite("/home/jimmy/track_imgs/orig.png", orig_img.detach().cpu().numpy()[::-1].transpose(1, 2, 0) * 255)
+        cv2.imwrite("/home/jimmy/track_imgs/vae.png", vae_img.detach().cpu().numpy()[::-1].transpose(1, 2, 0) * 255)

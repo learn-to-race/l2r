@@ -28,9 +28,12 @@ import argparse
 import time
 
 from envs.env import RacingEnv
+PRE_EVALUATION_TIME = 3600
+
 
 class IllegalEvaluation(Exception):
     pass
+
 
 class Evaluator(object):
     """Evaluator class which consists of a 1-hour pre-evaluation phase
@@ -63,7 +66,7 @@ class Evaluator(object):
         ensuring that their agent begins evaluation within 1-hour of calling
         this method.
         """
-        self._start_pre_eval() # do not modify this line
+        self._start_pre_eval()  # do not modify this line
 
         done = False
         state = self.env.reset()
@@ -74,7 +77,7 @@ class Evaluator(object):
                 state, reward, done, info = self.env.step(action)
 
                 # Users are responsible for keeping time under 1-hour
-                if time.time() - self.start_time > (self.pre_eval_time-10.0):
+                if time.time() - self.start_time > (self.pre_eval_time - 10.0):
                     # Do not forget to set agent to evaluation mode
                     self.agent.eval()
                     return
@@ -90,6 +93,7 @@ class Evaluator(object):
             done = False
             state = self.env.reset()
             while not done:
+                action = self.agent.select_action(state)
                 state, reward, done, info = self.env.step(action)
             self._record_metrics(ep, info['metrics'])
 
@@ -140,6 +144,7 @@ class Evaluator(object):
             multimodal=env_kwargs['multimodal'],
             driver_params=sim_kwargs['driver_params']
         )
+
 
 if __name__ == '__main__':
     """Do not modify"""

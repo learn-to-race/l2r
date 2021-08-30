@@ -9,6 +9,7 @@
 from core.templates import AbstractAgent
 from envs.env import RacingEnv
 
+
 class RandomActionAgent(AbstractAgent):
     """Reinforcement learning agent that simply chooses random actions.
 
@@ -29,7 +30,7 @@ class RandomActionAgent(AbstractAgent):
                 action = self.select_action()
                 state, reward, done, info = self.env.step(action)
                 ep_reward += reward
-                
+
             print(f'Completed episode with total reward: {ep_reward}')
             print(f'Episode info: {info}\n')
 
@@ -66,6 +67,6 @@ class RandomActionAgent(AbstractAgent):
             driver_params=sim_kwargs['driver_params']
         )
 
-        print(f'Environment created with observation space: ')
+        print('Environment created with observation space: ')
         for k, v in self.env.observation_space.spaces.items():
             print(f'\t{k}: {v}')

@@ -72,7 +72,7 @@ class SimulatorController(object):
         except ConnectionRefusedError:
             if start_container or sim_path:
                 print('Failed to connect to simulator. Trying again.')
-                time.sleep(MEDIUM_DELAY//2)
+                time.sleep(MEDIUM_DELAY // 2)
                 self.ws = create_connection(f'ws://{self.addr}')
             else:
                 print('Simulator is not running. Aborting.')
@@ -346,7 +346,7 @@ class SimulatorController(object):
                 'sensor_name': sensor,
                 'parameters': parameters
             }
-        )   
+        )
 
     def get_vehicle_driver_params(self, veh_id=0):
         """Get the parameters of the sensor 'ArrivalVehicleDriver'.

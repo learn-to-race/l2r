@@ -34,7 +34,7 @@ if __name__ == "__main__":
         reward_kwargs=env_kwargs['reward_kwargs'],
         action_if_kwargs=env_kwargs['action_if_kwargs'],
         pose_if_kwargs=env_kwargs['pose_if_kwargs'],
-        cameras = env_kwargs['cameras']
+        cameras=env_kwargs['cameras']
     )
 
     env.make(

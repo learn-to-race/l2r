@@ -97,7 +97,7 @@ class RacingEnv(gym.Env):
     :param dict cameras: dictionary of camera keyword arguments
     :param float obs_delay: time delay between action and observation
     :param str reward_pol: reward policy to use, defaults to GranTurismo
-    :param bool training: in training mode, vehicle starts episodes at 
+    :param bool training: in training mode, vehicle starts episodes at
       random positions on the track
     :param int not_moving_timeout: terminate if not moving for this many
       timesteps
@@ -321,7 +321,6 @@ class RacingEnv(gym.Env):
             _spaces['pose'] = Box(low=np.array(MIN_OBS_ARR),
                                   high=np.array(MAX_OBS_ARR))
         self.observation_space = Dict(_spaces)
-
 
     def eval(self):
         """If evaluation mode, do not use random start location.

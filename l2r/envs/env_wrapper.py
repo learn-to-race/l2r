@@ -8,6 +8,7 @@
 
 import gym
 
+
 class EnvWrapper(gym.Wrapper):
     """A sample wrapper that may be particularly useful for pre-processing
     observations from the environment, such as encoding images
@@ -29,4 +30,3 @@ class EnvWrapper(gym.Wrapper):
     def observation(self, observation):
         img = observation['CameraFrontRGB']
         return self.encoder.encode_raw(img[None], self.device)[0]
-

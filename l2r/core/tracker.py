@@ -213,7 +213,7 @@ class ProgressTracker(object):
         metrics['trajectory_efficiency'] = round(track_curvature / avg_curvature, 3)
         metrics['trajectory_admissibility'] = round(1 - (proportion_unsafe**0.5), 3)
         metrics['movement_smoothness'] = round(ms, 3)
-        metrics['timestep/sec'] = round(len(path[0])/total_time, 2)
+        metrics['timestep/sec'] = round(len(path[0]) / total_time, 2)
         info['metrics'] = metrics
         return info
 
