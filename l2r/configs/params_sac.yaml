@@ -59,9 +59,3 @@ sim_kwargs:
   driver_params:
     DriverAPIClass: 'VApiUdp'
     DriverAPI_UDP_SendAddress: '0.0.0.0'
-  camera_params:
-    Format: ColorBGR8
-    FOVAngle: 90
-    Width: 192
-    Height: 144
-    bAutoAdvertise: True
