@@ -66,15 +66,9 @@ class ProgressTracker(object):
         self.current_segment = 0
         self.segment_success = [0]*n_segments
         self.segment_idxs = np.round(np.linspace(0, n_indices-2, n_segments+1)).astype(int)
-        
-        if env is not None:
-            self.segment_coords = {
-                    'first': [centerline[index] for index in self.segment_idxs],
-                    'second': [centerline[index+1] for index in self.segment_idxs]
-            }
-        else:
-            self.segment_coords = None
 
+        self.segment_coords = self.get_segment_coords(self.centerline, self.segment_idxs)
+        
         self.respawns = 0
 
     def reset(self, start_idx, segmentwise=False):
@@ -423,3 +417,12 @@ class ProgressTracker(object):
             return n_out_inside
 
         return 4 - np.count_nonzero(self.outer_track.contains_points(car_corners))
+
+    def get_segment_coords(self, centerline, segment_idxs):
+
+        segment_coords = {
+                'first': [centerline[index] for index in segment_idxs],
+                'second': [centerline[index+1] for index in segment_idxs],
+                }
+        
+        return segment_coords

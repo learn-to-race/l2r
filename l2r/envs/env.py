@@ -499,8 +499,7 @@ class RacingEnv(gym.Env):
             centerline=self.centerline_arr,
             car_dims=CAR_DIMS,
             n_episode_laps=N_EPISODE_LAPS,
-            n_segments=N_SEGMENTS,
-            env=self
+            n_segments=N_SEGMENTS
         )
 
         self.reward.set_track(
@@ -509,6 +508,11 @@ class RacingEnv(gym.Env):
             centre_path=self.centre_path,
             car_dims=CAR_DIMS
         )
+
+        self.segment_coords = self.tracker.get_segment_coords(self.centerline_arr, self.tracker.segment_idxs)
+
+        pdb.set_trace()
+        pass
 
 
     def record_manually(self, output_dir, fname='thruxton', num_imgs=5000,
@@ -570,8 +574,10 @@ class RacingEnv(gym.Env):
             #pos = [0]*4
             #pos[0] = self.tracker.segment_coords['first'][next_segment_idx][0] # x
             #pos[1] = self.tracker.segment_coords['first'][next_segment_idx][1] # y
+
             #dy = pos[1]-self.tracker.segment_coords['second'][next_segment_idx][1]
             #dx = pos[0]-self.tracker.segment_coords['second'][next_segment_idx][0]
+            #
             #pos[2] = 61.3 # z # TODO: different for each track
             #pos[3] = np.arctan(dx/-dy) # yaw, radians
             
