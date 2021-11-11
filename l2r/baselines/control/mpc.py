@@ -15,6 +15,8 @@ from core.templates import AbstractAgent
 from envs.env import RacingEnv
 from racetracks.mapping import level_2_trackmap
 
+import ipdb as pdb
+
 if float(torch.__version__[0:3]) > 1.4:
     raise Exception('MPC agent requires torch version of 1.4 or lower')
 
@@ -162,7 +164,7 @@ class MPCAgent(AbstractAgent):
 
     @staticmethod
     def unpack_state(state):
-        state = state['pose']
+        (state, _) = state
         x = state[16]
         y = state[15]
         v = (state[4]**2 + state[3]**2 + state[5]**2)**0.5
@@ -190,6 +192,7 @@ class MPCAgent(AbstractAgent):
             action_if_kwargs=env_kwargs['action_if_kwargs'],
             camera_if_kwargs=env_kwargs['camera_if_kwargs'],
             pose_if_kwargs=env_kwargs['pose_if_kwargs'],
+            sensors=sim_kwargs['active_sensors'],
             provide_waypoints=env_kwargs['provide_waypoints']
         )
 
@@ -208,8 +211,9 @@ class MPCAgent(AbstractAgent):
 
         :param str track_name: 'VegasNorthRoad' or 'Thruxton'
         """
-        assert len(track_name) == 1
-        map_file, _ = level_2_trackmap(track_name[-1])
+        #assert len(track_name) == 1
+        #map_file, _ = level_2_trackmap(track_name[-1])
+        map_file, _ = level_2_trackmap(track_name)
 
         # np.asarray(original_map['Racing'], dtype=np.float32).T
         raceline = self.env.centerline_arr

@@ -40,7 +40,7 @@ env_kwargs:
     port: 8008
 
 sim_kwargs:
-  racetrack: ['AngleseyNational']
+  racetrack: 'Thruxton' #['AngleseyNational']
   active_sensors:
     - CameraFrontRGB
   driver_params:
