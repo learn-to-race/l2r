@@ -54,7 +54,7 @@ PARK_GEAR = 3
 GEAR_REQ_RANGE = 4
 
 N_EPISODE_LAPS = 1
-N_SEGMENTS = 10
+N_SEGMENTS = 9
 
 # Pose observation space boundaries
 MIN_OBS_ARR = [
@@ -464,7 +464,7 @@ class RacingEnv(gym.Env):
 
         :param str level: the racetrack name
         """
-        map_file, self.random_poses = level_2_trackmap(self.active_level)
+        map_file, self.random_poses, self.segment_poses = level_2_trackmap(self.active_level)
 
         with open(os.path.join(pathlib.Path().absolute(), map_file), 'r') as f:
             self.original_map = json.load(f)
@@ -485,7 +485,9 @@ class RacingEnv(gym.Env):
         self.n_indices = len(self.centerline_arr)
         self.kdtree = KDTree(self.centerline_arr)
 
-        self.local_segment_idxs = self.poses_to_local_segment_idxs()
+        self.local_segment_idxs = self.poses_to_local_segment_idxs(self.segment_poses)
+
+        self.segment_tree = KDTree(np.expand_dims(np.array(self.local_segment_idxs),axis=1))
 
         #pdb.set_trace()
 
@@ -499,7 +501,9 @@ class RacingEnv(gym.Env):
             centerline=self.centerline_arr,
             car_dims=CAR_DIMS,
             n_episode_laps=N_EPISODE_LAPS,
-            n_segments=N_SEGMENTS
+            n_segments=N_SEGMENTS,
+            segment_idxs=self.local_segment_idxs,
+            segment_tree=self.segment_tree
         )
 
         self.reward.set_track(
@@ -509,10 +513,10 @@ class RacingEnv(gym.Env):
             car_dims=CAR_DIMS
         )
 
-        self.segment_coords = self.tracker.get_segment_coords(self.centerline_arr, self.tracker.segment_idxs)
+        #self.segment_coords = self.tracker.get_segment_coords(self.centerline_arr, self.tracker.segment_idxs)
 
-        pdb.set_trace()
-        pass
+        #pdb.set_trace()
+        #pass
 
 
     def record_manually(self, output_dir, fname='thruxton', num_imgs=5000,
@@ -563,14 +567,16 @@ class RacingEnv(gym.Env):
 
     
     def next_segment_start_location(self):
-        print(f"Spawning to next segment start location: curr_segment: {self.tracker.current_segment}; respawns: {self.tracker.respawns}")
+        print(f"Spawning to next segment start location: curr_segment: {self.tracker.current_segment}; respawns: {self.tracker.respawns}\n{self.segment_poses[next_segment_idx]}")
 
         next_segment_idx = self.tracker.respawns
 
-        next_segment_idx = next_segment_idx % 11
+        next_segment_idx = next_segment_idx % 10
+        
+        #self.segment_coords = self.tracker.get_segment_coords(self.centerline_arr, self.tracker.segment_idxs)
 
         try:
-            pos = self.random_poses[next_segment_idx]
+            pos = self.segment_poses[next_segment_idx]
             #pos = [0]*4
             #pos[0] = self.tracker.segment_coords['first'][next_segment_idx][0] # x
             #pos[1] = self.tracker.segment_coords['first'][next_segment_idx][1] # y
@@ -585,8 +591,6 @@ class RacingEnv(gym.Env):
             pdb.set_trace()
             pass
 
-        #pdb.set_trace()
-
         coords = {'x': pos[0], 'y': pos[1], 'z': pos[2]}
         rot = {'yaw': pos[3], 'pitch': 0.0, 'roll': 0.0}
 
@@ -594,12 +598,13 @@ class RacingEnv(gym.Env):
 
         return coords, rot
     
-    def poses_to_local_segment_idxs(self):
+    def poses_to_local_segment_idxs(self, poses):
         
         segment_idxs = []
-        for (x,y,z,yaw) in self.random_poses:
-            enu_x, enu_y, enu_z = self.geo_location.convert_to_ENU((x, y, z))
-            idx = self.kdtree.query(np.asarray([enu_x, enu_y]))[1]
+        for (x,y,z,yaw) in poses:
+            #enu_x, enu_y, enu_z = self.geo_location.convert_to_ENU((x, y, z))
+            #idx = self.kdtree.query(np.asarray([enu_x, enu_y]))[1]
+            idx = self.kdtree.query(np.asarray([x, y]))[1]
             segment_idxs.append(idx)
 
         return segment_idxs

@@ -14,7 +14,7 @@ from envs.utils import GeoLocation
 
 import ipdb as pdb
 
-SEGMENTS_COMPLETE_NUM = 11
+SEGMENTS_COMPLETE_NUM = 9
 
 # Assumed max progression, in number of indicies, in one RacingEnv.step()
 MAX_PROGRESSION = 100
@@ -49,7 +49,7 @@ class ProgressTracker(object):
 
     def __init__(self, n_indices, inner_track, outer_track, centerline,
                  car_dims, obs_delay, max_timesteps, not_moving_ct,
-                 debug=False, n_episode_laps=3, n_segments=10):
+                 debug=False, n_episode_laps=3, n_segments=9, segment_idxs=None, segment_tree=None):
         self.n_indices = n_indices
         self.inner_track = inner_track
         self.outer_track = outer_track
@@ -65,9 +65,10 @@ class ProgressTracker(object):
         self.n_segments = n_segments
         self.current_segment = 0
         self.segment_success = [0]*n_segments
-        self.segment_idxs = np.round(np.linspace(0, n_indices-2, n_segments+1)).astype(int)
-
-        self.segment_coords = self.get_segment_coords(self.centerline, self.segment_idxs)
+        #self.segment_idxs = np.round(np.linspace(0, n_indices-2, n_segments+1)).astype(int)
+        #self.segment_coords = self.get_segment_coords(self.centerline, self.segment_idxs)
+        self.segment_idxs = segment_idxs
+        self.segment_tree = segment_tree
         
         self.respawns = 0
 
@@ -103,6 +104,8 @@ class ProgressTracker(object):
         :param numpy.array ac: directional acceleration, shape of (3,)
         :param numpy.array bp: brake pressure, per wheel, shape of (4,)
         """
+        print(f'idx: {idx}')
+        self.absolute_idx = idx
         now = time.time()
 
         if self.lap_start is None:
@@ -129,7 +132,7 @@ class ProgressTracker(object):
         self._store(e, n, u, idx, yaw, c_dist, dt, ac, bp, n_out)
 
         # set halfway flag, if necessary
-        self.current_segment = self.monitor_segment_progression(idx)
+        self.current_segment = self.monitor_segment_progression([idx, self.absolute_idx])
         _ = self.check_lap_completion(idx, now)
         self.ep_step_ct += 1
         self.last_update_time = now
@@ -154,17 +157,38 @@ class ProgressTracker(object):
         a = np.linalg.norm(ac) - GRAVITY
         self.transitions.append([e, n, u, idx, c_dist, yaw, dt, a, b, n_out])
 
-    def monitor_segment_progression(self, shifted_idx):
+    def monitor_segment_progression(self, idxs):
+
+        shifted_idx, absolute_idx = idxs
     
-        segment_scores = list(shifted_idx >= self.segment_idxs)
+        closest_border_shft = self.segment_tree.query([shifted_idx])
+        closest_border_abs = self.segment_tree.query([absolute_idx])
+        print(f"Current segment: {self.current_segment}\nSegment proposal (shifted idx: {shifted_idx}): {closest_border_shft}\nSegment proposal (absolute idx: {absolute_idx}): {closest_border_abs}\nSegment idxs: {self.segment_idxs}")
+    
+        #pdb.set_trace()
+        if closest_border_abs[1] is not (self.current_segment+1):
+            # ensure linear progression through segment proposal numbers
+            current_segment_proposal = self.current_segment
 
-        try:
-            current_segment = segment_scores.index(False)
-        except:
-            current_segment = SEGMENTS_COMPLETE_NUM
+        else: 
+            # closest_border_abs[1] equals self.current_segment+1
+            if absolute_idx < self.segment_idxs[closest_border_abs[1]]:
+                # still in curent segment, but close to the border
+                current_segment_proposal = self.current_segment
+            else:
+                # in next segment and is still close to the border
+                current_segment_proposal = closest_border_abs[1]
 
-        if shifted_idx < MAX_PROGRESSION and self.halfway_flag:
-            current_segment = SEGMENTS_COMPLETE_NUM
+        #pdb.set_trace()
+        current_segment = current_segment_proposal
+
+        #try:
+        #    current_segment = self.respawns
+        #except:
+        #    current_segment = SEGMENTS_COMPLETE_NUM
+
+        #if shifted_idx < MAX_PROGRESSION and self.halfway_flag:
+        #    current_segment = SEGMENTS_COMPLETE_NUM
 
         if current_segment >= 2:
 
