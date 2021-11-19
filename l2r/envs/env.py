@@ -115,7 +115,9 @@ class RacingEnv(gym.Env):
                  action_if_kwargs, camera_if_kwargs, pose_if_kwargs, sensors,
                  reward_pol='default', obs_delay=0.10, segm_if_kwargs=False,
                  birdseye_if_kwargs=False, birdseye_segm_if_kwargs=False,
-                 not_moving_timeout=20, zone=False, provide_waypoints=False):
+                 not_moving_timeout=20, zone=False, provide_waypoints=False, manual_segments=False):
+
+        self.manual_segments = manual_segments
 
         self.controller = SimulatorController(**controller_kwargs)
         self.action_if = utils.ActionInterface(**action_if_kwargs)
@@ -492,7 +494,11 @@ class RacingEnv(gym.Env):
         self.n_indices = len(self.centerline_arr)
         self.kdtree = KDTree(self.centerline_arr)
 
-        self.local_segment_idxs = self.poses_to_local_segment_idxs(self.segment_poses)
+        local_segment_idxs_manual = self.poses_to_local_segment_idxs(self.segment_poses)
+        local_segment_idxs_linspace = np.round(np.linspace(0, self.n_indices-2, N_SEGMENTS+1)).astype(int)
+
+        self.local_segment_idxs = local_segment_idxs_linspace \
+                if not self.manual_segments else local_segment_idxs_manual
 
         self.segment_tree = KDTree(np.expand_dims(np.array(self.local_segment_idxs),axis=1))
 
