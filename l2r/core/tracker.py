@@ -65,9 +65,12 @@ class ProgressTracker(object):
         self.n_segments = n_segments
         self.current_segment = 0
         self.segment_success = [0]*n_segments
-        #self.segment_idxs = np.round(np.linspace(0, n_indices-2, n_segments+1)).astype(int)
-        #self.segment_coords = self.get_segment_coords(self.centerline, self.segment_idxs)
-        self.segment_idxs = segment_idxs
+        
+        segment_idxs_linspace = np.round(np.linspace(0, n_indices-2, n_segments+1)).astype(int)
+        segment_idxs_manual = segment_idxs
+        self.segment_idxs = segment_idxs_linspace
+
+        self.segment_coords = self.get_segment_coords(self.centerline, self.segment_idxs)
         self.segment_tree = segment_tree
         
         self.respawns = 0
@@ -445,8 +448,8 @@ class ProgressTracker(object):
     def get_segment_coords(self, centerline, segment_idxs):
 
         segment_coords = {
-                'first': [centerline[index] for index in segment_idxs],
-                'second': [centerline[index+1] for index in segment_idxs],
+                'first': [-1*centerline[index] for index in segment_idxs],
+                'second': [-1*centerline[index+1] for index in segment_idxs],
                 }
         
         return segment_coords

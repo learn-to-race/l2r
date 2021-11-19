@@ -126,7 +126,7 @@
 		},
 		{
 			"level": "Thruxton",
-			"trackmap": "racetracks/thruxton/ThruxtonOfficial.json",
+			"trackmap": "racetracks/thruxton/ThruxtonFromGoogle_2.json",
 			"random_pos": [
 				[55.7, -158.8, 61.3, 0.532],
 				[-172.8, -424.2, 62.1, 0.290],

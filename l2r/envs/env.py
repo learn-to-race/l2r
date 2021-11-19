@@ -87,6 +87,13 @@ RACETRACKS = {
     'AngleseyNational': 2,
 }
 
+LEVEL_Z_DICT = {
+    'Thruxton': 63.0,
+    'VegasNorthRoad': 0.4,
+    'AngleseyNational': 14.0
+}
+
+
 class RacingEnv(gym.Env):
     """A reinforcement learning environment for autonomous racing.
 
@@ -567,7 +574,6 @@ class RacingEnv(gym.Env):
 
     
     def next_segment_start_location(self):
-        print(f"Spawning to next segment start location: curr_segment: {self.tracker.current_segment}; respawns: {self.tracker.respawns}\n{self.segment_poses[next_segment_idx]}")
 
         next_segment_idx = self.tracker.respawns
 
@@ -576,16 +582,16 @@ class RacingEnv(gym.Env):
         #self.segment_coords = self.tracker.get_segment_coords(self.centerline_arr, self.tracker.segment_idxs)
 
         try:
-            pos = self.segment_poses[next_segment_idx]
-            #pos = [0]*4
-            #pos[0] = self.tracker.segment_coords['first'][next_segment_idx][0] # x
-            #pos[1] = self.tracker.segment_coords['first'][next_segment_idx][1] # y
+            #pos = self.segment_poses[next_segment_idx]
+            pos = [0]*4
+            pos[0] = self.tracker.segment_coords['first'][next_segment_idx][0] # x
+            pos[1] = self.tracker.segment_coords['first'][next_segment_idx][1] # y
 
-            #dy = pos[1]-self.tracker.segment_coords['second'][next_segment_idx][1]
-            #dx = pos[0]-self.tracker.segment_coords['second'][next_segment_idx][0]
-            #
-            #pos[2] = 61.3 # z # TODO: different for each track
-            #pos[3] = np.arctan(dx/-dy) # yaw, radians
+            dy = pos[1]-self.tracker.segment_coords['second'][next_segment_idx][1]
+            dx = pos[0]-self.tracker.segment_coords['second'][next_segment_idx][0]
+            
+            pos[2] = LEVEL_Z_DICT[self.active_level] #
+            pos[3] = np.arctan(dx/dy) # yaw, radians
             
         except:
             pdb.set_trace()
@@ -595,6 +601,8 @@ class RacingEnv(gym.Env):
         rot = {'yaw': pos[3], 'pitch': 0.0, 'roll': 0.0}
 
         self.tracker.current_segment += 1
+
+        print(f"Spawning to next segment start location: curr_segment: {self.tracker.current_segment}; respawns: {self.tracker.respawns}\n{coords},{rot}")
 
         return coords, rot
     
