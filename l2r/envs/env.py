@@ -54,7 +54,7 @@ PARK_GEAR = 3
 GEAR_REQ_RANGE = 4
 
 N_EPISODE_LAPS = 1
-N_SEGMENTS = 9
+N_SEGMENTS = 10
 
 # Pose observation space boundaries
 MIN_OBS_ARR = [
@@ -581,9 +581,9 @@ class RacingEnv(gym.Env):
     
     def next_segment_start_location(self):
 
-        next_segment_idx = self.tracker.respawns
+        next_segment_idx = self.tracker.current_segment
 
-        next_segment_idx = next_segment_idx % 10
+        next_segment_idx = next_segment_idx % (N_SEGMENTS)
         
         #self.segment_coords = self.tracker.get_segment_coords(self.centerline_arr, self.tracker.segment_idxs)
 
@@ -606,7 +606,7 @@ class RacingEnv(gym.Env):
         coords = {'x': pos[0], 'y': pos[1], 'z': pos[2]}
         rot = {'yaw': pos[3], 'pitch': 0.0, 'roll': 0.0}
 
-        self.tracker.current_segment += 1
+        self.tracker.current_segment += 1 if self.tracker.current_segment != 1 else 0
 
         print(f"Spawning to next segment start location: curr_segment: {self.tracker.current_segment}; respawns: {self.tracker.respawns}\n{coords},{rot}")
 

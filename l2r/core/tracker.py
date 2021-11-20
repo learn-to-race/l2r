@@ -50,7 +50,7 @@ class ProgressTracker(object):
 
     def __init__(self, n_indices, inner_track, outer_track, centerline,
                  car_dims, obs_delay, max_timesteps, not_moving_ct,
-                 debug=False, n_episode_laps=3, n_segments=9, segment_idxs=None, segment_tree=None):
+                 debug=False, n_episode_laps=1, n_segments=10, segment_idxs=None, segment_tree=None):
         self.n_indices = n_indices
         self.inner_track = inner_track
         self.outer_track = outer_track
@@ -166,9 +166,9 @@ class ProgressTracker(object):
     
         closest_border_shft = self.segment_tree.query([shifted_idx])
         closest_border_abs = self.segment_tree.query([absolute_idx])
-        print(f"Current segment: {self.current_segment}\nSegment proposal (shifted idx: {shifted_idx}): {closest_border_shft}\nSegment proposal (absolute idx: {absolute_idx}): {closest_border_abs}\nSegment idxs: {self.segment_idxs}")
+        print(f"Current segment: {self.current_segment}\nSegment proposal (shifted idx: {shifted_idx}): ({closest_border_shft[0]},{closest_border_shft[1]})\nSegment proposal (absolute idx: {absolute_idx}): ({closest_border_abs[0]},{closest_border_abs[1]})\nSegment idxs: {self.segment_idxs}")
    
-        if self.last_segment_dist < closest_border_abs[0]:
+        if closest_border_abs[0] < 50 and self.last_segment_dist <= closest_border_abs[0]:
             # border crossing
             current_segment_proposal = closest_border_abs[1]+1
         else:
