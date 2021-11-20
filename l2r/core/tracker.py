@@ -15,6 +15,7 @@ from envs.utils import GeoLocation
 import ipdb as pdb
 
 SEGMENTS_COMPLETE_NUM = 9
+A_BIG_NUMBER = 1000
 
 # Assumed max progression, in number of indicies, in one RacingEnv.step()
 MAX_PROGRESSION = 100
@@ -64,6 +65,7 @@ class ProgressTracker(object):
 
         self.n_segments = n_segments
         self.current_segment = 0
+        self.last_segment_dist = A_BIG_NUMBER
         self.segment_success = [0]*n_segments
         
         self.segment_idxs = segment_idxs
@@ -165,23 +167,31 @@ class ProgressTracker(object):
         closest_border_shft = self.segment_tree.query([shifted_idx])
         closest_border_abs = self.segment_tree.query([absolute_idx])
         print(f"Current segment: {self.current_segment}\nSegment proposal (shifted idx: {shifted_idx}): {closest_border_shft}\nSegment proposal (absolute idx: {absolute_idx}): {closest_border_abs}\nSegment idxs: {self.segment_idxs}")
-    
-        #pdb.set_trace()
-        if closest_border_abs[1] is not (self.current_segment+1):
-            # ensure linear progression through segment proposal numbers
+   
+        if self.last_segment_dist < closest_border_abs[0]:
+            # border crossing
+            current_segment_proposal = closest_border_abs[1]+1
+        else:
+            # approaching the next broder
             current_segment_proposal = self.current_segment
 
-        else: 
-            # closest_border_abs[1] equals self.current_segment+1
-            if absolute_idx < self.segment_idxs[closest_border_abs[1]]:
-                # still in curent segment, but close to the border
-                current_segment_proposal = self.current_segment
-            else:
-                # in next segment and is still close to the border
-                current_segment_proposal = closest_border_abs[1]
+        ##pdb.set_trace()
+        #if closest_border_abs[1] is not (self.current_segment+1):
+        #    # ensure linear progression through segment proposal numbers
+        #    current_segment_proposal = self.current_segment
+
+        #else: 
+        #    # closest_border_abs[1] equals self.current_segment+1
+        #    if absolute_idx < self.segment_idxs[closest_border_abs[1]]:
+        #        # still in curent segment, but close to the border
+        #        current_segment_proposal = self.current_segment
+        #    else:
+        #        # in next segment and is still close to the border
+        #        current_segment_proposal = closest_border_abs[1]
 
         #pdb.set_trace()
         current_segment = current_segment_proposal
+        self.last_segment_dist = closest_border_abs[0]
 
         #try:
         #    current_segment = self.respawns
@@ -196,7 +206,7 @@ class ProgressTracker(object):
             self.segment_success[current_segment-2] = True \
                     if self.segment_success[current_segment-2] is not False else False
 
-        print(f"idx:{shifted_idx}, success:{self.segment_success}, curr_seg:{current_segment}, half:{self.halfway_flag}")
+        print(f"shft_idx:{shifted_idx}, abs_idx: {absolute_idx}, success:{self.segment_success}, curr_seg:{current_segment}, half:{self.halfway_flag}")
 
         return current_segment 
 
