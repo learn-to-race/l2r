@@ -55,7 +55,7 @@ class MPCAgent(AbstractAgent):
     def race(self):
         """Race following the environment's step until completion framework
         """
-        plt.plot(self.race_x, self.race_y, 'k--')
+        #plt.plot(self.race_x, self.race_y, 'k--')
         if self.save_transitions:
             self._imgs = []
             self._multimodal = []
@@ -213,7 +213,7 @@ class MPCAgent(AbstractAgent):
         """
         #assert len(track_name) == 1
         #map_file, _ = level_2_trackmap(track_name[-1])
-        map_file, _ = level_2_trackmap(track_name)
+        map_file, _, _ = level_2_trackmap(track_name)
 
         # np.asarray(original_map['Racing'], dtype=np.float32).T
         raceline = self.env.centerline_arr
