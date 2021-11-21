@@ -234,6 +234,10 @@ class ProgressTracker(object):
             self.lap_times.append(lap_time)
             self.lap_start = lap_end
             self.halfway_flag = False
+
+            print(f"Completed a lap! Current segment: {self.current_segment}")
+            self.segment_success[-1] = True
+            self.current_segment = 0
             return True
 
         return False

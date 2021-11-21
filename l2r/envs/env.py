@@ -606,7 +606,7 @@ class RacingEnv(gym.Env):
         coords = {'x': pos[0], 'y': pos[1], 'z': pos[2]}
         rot = {'yaw': pos[3], 'pitch': 0.0, 'roll': 0.0}
 
-        self.tracker.current_segment += 1 if self.tracker.current_segment != 1 else 0
+        self.tracker.current_segment += 1
 
         print(f"Spawning to next segment start location: curr_segment: {self.tracker.current_segment}; respawns: {self.tracker.respawns}\n{coords},{rot}")
 
