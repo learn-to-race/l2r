@@ -96,7 +96,7 @@ class SimulatorController(object):
         """Starts the simulator container, and briefly waits. If a connection
         error occurs, you may need to increase this delay.
         """
-        assert not (self.start_container and self.sim_path)
+        assert not (self.start_container and self.sim_path), "Let L2R start EITHER a docker container OR a native simulstor -- not both"
 
         if self.start_container:
             print('Starting simulator container')
