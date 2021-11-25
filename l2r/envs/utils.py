@@ -119,7 +119,7 @@ class PoseInterface(AbstractInterface):
     following format:
 
     [0,1,2] steering, gear, mode \n
-    [3,4,5] velocity \n
+    [3,4,5] \n
     [6,7,8] acceleration \n
     [9,10,11] angular velocity \n
     [12,13,14] yaw, pitch, roll \n
@@ -174,15 +174,17 @@ class PoseInterface(AbstractInterface):
 class CameraInterface(AbstractInterface):
     """Receives images from the simulator.
 
-    :param str addr: address to listen on
+    :param str ip: ip address to listen on
+    :param int port: system port
     """
-    def __init__(self, addr='tcp://127.0.0.1:8008'):
+
+    def __init__(self, ip='tcp://127.0.0.1', port=8008):
         ctx = zmq.Context()
         self.sock = ctx.socket(zmq.SUB)
         self.sock.setsockopt(zmq.SUBSCRIBE, b'')
         self.sock.setsockopt(zmq.CONFLATE, 1)
-        self.sock.connect(addr)
-        self.addr = addr
+        self.sock.connect(f'{ip}:{port}')
+        self.addr = f'{ip}:{port}'
 
     def start(self, img_dims):
         """Starts a thread to listen for images on.

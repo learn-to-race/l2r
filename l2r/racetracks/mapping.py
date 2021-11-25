@@ -27,7 +27,7 @@ def level_2_trackmap(level):
         racetracks = data['racetracks']
         for track in racetracks:
             if level == track['level']:
-                return track['trackmap'], track['random_pos']
+                return track['trackmap'], track['random_pos'], track['segments']
 
     raise LevelNotFoundError(f'Map of track not found for level: {level}')
 

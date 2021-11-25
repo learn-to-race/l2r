@@ -18,40 +18,25 @@ if __name__ == "__main__":
 
     # load configuration file
     yaml = YAML()
-    params = yaml.load(open(sys.argv[1]))
+    agent_params = yaml.load(open(sys.argv[1]))
+    agent_kwargs = agent_params['agent_kwargs']
 
-    env_kwargs = params['env_kwargs']
-    sim_kwargs = params['sim_kwargs']
-    sac_kwargs = params['sac_kwargs']
+    sys_params = yaml.load(open(f"{(sys.argv[1]).split['/'][0]}/params-env.yaml"))
+    env_kwargs = sys_params['env_kwargs']
+    sim_kwargs = sys_params['sim_kwargs']
 
     # create the environment
-    env = RacingEnv(
-        max_timesteps=env_kwargs['max_timesteps'],
-        obs_delay=env_kwargs['obs_delay'],
-        not_moving_timeout=env_kwargs['not_moving_timeout'],
-        controller_kwargs=env_kwargs['controller_kwargs'],
-        reward_pol=env_kwargs['reward_pol'],
-        reward_kwargs=env_kwargs['reward_kwargs'],
-        action_if_kwargs=env_kwargs['action_if_kwargs'],
-        pose_if_kwargs=env_kwargs['pose_if_kwargs'],
-        cameras=env_kwargs['cameras']
-    )
-
-    env.make(
-        level=sim_kwargs['racetrack'],
-        multimodal=env_kwargs['multimodal'],
-        driver_params=sim_kwargs['driver_params'],
-        sensors=sim_kwargs['active_sensors'],
-    )
+    env = RacingEnv(env_kwargs, sim_kwargs)
+    env.make()
 
     # create results directory
-    save_path = sac_kwargs['save_path']
+    save_path = agent_kwargs['model_save_path']
     if not os.path.exists(save_path):
         os.makedirs(save_path)
 
     with open(save_path + 'params.json', 'w') as f:
-        json = json.dumps(params)
+        json = json.dumps([agent_params, sys_params])
         f.write(json)
 
     # train an agent
-    sac(env=env, **sac_kwargs)
+    sac(env=env, **agent_kwargs)

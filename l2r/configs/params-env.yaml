@@ -1,0 +1,48 @@
+env_kwargs:
+    multimodal: True
+    max_timesteps: 5000
+    obs_delay: 0.1
+    not_moving_timeout: 100
+    reward_pol: 'custom'
+    reward_kwargs:
+        oob_penalty: 5.0
+        min_oob_penalty: 25.0
+        max_oob_penalty: 125.0
+    controller_kwargs:
+        sim_version: 'ArrivalSim-linux-0.7.1.188691'
+        quiet: False
+        start_container: False
+        sim_path: '/data/l2r/sims/original/ArrivalSim-linux-0.7.1.188691/LinuxNoEditor'
+        user: '${USER}'
+    action_if_kwargs:
+        max_accel: 6.
+        min_accel: -16
+        max_steer: .3
+        min_steer: -.3
+        ip: '0.0.0.0'
+        port: 7077
+    pose_if_kwargs:
+        ip: '0.0.0.0'
+        port: 7078
+    camera_if_kwargs:
+        ip: 'tcp://127.0.0.1'
+        port: 8008
+    logger_kwargs:
+        default: True
+
+sim_kwargs:
+    racetrack: 'Thruxton'  # ['VegasNorthRoad', 'Thruxton']
+    active_sensors:
+        - ImuOxtsSensor
+        - CameraFrontRGB
+    driver_params:
+        DriverAPIClass: 'VApiUdp'
+        DriverAPI_UDP_SendAddress: '0.0.0.0'
+    camera_params:
+        Format: ColorBGR8
+        FOVAngle: 90
+        Width: 192
+        Height: 144
+        bAutoAdvertise: True
+    vehicle_params: None
+
