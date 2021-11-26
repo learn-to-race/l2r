@@ -117,7 +117,7 @@ class RacingEnv(gym.Env):
 
         # switches
         self.manual_segments = manual_segments
-        self.provide_waypoints = provide_waypoints
+        self.provide_waypoints = provide_waypoints if provide_waypoints else env_kwargs['provide_waypoints']
         self.zone = zone
         self.multi_agent = multi_agent # currently not supported; future
        
@@ -313,6 +313,7 @@ class RacingEnv(gym.Env):
         _ = self._check_restart(done)
 
         if self.provide_waypoints:
+            print(f"WARNING: 'self.provide_waypoints' is set to {self.provide_waypoints}")
             info['track_idx'] = self.nearest_idx
             info['waypoints'] = self._waypoints()
 
@@ -394,6 +395,7 @@ class RacingEnv(gym.Env):
         self.tracker.reset(start_idx=self.nearest_idx, segmentwise=segment_pos)
 
         if self.provide_waypoints:
+            print(f"WARNING: 'self.provide_waypoints' is set to {self.provide_waypoints}")
             info['waypoints'] = self._waypoints()
             info['track_idx'] = self.nearest_idx
             return observation, info

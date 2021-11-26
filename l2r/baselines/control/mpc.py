@@ -182,27 +182,8 @@ class MPCAgent(AbstractAgent):
         :param dict env_kwargs: environment keyword arguments
         :param dict sim_kwargs: simulator setting keyword arguments
         """
-        self.env = RacingEnv(
-            max_timesteps=env_kwargs['max_timesteps'],
-            obs_delay=env_kwargs['obs_delay'],
-            not_moving_timeout=env_kwargs['not_moving_timeout'],
-            controller_kwargs=env_kwargs['controller_kwargs'],
-            reward_pol=env_kwargs['reward_pol'],
-            reward_kwargs=env_kwargs['reward_kwargs'],
-            action_if_kwargs=env_kwargs['action_if_kwargs'],
-            camera_if_kwargs=env_kwargs['camera_if_kwargs'],
-            pose_if_kwargs=env_kwargs['pose_if_kwargs'],
-            sensors=sim_kwargs['active_sensors'],
-            provide_waypoints=env_kwargs['provide_waypoints']
-        )
-
-        self.env.make(
-            level=sim_kwargs['racetrack'],
-            multimodal=env_kwargs['multimodal'],
-            driver_params=sim_kwargs['driver_params'],
-            camera_params=sim_kwargs['camera_params'],
-            sensors=sim_kwargs['active_sensors']
-        )
+        self.env = RacingEnv(env_kwargs, sim_kwargs)
+        self.env.make()
 
         self.load_track(sim_kwargs['racetrack'])
 

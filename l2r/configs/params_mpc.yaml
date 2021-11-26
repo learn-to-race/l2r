@@ -1,54 +1,10 @@
 # parameters for the baseline mpc agent
 
-mpc_kwargs:
-  num_episodes: 3
-  velocity_target: 14 # m/s
-  step_size: 8 # number of indicies b/w waypoints
-  save_transitions: False
-  save_path: False
-  plot: False
+agent_kwargs:
+    num_episodes: 10
+    velocity_target: 14 # m/s
+    step_size: 8 # number of indicies b/w waypoints
+    save_transitions: False
+    save_path: False
+    plot: False
 
-env_kwargs:
-  multimodal: True
-  max_timesteps: 9000
-  obs_delay: 0.
-  not_moving_timeout: 50
-  reward_pol: 'default'
-  provide_waypoints: True
-  reward_kwargs:
-    oob_penalty: 5.0
-    min_oob_penalty: 25.0
-  controller_kwargs:
-    sim_version: 'ArrivalSim-linux-0.7.0-cmu4'
-    quiet: False
-    user: 'ubuntu'
-    start_container: False
-    sim_path: '/mnt/ArrivalSim-linux-0.7.0-cmu4/ArrivalSim-linux-0.7.0.182276/LinuxNoEditor'
-    # sim_path: '/home/ubuntu/ArrivalSim-linux-0.7.0-cmu4/ArrivalSim-linux-0.7.0.182276/LinuxNoEditor'
-  action_if_kwargs:
-    max_accel: 4.
-    min_accel: -6.
-    max_steer: 1.0
-    min_steer: -1.0
-    ip: '0.0.0.0'
-    port: 7077
-  pose_if_kwargs:
-    ip: '0.0.0.0'
-    port: 7078
-  camera_if_kwargs:
-    ip: 'tcp://127.0.0.1'
-    port: 8008
-
-sim_kwargs:
-  racetrack: 'Thruxton' #['AngleseyNational']
-  active_sensors:
-    - CameraFrontRGB
-  driver_params:
-    DriverAPIClass: 'VApiUdp'
-    DriverAPI_UDP_SendAddress: '0.0.0.0'
-  camera_params:
-    Format: ColorBGR8
-    FOVAngle: 90
-    Width: 512
-    Height: 384
-    bAutoAdvertise: True
