@@ -487,8 +487,6 @@ class RacingEnv(gym.Env):
         self.nearest_idx = self.kdtree.query(np.asarray([enu_x, enu_y]))[1]
         self.tracker.update(self.nearest_idx, enu_x, enu_y, enu_z, yaw, a, bp)
 
-        #pdb.set_trace()
-
         return (pose, self.imgs)
 
     def _is_complete(self, observation):

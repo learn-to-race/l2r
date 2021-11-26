@@ -1,9 +1,16 @@
 agent_kwargs:
     experiment_name: 'EXPERIMENT_NAME'
-    make_random_actions: 0
     inference_only: False
     record_experience: False
     load_checkpoint: False
+    make_random_actions: 0
+    action_if_kwargs:
+        max_accel: 6.
+        min_accel: -16
+        max_steer: .3
+        min_steer: -.3
+        ip: '0.0.0.0'
+        port: 7077
     seed: 0
     save_episodes: 1
     save_freq: 1
