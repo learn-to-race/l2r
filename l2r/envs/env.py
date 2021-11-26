@@ -126,8 +126,6 @@ class RacingEnv(gym.Env):
         self.not_moving_timeout=env_kwargs['not_moving_timeout']
         self.observation_delay=env_kwargs['obs_delay']                        
         self.reward_pol=env_kwargs['reward_pol']                      
-        self.metadata = env_kwargs['metadata']
-        self.multimodal = env_kwargs['multimodal']
 
         self.level = sim_kwargs['racetrack']
         self.vehicle_params = sim_kwargs['vehicle_params']
@@ -136,21 +134,29 @@ class RacingEnv(gym.Env):
         self.driver_params = sim_kwargs['driver_params']
 
         # local confiig mappings
-        controller_kwargs=env_kwargs['controller_kwargs'],        
-        reward_kwargs=env_kwargs['reward_kwargs'],                
-        action_if_kwargs=env_kwargs['action_if_kwargs'],          
-        pose_if_kwargs=env_kwargs['pose_if_kwargs'],              
-        cameras=env_kwargs['cameras'],                            
+        controller_kwargs=env_kwargs['controller_kwargs']        
+        reward_kwargs=env_kwargs['reward_kwargs']           
+        action_if_kwargs=env_kwargs['action_if_kwargs']          
+        pose_if_kwargs=env_kwargs['pose_if_kwargs']           
+        camera_if_kwargs=env_kwargs['camera_if_kwargs']
+        cameras=env_kwargs['cameras']         
 
         camera_sensor_name = [c for c in self.sensors if "Camera" in c][0]
+        self.camera_dims = {camera_sensor_name: # 'CameraFrontalRGB'
+            {'width': self.camera_params['Width'],
+             'height': self.camera_params['Height']}}
+
 
         # class init
         self.controller = SimulatorController(**controller_kwargs)
         self.action_if = utils.ActionInterface(**action_if_kwargs)
         self.pose_if = utils.PoseInterface(**pose_if_kwargs)
 
-        self.cameras = [(camera_sensor_name,
-            utils.CameraInterface(**camera_if_kwargs))]
+        #self.cameras = [(camera_sensor_name,
+        #    utils.CameraInterface(**camera_if_kwargs))]
+
+        self.cameras = [(name, params, utils.CameraInterface(
+            ip=params['Addr'])) for name, params in cameras.items()]
 
         if segm_if_kwargs:
             self.cameras.append(('CameraFrontSegm',
@@ -169,6 +175,7 @@ class RacingEnv(gym.Env):
 
         # openAI gym compliance - action space
         self.action_space = Box(low=-1., high=1., shape=(2,), dtype=np.float64)
+        self.multimodal = env_kwargs['multimodal']
 
         # misc
         self.last_restart = time.time()
@@ -194,7 +201,6 @@ class RacingEnv(gym.Env):
         """
 
         self.level = level if level else self.level
-        self.multimodal = multimodal if multimodal else self.multimodal
         self.sensors = sensors if sensors else self.sensors
         self.driver_params = driver_params if driver_params else self.driver_params
         self.camera_params = camera_params if camera_params else self.camera_params
@@ -227,12 +233,16 @@ class RacingEnv(gym.Env):
             self.levels = level
             self.active_level = random.choice(self.levels)
         else:
-            pdb.set_trace()
-            raise NotImplemented
+            self.active_level = self.level
 
         self.controller.set_level(self.active_level)
         self.controller.set_api_udp()        
         self._load_map()
+
+        for cam_name, _, _ in self.cameras:
+                self.controller.enable_sensor(cam_name)
+
+        pdb.set_trace()
 
         for sensor in self.sensors:
             self.controller.enable_sensor(sensor)
@@ -240,7 +250,8 @@ class RacingEnv(gym.Env):
         self.controller.set_sensor_params(sensor='ArrivalVehicleDriver',
                                           params=self.driver_params)
 
-        for name, params in self.camera_dims.items():
+        for name, params, _ in self.cameras:
+            params['ColorPublisher : Addr'] = params.pop('Addr')
             self.controller.set_sensor_params(sensor=name, params=params)
 
         if remake:
@@ -251,6 +262,8 @@ class RacingEnv(gym.Env):
             for (name, cam) in self.cameras:
                 cam.start(img_dims=(self.camera_dims[name]['width'],
                                     self.camera_dims[name]['height'], 3))
+
+        self.multimodal = multimodal if multimodal else self.multimodal
 
     def _restart_simulator(self):
         """Periodically need to restart the container for long runtimes
@@ -435,9 +448,8 @@ class RacingEnv(gym.Env):
         self._multimodal = value
         _spaces = {}
 
-        for (name, cam) in self.cameras:
-            _shape = (self.camera_dims[name]['width'],
-                      self.camera_dims[name]['height'], 3)
+        for name, params, cam in self.cameras:
+            _shape = (params['Width'], params['Height'], 3)
             _spaces[name] = Box(low=0, high=255, shape=_shape, dtype=np.uint8)
 
         if self._multimodal:

@@ -51,11 +51,12 @@ class SimulatorController(object):
 
     def __init__(self, ip='0.0.0.0', port='16000', quiet=False,
                  sim_version='ArrivalSim-linux-0.7.1.188691',
-                 start_container=False, image_name='arrival-sim',
+                 sim_running=False, start_container=False, image_name='arrival-sim',
                  container_name='racing-sim', sim_path=False,
                  user='ubuntu', evaluation=False):
         """Constructor method
         """
+        self.sim_running = sim_running
         self.start_container = start_container
         self.sim_path = sim_path
         self.start = START_CMD + f'--name {container_name} {image_name}'
@@ -98,19 +99,25 @@ class SimulatorController(object):
         """
         assert not (self.start_container and self.sim_path), "Let L2R start EITHER a docker container OR a native simulstor -- not both"
 
-        if self.start_container:
-            print('Starting simulator container')
-            with open('/tmp/sim_log.txt', 'w') as out:
-                subprocess.Popen(self.start, shell=True, stdout=out, stderr=out)
+        if self.sim_running:
+            print("Assiuming sim is running as a separate process. If this is not true, either start sim manually or adjust the config.")
+            pass
+        else:
 
-        elif self.sim_path:
-            print('Starting simulator')
-            pth = os.path.join(self.sim_path, 'ArrivalSim.sh')
-            cmd = ['sudo', '-u', self.user, pth, '-openGL']
-            with open('/tmp/sim_log.txt', 'w') as out:
-                self.simproc = subprocess.Popen(cmd, stdout=out)
+            if self.start_container:
+                print('Starting simulator container')
+                with open('/tmp/sim_log.txt', 'w') as out:
+                    subprocess.Popen(self.start, shell=True, stdout=out, stderr=out)
 
-        time.sleep(MEDIUM_DELAY)
+            elif self.sim_path:
+                print('Starting simulator')
+                pth = os.path.join(self.sim_path, 'ArrivalSim.sh')
+                cmd = ['sudo', '-u', self.user, pth, '-openGL']
+                with open('/tmp/sim_log.txt', 'w') as out:
+                    self.simproc = subprocess.Popen(cmd, stdout=out)
+
+            time.sleep(MEDIUM_DELAY)
+
         return
 
     def poll_sim(self):
