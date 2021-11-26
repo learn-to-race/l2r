@@ -3,10 +3,3 @@
 agent_kwargs:
     num_episodes: 10
     save_path: '/mnt/results/random_agent' # for phoebe, should begin with '/mnt'
-    action_if_kwargs:
-        max_accel: 6.
-        min_accel: -4
-        max_steer: .3
-        min_steer: -.3
-        ip: '0.0.0.0'
-        port: 7077
