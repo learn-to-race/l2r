@@ -233,6 +233,7 @@ class RacingEnv(gym.Env):
             self.levels = level
             self.active_level = random.choice(self.levels)
         else:
+            self.levels = None
             self.active_level = self.level
 
         self.controller.set_level(self.active_level)
@@ -241,8 +242,6 @@ class RacingEnv(gym.Env):
 
         for cam_name, _, _ in self.cameras:
                 self.controller.enable_sensor(cam_name)
-
-        pdb.set_trace()
 
         for sensor in self.sensors:
             self.controller.enable_sensor(sensor)
@@ -255,13 +254,12 @@ class RacingEnv(gym.Env):
             self.controller.set_sensor_params(sensor=name, params=params)
 
         if remake:
-            for (_, cam) in self.cameras:
+            for (_, _, cam) in self.cameras:
                 cam.reconnect()
         else:
             self.pose_if.start()
-            for (name, cam) in self.cameras:
-                cam.start(img_dims=(self.camera_dims[name]['width'],
-                                    self.camera_dims[name]['height'], 3))
+            for name, params, cam in self.cameras:
+                cam.start(img_dims=(params['Width'], params['Height'], 3))
 
         self.multimodal = multimodal if multimodal else self.multimodal
 
@@ -383,7 +381,7 @@ class RacingEnv(gym.Env):
         self.reward.reset()
         self.pose_if.reset()
 
-        for (_, cam) in self.cameras:
+        for (_, _, cam) in self.cameras:
             cam.reset()
 
         # no delay is causing issues with the initial starting index
@@ -456,7 +454,7 @@ class RacingEnv(gym.Env):
             _spaces['sensors'] = Box(low=np.array(MIN_OBS_ARR),
                                      high=np.array(MAX_OBS_ARR))
         self.observation_space = Dict(_spaces)
-        print(self.observation_space)
+        #print(self.observation_space)
 
     def _observe(self):
         """Perform an observation action by getting the most recent data from
@@ -472,7 +470,7 @@ class RacingEnv(gym.Env):
         """
         time.sleep(self.observation_delay)
         pose = self.pose_if.get_data()
-        self.imgs = [cam.get_data() for (_, cam) in self.cameras]
+        self.imgs = [cam.get_data() for (_, _, cam) in self.cameras]
 
         yaw = pose[12]
         bp = pose[22:25]
@@ -536,8 +534,6 @@ class RacingEnv(gym.Env):
 
         self.segment_tree = KDTree(np.expand_dims(np.array(self.local_segment_idxs),axis=1))
 
-        #pdb.set_trace()
-
         self.tracker = ProgressTracker(
             n_indices=len(self.centerline_arr),
             obs_delay=self.observation_delay,
@@ -561,9 +557,6 @@ class RacingEnv(gym.Env):
         )
 
         #self.segment_coords = self.tracker.get_segment_coords(self.centerline_arr, self.tracker.segment_idxs)
-
-        #pdb.set_trace()
-        #pass
 
 
     def record_manually(self, output_dir, fname='thruxton', num_imgs=5000,
