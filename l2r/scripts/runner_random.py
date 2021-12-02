@@ -23,6 +23,10 @@ if __name__ == "__main__":
     env_kwargs = sys_params['env_kwargs']
     sim_kwargs = sys_params['sim_kwargs']
 
+    # overrrides                                    
+    env_kwargs['action_if_kwargs']['max_accel'] = 6.
+    env_kwargs['action_if_kwargs']['min_accel'] = -4
+
     # instantiate and run agent
     agent = RandomActionAgent(agent_kwargs)
     agent.create_env(env_kwargs, sim_kwargs)

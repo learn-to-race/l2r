@@ -120,8 +120,11 @@ class RacingEnv(gym.Env):
         self.provide_waypoints = provide_waypoints if provide_waypoints else env_kwargs['provide_waypoints']
         self.zone = zone
         self.multi_agent = multi_agent # currently not supported; future
+        self.evaluation = env_kwargs['eval_mode']
+        self.training = True if not self.evaluation else False
        
         # global config mappings
+        self.n_eval_laps=env_kwargs['n_eval_laps']                
         self.max_timesteps=env_kwargs['max_timesteps']                
         self.not_moving_timeout=env_kwargs['not_moving_timeout']
         self.observation_delay=env_kwargs['obs_delay']                        
@@ -343,17 +346,16 @@ class RacingEnv(gym.Env):
             
         if new_level is self.active_level:
             self.controller.reset_level()
+
         else:
             self.active_level = new_level
             self.controller.set_level(self.active_level)
             self._load_map()
-
+        
         self.nearest_idx, info = None, {}
 
         # give the simulator time to reset
         time.sleep(MEDIUM_DELAY)
-
-        self.training, self.evaluation = False, True
 
         # randomly initialize starting location
         p = np.random.uniform()
@@ -543,7 +545,7 @@ class RacingEnv(gym.Env):
             not_moving_ct=self.not_moving_timeout,
             centerline=self.centerline_arr,
             car_dims=CAR_DIMS,
-            n_episode_laps=N_EPISODE_LAPS,
+            n_eval_laps=self.n_eval_laps,
             n_segments=N_SEGMENTS,
             segment_idxs=self.local_segment_idxs,
             segment_tree=self.segment_tree
@@ -612,8 +614,6 @@ class RacingEnv(gym.Env):
 
         next_segment_idx = next_segment_idx % (N_SEGMENTS)
         
-        #self.segment_coords = self.tracker.get_segment_coords(self.centerline_arr, self.tracker.segment_idxs)
-
         try:
             #pos = self.segment_poses[next_segment_idx]
             pos = [0]*4
@@ -635,7 +635,7 @@ class RacingEnv(gym.Env):
 
         self.tracker.current_segment += 1
 
-        print(f"Spawning to next segment start location: curr_segment: {self.tracker.current_segment}; respawns: {self.tracker.respawns}\n{coords},{rot}")
+        print(f"Spawning to next segment start location: curr_segment: {self.tracker.current_segment}; respawns: {self.tracker.respawns}; infractions: {self.tracker.num_infractions}\n{coords},{rot}")
 
         return coords, rot
     

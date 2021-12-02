@@ -1,5 +1,7 @@
 env_kwargs:
     multimodal: True
+    eval_mode: True
+    n_eval_laps: 1
     max_timesteps: 5000
     obs_delay: 0.1
     not_moving_timeout: 100
