@@ -138,7 +138,8 @@ class ProgressTracker(object):
         if self.eval_mode:
             self.current_segment = self.monitor_segment_progression([idx, self.absolute_idx])
 
-        _ = self.check_lap_completion(idx, now)
+        if self.check_lap_completion(idx, now) and self.eval_mode:
+            self.segment_success = [0]*self.n_segments
 
         self.ep_step_ct += 1
         self.last_update_time = now
