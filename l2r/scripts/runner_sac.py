@@ -29,6 +29,11 @@ if __name__ == "__main__":
     env_kwargs = sys_params['env_kwargs']
     sim_kwargs = sys_params['sim_kwargs']
 
+    # overrrides
+    env_kwargs['action_if_kwargs']['max_accel'] = 6.
+    env_kwargs['action_if_kwargs']['min_accel'] = -2
+    env_kwargs['eval_mode'] = False
+
     # create results directory
     save_path = agent_kwargs['model_save_path']
     if not os.path.exists(save_path):

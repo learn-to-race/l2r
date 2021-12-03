@@ -49,8 +49,8 @@ class ProgressTracker(object):
     """
 
     def __init__(self, n_indices, inner_track, outer_track, centerline,
-                 car_dims, obs_delay, max_timesteps, not_moving_ct,
-                 debug=False, n_eval_laps=1, n_segments=10, segment_idxs=None, segment_tree=None):
+                 car_dims, obs_delay, max_timesteps, not_moving_ct, debug=False, 
+                 n_eval_laps=1, n_segments=10, segment_idxs=None, segment_tree=None, eval_mode=False):
         self.n_indices = n_indices
         self.inner_track = inner_track
         self.outer_track = outer_track
@@ -63,18 +63,17 @@ class ProgressTracker(object):
         self.reset(None)
         self.n_eval_laps = n_eval_laps
 
-        self.n_segments = n_segments
-        self.current_segment = 0
-        self.last_segment_dist = A_BIG_NUMBER
-        self.segment_success = [0]*self.n_segments
-        
-        self.segment_idxs = segment_idxs
-
-        self.segment_coords = self.get_segment_coords(self.centerline, self.segment_idxs)
-        self.segment_tree = segment_tree
-        
         self.respawns = 0
         self.num_infractions = 0
+        self.eval_mode = eval_mode
+        if self.eval_mode:
+            self.n_segments = n_segments
+            self.current_segment = 0
+            self.last_segment_dist = A_BIG_NUMBER
+            self.segment_success = [0]*self.n_segments
+            self.segment_idxs = segment_idxs
+            self.segment_coords = self.get_segment_coords(self.centerline, self.segment_idxs)
+            self.segment_tree = segment_tree
 
     def reset(self, start_idx, segmentwise=False):
         """Reset the tracker for the next episode.
@@ -136,7 +135,9 @@ class ProgressTracker(object):
         self._store(e, n, u, idx, yaw, c_dist, dt, ac, bp, n_out)
 
         # set halfway flag, if necessary
-        self.current_segment = self.monitor_segment_progression([idx, self.absolute_idx])
+        if self.eval_mode:
+            self.current_segment = self.monitor_segment_progression([idx, self.absolute_idx])
+
         _ = self.check_lap_completion(idx, now)
 
         self.ep_step_ct += 1
@@ -217,9 +218,11 @@ class ProgressTracker(object):
             self.lap_start = lap_end
             self.halfway_flag = False
 
-            print(f"Completed a lap! Current segment: {self.current_segment}")
-            self.segment_success[-1] = True
-            self.current_segment = 0
+            print(f"Completed a lap!")
+            if self.eval_mode:
+                self.segment_success[-1] = True
+                self.current_segment = 0
+
             return True
 
         return False
@@ -237,7 +240,6 @@ class ProgressTracker(object):
 
         if info['stuck'] or info['not_progressing'] or info['dnf'] or info['oob'] or info['success'] or info['end_last_segment']:
 
-            # used for segmentwise metrics
             self.respawns += 1
             if info['oob']:
                 self.num_infractions += 1
@@ -269,9 +271,7 @@ class ProgressTracker(object):
         proportion_unsafe = np.dot(transitions[-4], transitions[-1]) / total_time
 
         metrics = dict()
-        metrics['success_rate'] = sum(self.segment_success)/self.n_segments
         metrics['num_infractions'] = self.num_infractions
-        metrics['pct_complete'] = round(100 * total_idxs / (self.n_eval_laps * self.n_indices), 1)
         metrics['total_time'] = round(total_time, 2)
         metrics['total_distance'] = round(total_distance, 2)
         metrics['average_speed_kph'] = round(avg_speed, 2)
@@ -281,10 +281,14 @@ class ProgressTracker(object):
         metrics['movement_smoothness'] = round(ms, 3)
         metrics['timestep/sec'] = round(len(path[0]) / total_time, 2)
 
+        if self.eval_mode: 
+            metrics['pct_complete'] = round(100 * total_idxs / (self.n_eval_laps * self.n_indices), 1)
+            metrics['success_rate'] = sum(self.segment_success)/self.n_segments
+
         info['metrics'] = metrics
 
         if info['success']:
-            self.segment_success = [0]*self.n_segments
+            if self.eval_mode: self.segment_success = [0]*self.n_segments
 
         return info
 
@@ -387,9 +391,11 @@ class ProgressTracker(object):
             'dnf': False,
             'end_last_segment': False,
             'not_progressing': False,
-            'lap_times': self.lap_times,
-            'segment_success': self.segment_success
+            'lap_times': self.lap_times
         }
+
+        if self.eval_mode:
+            info['segment_success'] = self.segment_success
 
         if len(self.lap_times) >= self.n_eval_laps:
             info['success'] = True
@@ -400,23 +406,23 @@ class ProgressTracker(object):
         if len(self.transitions) > self.not_moving_ct:
             if self.transitions[-1][3] == self.transitions[-self.not_moving_ct][3]:
                 info['stuck'] = True
-                self.segment_success[self.current_segment-1] = False
+                if self.eval_mode: self.segment_success[self.current_segment-1] = False
 
         total_idxs = self.last_idx + self.n_indices * len(self.lap_times)
 
         if self.ep_step_ct == CHECK_PROGRESS_AT and total_idxs < PROGRESS_THRESHOLD:
             info['not_progressing'] = True
-            self.segment_success[self.current_segment-1] = False
+            if self.eval_mode: self.segment_success[self.current_segment-1] = False
 
         if self.ep_step_ct >= self.max_timesteps:
             info['dnf'] = True
-            self.segment_success[self.current_segment-1] = False
+            if self.eval_mode: self.segment_success[self.current_segment-1] = False
 
         if self._car_out_of_bounds():
             info['oob'] = True
-            self.segment_success[self.current_segment-1] = False
+            if self.eval_mode: self.segment_success[self.current_segment-1] = False
 
-            if self.current_segment == self.n_segments:
+            if self.eval_mode and self.current_segment == self.n_segments:
                 info['end_last_segment'] = True
 
         return info

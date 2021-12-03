@@ -209,8 +209,8 @@ class SACAgent(AbstractAgent):
         # Action limit for clamping: critically, assumes all dimensions share the same bound!
         # self.act_limit = self.env.action_space.high[0]
 
-        assert self.cfg['use_encoder_type'] in ['vae', 'vae_small', 'resnet'], \
-                "Specified encoder type must be in ['vae', 'vae_small', 'resnet']" 
+        assert self.cfg['use_encoder_type'] in ['vae'], \
+                "Specified encoder type must be in ['vae']" 
         speed_hiddens = self.cfg[self.cfg['use_encoder_type']]['speed_hiddens'] 
         self.feat_dim = self.cfg[self.cfg['use_encoder_type']]['latent_dims'] + 1
         self.obs_dim = self.cfg[self.cfg['use_encoder_type']]['latent_dims'] + speed_hiddens[-1] \
@@ -224,23 +224,14 @@ class SACAgent(AbstractAgent):
                 size=self.cfg['replay_size'])
         
         ## vision encoder
-        if 'resnet' in self.cfg['use_encoder_type']:
-            self.backbone = resnet18(pretrained=self.cfg['resnet']['pretrained'])
-        elif self.cfg['use_encoder_type'] == 'vae':
+        if self.cfg['use_encoder_type'] == 'vae':
             self.backbone = VAE(
+                    im_c=self.cfg['vae']['im_c'], 
                     im_h=self.cfg['vae']['im_h'], 
                     im_w=self.cfg['vae']['im_w'], 
                     z_dim=self.cfg['vae']['latent_dims']
                 )
-            self.backbone.load_state_dict(torch.load(self.cfg['vae']['vae_chkpt_statedict']))
-        elif self.cfg['use_encoder_type'] == 'vae_small':
-            self.backbone = VAE(
-                    im_c=self.cfg['vae_small']['im_c'], 
-                    im_h=self.cfg['vae_small']['im_h'], 
-                    im_w=self.cfg['vae_small']['im_w'], 
-                    z_dim=self.cfg['vae_small']['latent_dims']
-                )
-            self.backbone.load_state_dict(torch.load(self.cfg['vae_small']['vae_chkpt_statedict'],\
+            self.backbone.load_state_dict(torch.load(self.cfg['vae']['vae_chkpt_statedict'],\
                     map_location=DEVICE))
         else:
             raise NotImplementedError
@@ -369,25 +360,14 @@ class SACAgent(AbstractAgent):
             obs = self.test_env.reset(random_pos=False) \
                     if test else self.env.reset(random_pos=True)
             (state, camera), _ = obs
-        return camera, self._encode(obs), state
+        return camera, self._encode((state, camera)), state
 
     def _encode(self, o):
         state, img = o
 
-        if self.cfg['use_encoder_type'] == 'resnet':
-            img = self.transform(np.array(img).squeeze(0)).float().to(DEVICE)
-            speed = torch.tensor((state[4]**2 + state[3]**2 + state[5]**2)**0.5).float().reshape(1, -1).to(DEVICE)
-            img_embed = self.backbone(img.unsqueeze(0))
-            out = torch.cat([img_embed, speed], dim = -1).squeeze(0) # BS X 513
-            self.using_speed = 1
-        elif self.cfg['use_encoder_type'] == 'vae':
-            img = torch.as_tensor(cv2.resize(img, (im_w, im_h)), dtype=torch.float32, device=DEVICE)
-            img = img / 255
-            out, _, _ = self.backbone.encode(img.view(1, 3, im_w, im_h)) # BS X 32
-            self.using_speed = 0
-        elif self.cfg['use_encoder_type'] == 'vae_small':
+        if self.cfg['use_encoder_type'] == 'vae':
             img_embed = self.backbone.encode_raw(np.array(img), DEVICE)[0][0]
-            speed = torch.tensor((state[4]**2 + state[3]**2 + state[5]**2)**0.5).float().reshape(1, -1).to(DEVICE)
+            speed = torch.tensor((state[4]**2+state[3]**2+state[5]**2)**0.5).float().reshape(1, -1).to(DEVICE)
             out = torch.cat([img_embed.unsqueeze(0), speed], dim = -1).squeeze(0) # torch.Size([33])
             self.using_speed = 1
         else:
@@ -576,16 +556,8 @@ class SACAgent(AbstractAgent):
             d = False if ep_len == self.cfg['max_ep_len'] else d
 
             # Store experience to replay buffer
-            
-            if self.store_from_safe: ## SPAR
-                if (not np.allclose(state2[15:16], state[15:16], atol=3e-1, rtol=0)) | (r!=0) | (self.record['transition_actor'] == 'safepol'):
-                    self.replay_buffer.store(feat, a, r, feat2, d)
-                else:
-                    print('Skip')
-            elif self.record['transition_actor'] != 'safepol': 
-                ## Discard sample if not moving
-                if (not np.allclose(state2[15:16], state[15:16], atol=3e-1, rtol=0)) | (r!=0):
-                    self.replay_buffer.store(feat, a, r, feat2, d)
+            if (not np.allclose(state2[15:16], state[15:16], atol=3e-1, rtol=0)) | (r!=0):
+                self.replay_buffer.store(feat, a, r, feat2, d)
             else:
                 print('Skip')
 
@@ -622,12 +594,8 @@ class SACAgent(AbstractAgent):
             # Update handling
             if (t >= self.cfg['update_after']) & (t % self.cfg['update_every'] == 0):
                 for j in range(self.cfg['update_every']):
-                    if self.record['transition_actor'] == 'safepol':
-                        ## Skip update to save computing time when in an unsafe state. 
-                        pass 
-                    else:
-                        batch = self.replay_buffer.sample_batch(self.cfg['batch_size'])
-                        self.update(data=batch)
+                    batch = self.replay_buffer.sample_batch(self.cfg['batch_size'])
+                    self.update(data=batch)
 
             if ((t+1) % self.cfg['eval_every'] == 0):
                 # eval on test environment
@@ -646,7 +614,7 @@ class SACAgent(AbstractAgent):
                 self.file_logger(msg)
 
                 self.tb_logger.add_scalar('train/episodic_return', ep_ret, self.episode_num)
-                self.tb_logger.add_scalar('train/ep_pct_complete', self.metadata['info']['metrics']['pct_complete'], self.episode_num)
+                #self.tb_logger.add_scalar('train/ep_pct_complete', self.metadata['info']['metrics']['pct_complete'], self.episode_num)
                 self.tb_logger.add_scalar('train/ep_total_time', self.metadata['info']['metrics']['total_time'], self.episode_num)
                 self.tb_logger.add_scalar('train/ep_total_distance', self.metadata['info']['metrics']['total_distance'], self.episode_num)
                 self.tb_logger.add_scalar('train/ep_avg_speed', self.metadata['info']['metrics']['average_speed_kph'], self.episode_num)
@@ -656,10 +624,6 @@ class SACAgent(AbstractAgent):
                 self.tb_logger.add_scalar('train/movement_smoothness', self.metadata['info']['metrics']['movement_smoothness'], self.episode_num)
                 self.tb_logger.add_scalar('train/ep_n_steps', t-t_start, self.episode_num)
                 
-                # TODO: Find a better way: requires knowledge of child class API :( 
-                if 'safety_info' in self.metadata:
-                    self.tb_logger.add_scalar('train/ep_interventions', self.metadata['safety_info']['ep_interventions'], self.episode_num)
-
                 # Quickly dump recently-completed episode's experience to the multithread queue,
                 # as long as the episode resulted in "success"
                 if self.cfg['record_experience']:# and self.metadata['info']['success']:

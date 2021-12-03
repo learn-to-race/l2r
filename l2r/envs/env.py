@@ -554,7 +554,8 @@ class RacingEnv(gym.Env):
             n_eval_laps=self.n_eval_laps,
             n_segments=N_SEGMENTS,
             segment_idxs=self.local_segment_idxs,
-            segment_tree=self.segment_tree
+            segment_tree=self.segment_tree,
+            eval_mode=self.evaluation
         )
 
         self.reward.set_track(
