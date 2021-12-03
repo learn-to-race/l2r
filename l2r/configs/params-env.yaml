@@ -6,7 +6,7 @@ env_kwargs:
     obs_delay: 0.1
     not_moving_timeout: 100
     reward_pol: 'custom'
-    provide_waypoints: True
+    provide_waypoints: False
     reward_kwargs:
         oob_penalty: 5.0
         min_oob_penalty: 25.0
@@ -51,8 +51,9 @@ env_kwargs:
         default: True
 
 sim_kwargs:
-    racetrack: 'Thruxton'  # ['VegasNorthRoad', 'Thruxton']
+    racetrack: 'Thruxton'
     active_sensors:
+        - ImuOxtsSensor
         - CameraFrontRGB
     driver_params:
         DriverAPIClass: 'VApiUdp'
@@ -60,8 +61,8 @@ sim_kwargs:
     camera_params:
         Format: ColorBGR8
         FOVAngle: 90
-        Width: 192
-        Height: 144
+        Width: 512
+        Height: 384
         bAutoAdvertise: True
     vehicle_params: False
 

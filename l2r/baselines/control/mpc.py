@@ -210,5 +210,3 @@ class MPCAgent(AbstractAgent):
         self.race_yaw[X_diff < 0] += np.pi
         # Ensure the yaw is within [-pi, pi)
         self.race_yaw = (self.race_yaw + np.pi) % (2 * np.pi) - np.pi
-        # pdb.set_trace()
-        # self.race_yaw = np.asarray(original_map['RacingPsi'], dtype=np.float32)

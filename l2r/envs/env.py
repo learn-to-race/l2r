@@ -146,9 +146,11 @@ class RacingEnv(gym.Env):
 
         camera_sensor_name = [c for c in self.sensors if "Camera" in c][0]
         self.camera_dims = {camera_sensor_name: # 'CameraFrontalRGB'
-            {'width': self.camera_params['Width'],
-             'height': self.camera_params['Height']}}
+            {'Width': self.camera_params['Width'],
+             'Height': self.camera_params['Height']}}
 
+
+        #pdb.set_trace()
 
         # class init
         self.controller = SimulatorController(**controller_kwargs)
@@ -159,7 +161,10 @@ class RacingEnv(gym.Env):
         #    utils.CameraInterface(**camera_if_kwargs))]
 
         self.cameras = [(name, params, utils.CameraInterface(
-            ip=params['Addr'])) for name, params in cameras.items()]
+            addr=params['Addr'])) for name, params in cameras.items()]
+
+        #self.cameras = [(camera_sensor_name, self.camera_dims[camera_sensor_name],
+        #    utils.CameraInterface(**camera_if_kwargs))]
 
         if segm_if_kwargs:
             self.cameras.append(('CameraFrontSegm',
@@ -265,6 +270,7 @@ class RacingEnv(gym.Env):
                 cam.start(img_dims=(params['Width'], params['Height'], 3))
 
         self.multimodal = multimodal if multimodal else self.multimodal
+
 
     def _restart_simulator(self):
         """Periodically need to restart the container for long runtimes
@@ -402,7 +408,7 @@ class RacingEnv(gym.Env):
             info['track_idx'] = self.nearest_idx
             return observation, info
 
-        return observation
+        return observation, None
 
     def poll_simulator(self, level, random_pos):
         """Poll the simulator until it receives an action

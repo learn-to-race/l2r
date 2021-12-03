@@ -11,6 +11,7 @@ import socket
 import struct
 import threading
 from math import sqrt, cos, sin
+import ipdb as pdb
 
 import numpy as np
 import zmq
@@ -178,7 +179,7 @@ class CameraInterface(AbstractInterface):
     :param int port: system port
     """
 
-    def __init__(self, ip='tcp://127.0.0.1', port=8008):
+    def __init__(self, addr='tcp://127.0.0.1:8008', ip='tcp://127.0.0.1', port=8008):
         ctx = zmq.Context()
         self.sock = ctx.socket(zmq.SUB)
         self.sock.setsockopt(zmq.SUBSCRIBE, b'')

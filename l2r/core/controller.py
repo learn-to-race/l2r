@@ -10,6 +10,7 @@ import json
 import os
 import subprocess
 import time
+import ipdb as pdb
 
 from websocket import create_connection
 
@@ -97,7 +98,7 @@ class SimulatorController(object):
         """Starts the simulator container, and briefly waits. If a connection
         error occurs, you may need to increase this delay.
         """
-        assert not (self.start_container and self.sim_path), "Let L2R start EITHER a docker container OR a native simulstor -- not both"
+        assert not (self.start_container and self.sim_path), "Let L2R start EITHER a docker container OR a native simulator -- not both"
 
         if self.sim_running:
             print("Assiuming sim is running as a separate process. If this is not true, either start sim manually or adjust the config.")

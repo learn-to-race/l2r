@@ -16,11 +16,11 @@ class AbstractAgent(abc.ABC):
     def __init__(self, *args, **kwargs):
         pass
 
-    @abc.abstractmethod
-    def create_env(self):
-        """Instantiate a racing environment.
-        """
-        pass
+#    @abc.abstractmethod
+#    def create_env(self):
+#        """Instantiate a racing environment.
+#        """
+#        pass
 
     @abc.abstractmethod
     def select_action(self):

@@ -13,20 +13,20 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.distributions.normal import Normal
 
+import ipdb as pdb
+
 
 def combined_shape(length, shape=None):
     if shape is None:
         return (length,)
     return (length, shape) if np.isscalar(shape) else (length, *shape)
 
-
-def mlp(sizes, activation, output_activation=nn.Identity):
+def mlp(sizes, activation=nn.ReLU, output_activation=nn.Identity):
     layers = []
     for j in range(len(sizes) - 1):
         act = activation if j < len(sizes) - 2 else output_activation
         layers += [nn.Linear(sizes[j], sizes[j + 1]), act()]
     return nn.Sequential(*layers)
-
 
 def count_vars(module):
     return sum([np.prod(p.shape) for p in module.parameters()])
@@ -53,7 +53,12 @@ class SquashedGaussianMLPActor(nn.Module):
         std = torch.exp(log_std)
 
         # Pre-squash distribution and sample
-        pi_distribution = Normal(mu, std)
+        try:
+            pi_distribution = Normal(mu, std)
+        except ValueError:
+            pdb.set_trace()
+            pass
+        
         if deterministic:
             # Only used for evaluating policy at test time.
             pi_action = mu
@@ -67,7 +72,9 @@ class SquashedGaussianMLPActor(nn.Module):
             # and look in appendix C. This is a more numerically-stable equivalent to Eq 21.
             # Try deriving it yourself as a (very difficult) exercise. :)
             logp_pi = pi_distribution.log_prob(pi_action).sum(axis=-1)
-            logp_pi -= (2 * (np.log(2) - pi_action - F.softplus(-2 * pi_action))).sum(axis=1)
+            tmp = (2 * (np.log(2) - pi_action - F.softplus(-2 * pi_action)))
+            tmp = tmp.sum(axis=(1 if len(tmp.shape) > 1 else -1))
+            logp_pi -= tmp
         else:
             logp_pi = None
 
@@ -110,3 +117,4 @@ class MLPActorCritic(nn.Module):
         with torch.no_grad():
             a, _ = self.pi(obs, deterministic, False)
             return a.numpy() if self.device == 'cpu' else a.cpu().numpy()
+

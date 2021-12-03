@@ -34,6 +34,7 @@ if __name__ == "__main__":
     env_kwargs['action_if_kwargs']['max_steer'] = 1.0
     env_kwargs['action_if_kwargs']['min_steer'] = -1.0
     env_kwargs['obs_delay'] = 0.
+    env_kwargs['provide_waypoints'] = True
 
     # create and run agent
     agent = MPCAgent(agent_kwargs)
