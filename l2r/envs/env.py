@@ -366,7 +366,7 @@ class RacingEnv(gym.Env):
         # randomly initialize starting location
         p = np.random.uniform()
         # with prob 1/(1+n) use the default start location. 
-        if (random_pos) & (p > 2/(1+len(self.random_poses))) :
+        if (random_pos) and (p > 2/(1+len(self.random_poses))) and not self.evaluation:
             coords, rot = self.random_start_location()
             self.controller.set_location(coords, rot)
             time.sleep(MEDIUM_DELAY)
