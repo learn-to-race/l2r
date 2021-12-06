@@ -93,6 +93,11 @@ LEVEL_Z_DICT = {
     'AngleseyNational': 14.0
 }
 
+COORD_MULTIPLIER = {
+    'Thruxton': -1,
+    'VegasNorthRoad': -1
+        }
+
 
 class RacingEnv(gym.Env):
     """A reinforcement learning environment for autonomous racing.
@@ -555,7 +560,8 @@ class RacingEnv(gym.Env):
             n_segments=N_SEGMENTS,
             segment_idxs=self.local_segment_idxs,
             segment_tree=self.segment_tree,
-            eval_mode=self.evaluation
+            eval_mode=self.evaluation,
+            coord_multiplier=COORD_MULTIPLIER[self.active_level]
         )
 
         self.reward.set_track(
@@ -631,7 +637,7 @@ class RacingEnv(gym.Env):
             dx = pos[0]-self.tracker.segment_coords['second'][next_segment_idx][0]
             
             pos[2] = LEVEL_Z_DICT[self.active_level] #
-            pos[3] = np.arctan(dx/dy) # yaw, radians
+            pos[3] = (np.pi if self.active_level=='VegasNorthRoad' and self.tracker.current_segment==0 else 0)+np.arctan(dx/dy) # yaw, radians
             
         except:
             pdb.set_trace()

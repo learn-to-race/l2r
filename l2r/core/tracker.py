@@ -50,7 +50,8 @@ class ProgressTracker(object):
 
     def __init__(self, n_indices, inner_track, outer_track, centerline,
                  car_dims, obs_delay, max_timesteps, not_moving_ct, debug=False, 
-                 n_eval_laps=1, n_segments=10, segment_idxs=None, segment_tree=None, eval_mode=False):
+                 n_eval_laps=1, n_segments=10, segment_idxs=None, segment_tree=None, 
+                 eval_mode=False, coord_multiplier=dict()):
         self.n_indices = n_indices
         self.inner_track = inner_track
         self.outer_track = outer_track
@@ -62,6 +63,7 @@ class ProgressTracker(object):
         self.debug = debug
         self.reset(None)
         self.n_eval_laps = n_eval_laps
+        self.coord_multiplier = coord_multiplier
 
         self.respawns = 0
         self.num_infractions = 0
@@ -457,8 +459,8 @@ class ProgressTracker(object):
     def get_segment_coords(self, centerline, segment_idxs):
 
         segment_coords = {
-                'first': [-1*centerline[index] for index in segment_idxs],
-                'second': [-1*centerline[index+1] for index in segment_idxs],
+                'first': [self.coord_multiplier*centerline[index] for index in segment_idxs],
+                'second': [self.coord_multiplier*centerline[index+1] for index in segment_idxs],
                 }
         
         return segment_coords
