@@ -68,6 +68,7 @@ class ProgressTracker(object):
         self.idx_sequence = [0]*5
 
         self.respawns = 0
+        self.laps_completed = 0
         self.num_infractions = 0
         self.eval_mode = eval_mode
         if self.eval_mode:
@@ -233,6 +234,7 @@ class ProgressTracker(object):
             self.halfway_flag = False
 
             print(f"Completed a lap!")
+            self.laps_completed += 1
             if self.eval_mode:
                 self.segment_success[-1] = True
                 self.current_segment = 0
@@ -296,6 +298,7 @@ class ProgressTracker(object):
         metrics['timestep/sec'] = round(len(path[0]) / total_time, 2)
 
         if self.eval_mode: 
+            metrics['laps_completed'] = self.laps_completed
             metrics['pct_complete'] = round(100 * total_idxs / (self.n_eval_laps * self.n_indices), 1)
             metrics['success_rate'] = sum(self.segment_success)/self.n_segments
 
