@@ -383,6 +383,9 @@ class RacingEnv(gym.Env):
         else:
             pass
 
+        self.tracker.wrong_way = False # reset
+        self.tracker.idx_sequence = [0]*5 # reset
+
         # reset simulator sensors
         self.controller.set_mode_ai()
 
@@ -637,7 +640,7 @@ class RacingEnv(gym.Env):
             dx = pos[0]-self.tracker.segment_coords['second'][next_segment_idx][0]
             
             pos[2] = LEVEL_Z_DICT[self.active_level] #
-            pos[3] = (np.pi if self.active_level=='VegasNorthRoad' and self.tracker.current_segment==0 else 0)+np.arctan(dx/dy) # yaw, radians
+            pos[3] = (np.pi if self.active_level=='VegasNorthRoad' and self.tracker.current_segment<=1 else 0)+np.arctan(dx/dy) # yaw, radians
             
         except:
             pdb.set_trace()

@@ -64,6 +64,8 @@ class ProgressTracker(object):
         self.reset(None)
         self.n_eval_laps = n_eval_laps
         self.coord_multiplier = coord_multiplier
+        self.idx_dir = 0
+        self.idx_sequence = [0]*5
 
         self.respawns = 0
         self.num_infractions = 0
@@ -112,6 +114,10 @@ class ProgressTracker(object):
         print(f'idx: {idx}')
         self.absolute_idx = idx
         now = time.time()
+
+        self.idx_sequence.append(idx)
+        self.idx_sequence = self.idx_sequence[-5:]
+        self.idx_dir = 1 if self.idx_sequence[-1] >= self.idx_sequence[0] else -1
 
         if self.lap_start is None:
             self.start_time = now
@@ -169,23 +175,28 @@ class ProgressTracker(object):
     def monitor_segment_progression(self, idxs):
 
         shifted_idx, absolute_idx = idxs
+
+        self.last_segment = self.current_segment
     
         closest_border_shft = self.segment_tree.query([shifted_idx])
         closest_border_abs = self.segment_tree.query([absolute_idx])
-        print(f"Current segment: {self.current_segment}\nSegment proposal (shifted idx: {shifted_idx}): ({closest_border_shft[0]},{closest_border_shft[1]})\nSegment proposal (absolute idx: {absolute_idx}): ({closest_border_abs[0]},{closest_border_abs[1]})\nSegment idxs: {self.segment_idxs}")
+        print(f"Current segment: {self.current_segment}\nSegment proposal (shifted idx: {shifted_idx}): ({closest_border_shft[0]},{closest_border_shft[1]})\nSegment proposal (absolute idx: {absolute_idx}): ({closest_border_abs[0]},{closest_border_abs[1]})\nSegment idxs: {self.segment_idxs}\nWrong way: {self.wrong_way}")
    
         if closest_border_abs[0] < 50 and self.last_segment_dist <= closest_border_abs[0]:
             # border crossing
             current_segment_proposal = closest_border_abs[1]+1
 
-            # TODO: update segment metrics: e.g., segment_reward
-            
         else:
             # approaching the next broder
             current_segment_proposal = self.current_segment
 
         current_segment = current_segment_proposal
         self.last_segment_dist = closest_border_abs[0]
+
+        if current_segment >= 10 and self.last_segment <= 1: 
+            # wrong way
+            self.wrong_way = True
+            return current_segment
 
         if current_segment >= 2:
 
@@ -241,11 +252,11 @@ class ProgressTracker(object):
         """
         info = self._is_terminal()
 
-        if info['stuck'] or info['not_progressing'] or info['dnf'] or info['oob'] or info['success'] or info['end_last_segment']:
+        if info['stuck'] or info['not_progressing'] or info['dnf'] or info['oob'] or info['success'] or info['end_last_segment'] or info['wrong_way']:
 
             self.respawns += 1
-            if info['oob']:
-                self.num_infractions += 1
+            if info['oob']: self.num_infractions += 1
+            if info['wrong_way']: self.num_infractions += 1
         
             return True, self.append_metrics(info)
 
@@ -392,10 +403,15 @@ class ProgressTracker(object):
             'oob': False,
             'success': False,
             'dnf': False,
+            'wrong_way': False,
             'end_last_segment': False,
             'not_progressing': False,
             'lap_times': self.lap_times
         }
+
+        # correct for zero-index and for current_segment being greater than n_segments (post-lap complection)
+        curr_seg_sanitized = (self.n_segments-1) \
+                if self.current_segment > self.n_segments else (self.current_segment-1)
 
         if self.eval_mode:
             info['segment_success'] = self.segment_success
@@ -409,21 +425,24 @@ class ProgressTracker(object):
         if len(self.transitions) > self.not_moving_ct:
             if self.transitions[-1][3] == self.transitions[-self.not_moving_ct][3]:
                 info['stuck'] = True
-                if self.eval_mode: self.segment_success[self.current_segment-1] = False
+                if self.eval_mode: self.segment_success[curr_seg_sanitized] = False
 
         total_idxs = self.last_idx + self.n_indices * len(self.lap_times)
 
+        if self.wrong_way or self.idx_dir < 0:
+            info['wrong_way'] = True
+
         if self.ep_step_ct == CHECK_PROGRESS_AT and total_idxs < PROGRESS_THRESHOLD:
             info['not_progressing'] = True
-            if self.eval_mode: self.segment_success[self.current_segment-1] = False
+            if self.eval_mode: self.segment_success[curr_seg_sanitized] = False
 
         if self.ep_step_ct >= self.max_timesteps:
             info['dnf'] = True
-            if self.eval_mode: self.segment_success[self.current_segment-1] = False
+            if self.eval_mode: self.segment_success[curr_seg_sanitized] = False
 
         if self._car_out_of_bounds():
             info['oob'] = True
-            if self.eval_mode: self.segment_success[self.current_segment-1] = False
+            if self.eval_mode: self.segment_success[curr_seg_sanitized] = False
 
             if self.eval_mode and self.current_segment == self.n_segments:
                 info['end_last_segment'] = True
