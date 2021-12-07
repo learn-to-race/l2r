@@ -299,7 +299,7 @@ class ProgressTracker(object):
 
         if self.eval_mode: 
             metrics['laps_completed'] = self.laps_completed
-            metrics['pct_complete'] = round(100 * total_idxs / (self.n_eval_laps * self.n_indices), 1)
+            metrics['pct_complete'] = np.min([100, round(100 * total_idxs / (self.n_eval_laps * self.n_indices), 1)])
             metrics['success_rate'] = sum(self.segment_success)/self.n_segments
 
         info['metrics'] = metrics
