@@ -234,8 +234,8 @@ class ProgressTracker(object):
             self.halfway_flag = False
 
             print(f"Completed a lap!")
-            self.laps_completed += 1
             if self.eval_mode:
+                self.laps_completed += 1
                 self.segment_success[-1] = True
                 self.current_segment = 0
 
