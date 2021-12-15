@@ -76,6 +76,7 @@ class ProgressTracker(object):
             self.current_segment = 0
             self.last_segment_dist = A_BIG_NUMBER
             self.segment_success = [0]*self.n_segments
+            self.segment_success_final = [0]*self.n_segments
             self.segment_idxs = segment_idxs
             self.segment_coords = self.get_segment_coords(self.centerline, self.segment_idxs)
             self.segment_tree = segment_tree
@@ -148,6 +149,7 @@ class ProgressTracker(object):
             self.current_segment = self.monitor_segment_progression([idx, self.absolute_idx])
 
         if self.check_lap_completion(idx, now) and self.eval_mode:
+            self.segment_success_final = self.segment_success
             self.segment_success = [0]*self.n_segments
 
         self.ep_step_ct += 1
@@ -233,11 +235,13 @@ class ProgressTracker(object):
             self.lap_start = lap_end
             self.halfway_flag = False
 
-            print(f"Completed a lap!")
+            print(f"[Tracker] Completed a lap!")
             if self.eval_mode:
                 self.laps_completed += 1
                 self.segment_success[-1] = True
+                self.segment_success_final = self.segment_success
                 self.current_segment = 0
+                #print(f"[Tracker] In 'check_lap_completion': segment_success_final: {self.segment_success_final}")
 
             return True
 
@@ -299,13 +303,14 @@ class ProgressTracker(object):
 
         if self.eval_mode: 
             metrics['laps_completed'] = self.laps_completed
-            metrics['pct_complete'] = np.min([100, round(100 * total_idxs / (self.n_eval_laps * self.n_indices), 1)])
-            metrics['success_rate'] = sum(self.segment_success)/self.n_segments
+            metrics['pct_complete'] = np.min([100,round(100*total_idxs/(self.n_eval_laps*self.n_indices),1)])
+            metrics['success_rate'] = sum(self.segment_success_final)/self.n_segments
 
         info['metrics'] = metrics
 
         if info['success']:
-            if self.eval_mode: self.segment_success = [0]*self.n_segments
+            if self.eval_mode: 
+                self.segment_success = [0]*self.n_segments
 
         return info
 
@@ -417,7 +422,7 @@ class ProgressTracker(object):
                 if self.current_segment > self.n_segments else (self.current_segment-1)
 
         if self.eval_mode:
-            info['segment_success'] = self.segment_success
+            info['segment_success'] = self.segment_success_final
 
         if len(self.lap_times) >= self.n_eval_laps:
             info['success'] = True
