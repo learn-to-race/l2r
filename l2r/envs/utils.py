@@ -179,13 +179,18 @@ class CameraInterface(AbstractInterface):
     :param int port: system port
     """
 
-    def __init__(self, addr=None, ip='tcp://127.0.0.1', port=8008):
+    #def __init__(self, Addr=None, ip='tcp://127.0.0.1', port=8008, Format=None, bAutoAdvertise=None, FOVAngle=None):
+    def __init__(self, **params):
+        ip = params['ip'] if 'ip' in params else 'tcp://127.0.0.1' 
+        port = params['port'] if 'port' in params else '8008' 
+        addr = params['Addr'] if 'Addr' in params else f'{ip}:{port}' 
+        
         ctx = zmq.Context()
         self.sock = ctx.socket(zmq.SUB)
         self.sock.setsockopt(zmq.SUBSCRIBE, b'')
         self.sock.setsockopt(zmq.CONFLATE, 1)
-        self.sock.connect(f'{ip}:{port}')
-        self.addr = f'{ip}:{port}' if not addr else addr
+        self.sock.connect(addr)
+
 
     def start(self, img_dims):
         """Starts a thread to listen for images on.
