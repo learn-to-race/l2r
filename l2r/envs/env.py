@@ -236,7 +236,7 @@ class RacingEnv(gym.Env):
     def _restart_simulator(self):
         """Periodically need to restart the container for long runtimes
         """
-        print('[RacingEnv] Periodic simulator restart')
+        print('[Env] Periodic simulator restart')
         self.controller.restart_simulator()
         self.make(
             level=self.level,
@@ -283,7 +283,7 @@ class RacingEnv(gym.Env):
         _ = self._check_restart(done)
 
         if self.provide_waypoints:
-            print(f"WARNING: 'self.provide_waypoints' is set to {self.provide_waypoints}")
+            print(f"[Env] WARNING: 'self.provide_waypoints' is set to {self.provide_waypoints}")
             info['track_idx'] = self.nearest_idx
             info['waypoints'] = self._waypoints()
 
@@ -303,13 +303,13 @@ class RacingEnv(gym.Env):
         #new_level = level if level else random.choice(self.levels)
         if level:
             new_level = level
-            print(f"Setting to level: {new_level}")
+            print(f"[Env] Setting to level: {new_level}")
         elif self.levels:
             new_level = random.choice(self.levels)
-            print(f"New random level: {new_level}")
+            print(f"[Env] New random level: {new_level}")
         else:
             new_level = self.level
-            print(f"Continuing with level: {new_level}")
+            print(f"[Env] Continuing with level: {new_level}")
             
         if new_level is self.active_level:
             self.controller.reset_level()
@@ -367,7 +367,7 @@ class RacingEnv(gym.Env):
         self.tracker.reset(start_idx=self.nearest_idx, segmentwise=segment_pos)
 
         if self.provide_waypoints:
-            print(f"WARNING: 'self.provide_waypoints' is set to {self.provide_waypoints}")
+            print(f"[Env] WARNING: 'self.provide_waypoints' is set to {self.provide_waypoints}")
             info['waypoints'] = self._waypoints()
             info['track_idx'] = self.nearest_idx
             return observation, info
@@ -605,7 +605,7 @@ class RacingEnv(gym.Env):
 
         self.tracker.current_segment += 1
 
-        print(f"Spawning to next segment start location: curr_segment: {self.tracker.current_segment}; respawns: {self.tracker.respawns}; infractions: {self.tracker.num_infractions}\n{coords},{rot}")
+        print(f"[Env] Spawning to next segment start location: curr_segment: {self.tracker.current_segment}; respawns: {self.tracker.respawns}; infractions: {self.tracker.num_infractions}\n{coords},{rot}")
 
         return coords, rot
     

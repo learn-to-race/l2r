@@ -101,17 +101,17 @@ class SimulatorController(object):
         assert not (self.start_container and self.sim_path), "Let L2R start EITHER a docker container OR a native simulator -- not both"
 
         if self.sim_running:
-            print("[SimulatorController] Assuming sim is running as a separate process")
+            print("[Controller] Assuming sim is running as a separate process")
             pass
         else:
 
             if self.start_container:
-                print('[SimulatorController] Starting simulator container')
+                print('[Controller] Starting simulator container')
                 with open('/tmp/sim_log.txt', 'w') as out:
                     subprocess.Popen(self.start, shell=True, stdout=out, stderr=out)
 
             elif self.sim_path:
-                print('[SimulatorController] Starting simulator')
+                print('[Controller] Starting simulator')
                 pth = os.path.join(self.sim_path, 'ArrivalSim.sh')
                 cmd = ['sudo', '-u', self.user, pth, '-openGL']
                 with open('/tmp/sim_log.txt', 'w') as out:
@@ -498,4 +498,4 @@ class SimulatorController(object):
         """Helper print routine
         """
         if not self.quiet and not force:
-            print(f'[SimulatorController] {msg}')
+            print(f'[Controller] {msg}')
