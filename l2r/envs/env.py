@@ -102,23 +102,20 @@ COORD_MULTIPLIER = {
 class RacingEnv(gym.Env):
     """A reinforcement learning environment for autonomous racing.
 
-    :param int max_timesteps: maximimum number of timesteps per episode
-    :param dict controller_kwargs: keyword args for the simulator controller
-    :param dict reward_kwargs: keyword args the reward policy
-    :param dict action_if_kwargs: keyword args for the action interface
-    :param dict camera_if_kwargs: keyword args for the camera interface
-    :param dict pose_if_kwargs: keyword args for the position receive interface
-    :param str reward_pol: reward policy to use, defaults to GranTurismo
-    :param int not_moving_timeout: terminate if not moving for this many
-      timesteps
+    :param dict env_kwargs: keyword args for environment configuration
+    :param dict sim_kwargs: keyword args for simulator configuration
+
+    :param manual_segments: a switch for determing whether to use manually-defined segment waypoints
+        in racetracks/racetracks.json or to use automatically-calculated segments via np.linspace
+
+    :param multi_agent (currently not supported): a switch to enabling multi-agent mode in the simulator
+
     :param bool provide_waypoints: flag to provide ground-truth, future
-      waypoints on the track in the info returned from **step()**
-    :param float obs_delay: time delay between action and observation
+      waypoints on the track in the info returned from the step() method
    """
 
-    def __init__(self, env_kwargs, sim_kwargs, 
-            segm_if_kwargs=False, birdseye_if_kwargs=False, birdseye_segm_if_kwargs=False,
-                 zone=False, provide_waypoints=False, manual_segments=False, multi_agent=False):
+    def __init__(self, env_kwargs, sim_kwargs, zone=False, 
+            provide_waypoints=False, manual_segments=False, multi_agent=False):
 
         # switches
         self.manual_segments = manual_segments
@@ -167,23 +164,29 @@ class RacingEnv(gym.Env):
         self.last_restart = time.time()
 
     def make(self, level=False, multimodal=False, sensors=False, camera_params=False, 
-            driver_params=False, segm_params=False, birdseye_params=False, birdseye_segm_params=False, 
-            vehicle_params=None, multi_agent=False, remake=False, cameras=False):
-        """Unlike many environments, make does not start the simulator process.
-        It does, however, configure the simulator's settings. The simulator
-        process must be running prior to calling this method otherwise an error
+            driver_params=False, multi_agent=False, remake=False, cameras=False):
+        """
+        Make does not start the simulator process. It does, however, configure the simulator's settings. 
+        The simulator process must be running prior to calling this method, otherwise an error
         will occur when trying to establish a connection with the simulator.
 
         :param str level: the desired racetrack map
+
         :param bool multimodal: if false, then the agent is 'visual only'
           and only receives pixel values, if true, the agent also has access
           to additional sensor data
+        
         :param dict camera_params: camera parameters to set
+        
         :param list sensors: sensors to enable for the simulation
+        
         :param dict driver_params: driver parameters to modify
-        :param dict vehicle_params: vehicle parameters to set
+        
         :param multi_agent: not currently supported
+        
         :param bool remake: if remaking, reset the camera interface
+
+        :params list cameras: camera interface configuration
         """
 
         self.level = level if level else self.level
@@ -191,8 +194,7 @@ class RacingEnv(gym.Env):
         self.driver_params = driver_params if driver_params else self.driver_params
         self.camera_params = camera_params if camera_params else self.camera_params
             
-        self.cameras = [(name, params, utils.CameraInterface(**params)) for name, params in cameras.items() if name in self.sensors] \
-                if cameras else self.cameras
+        self.cameras = [(name, params, utils.CameraInterface(**params)) for name, params in cameras.items() if name in self.sensors] if cameras else self.cameras
 
         if type(level) == str:
             self.level = level
@@ -295,12 +297,12 @@ class RacingEnv(gym.Env):
 
         :param str level: if specified, will set the simulator to this level,
           otherwise set to a random track
-        :param bool random_pos: true/false for random starting position on the
-          track
+        :param bool random_pos: true/false for random starting position on the track
+        :param bool segment_pos: true/false for track starting positions that adhere to segment boundaries
         :return: an intial observation as in the *step* method
         :rtype: see **step()** method
         """
-        #new_level = level if level else random.choice(self.levels)
+
         if level:
             new_level = level
             print(f"[Env] Setting to level: {new_level}")
@@ -605,7 +607,11 @@ class RacingEnv(gym.Env):
 
         self.tracker.current_segment += 1
 
-        print(f"[Env] Spawning to next segment start location: curr_segment: {self.tracker.current_segment}; respawns: {self.tracker.respawns}; infractions: {self.tracker.num_infractions}\n{coords},{rot}")
+        print(f"[Env] Spawning to next segment start location")
+        print(f"[Env] Current segment: {self.tracker.current_segment}")
+        print(f"[Env] Respawns: {self.tracker.respawns}; infractions: {self.tracker.num_infractions}")
+        print(f"[Env] Coords: {coords}")
+        print(f"[Env] Rot: {rot}")
 
         return coords, rot
     
