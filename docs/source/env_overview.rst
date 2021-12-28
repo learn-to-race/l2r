@@ -2,28 +2,26 @@
 Environment Overview
 ====================
 
-.. warning::
-   The L2R framework is coupled with the Arrival Racing simulator which has not yet been released. To gain access to the racing simulator, you must sign a licensing agreement with Arrival, the creator and owner of the simulation software. The simulator is expected to be available in May, 2021. Please complete this `form <https://forms.gle/PXNM6hHkEgiAzhoa8>`_ to be notified of its release.
-
 
 Introduction
 -------------
-`Learn-to-Race <https://github.com/hermgerm29/learn-to-race>`_ (L2R) is an `OpenAI gym <https://gym.openai.com/>`_ compliant, multimodal control environment where agents learn how to race. Unlike many simplistic learning environments, ours is built around Arrival’s high-fidelity racing simulator featuring full software-in-the-loop (SIL), and even hardware-in-the-loop (HIL), simulation capabilities. This simulator has played a key role in bringing autonomous racing technology to real life in the `Roborace series <https://roborace.com/>`_, the world’s first extreme competition of teams developing self-driving AI. Racing is an extreme challenge where agents must make real-time, high-risk decisions while finely controlling hardware operating near its physical limits. The L2R framework presents *objective-centric* tasks, rather than providing abstract rewards, and provides numerous quantitative metrics to measure the racing performance and trajectory quality of various agents.
+`Learn-to-Race <https://learn-to-race.org>`_ (L2R) is an `OpenAI-gym` compliant, multimodal control environment, where agents learn how to race. 
 
-For more information, please read our `paper <https://arxiv.org/abs/2103.11575>`_ on arXiv.
+Unlike many simplistic learning environments, ours is built around high-fidelity simulators, based on Unreal Engine 4, such as the Arrival Autonomous Racing Simulator—featuring full software-in-the-loop (SIL) and even hardware-in-the-loop (HIL) simulation capabilities. This simulator has played a key role in bringing autonomous racing technology to real life in the `Roborace series <https://roborace.com/>`_, the world’s first extreme competition of teams developing self-driving AI. The L2R framework is the official training environment for Carnegie Mellon University's Roborace team, the first North American team to join the international challenge.
+
+Autonomous Racing poses a significant challenge for artificial intelligence, where agents must make accurate and high-risk control decisions in real-time, while operating autonomous systems near their physical limits. The L2R framework presents *objective-centric* tasks, rather than providing abstract rewards, and provides numerous quantitative metrics to measure the racing performance and trajectory quality of various agents.
+
+For more information, please read a couple of our conference papers:
+
+- `Learn-to-Race: A Multimodal Control Environment for Autonomous Racing <https://arxiv.org/abs/2103.11575>`_
+
+- `Safe Autonomous Racing via Approximate Reachability on Ego-vision <https://arxiv.org/abs/2110.07699>`_
 
 Baseline Models
 ---------------
-We provide 'out-of-the-box' baseline models to demonstrate how to use the environment including a ``RandomActionAgent`` as a starting point. We also provide a model predictive control (MPC) agent, which is non-learning, as well as a `Soft Actor-Critic <https://arxiv.org/abs/1801.01290v1>`_ agent, which only relies on the vehicle's camera as input, and finally, an imitation learning implementation based on the MPC's demonstrations.
+We provide three baseline models, to demonstrate how to use L2R: a random agent, a model predictive control (MPC) agent, a `Soft Actor-Critic <https://arxiv.org/abs/1801.01290v1>`_ reinforcement learning (RL) agent, and an imitation learning agent based on the MPC's demonstrations.
 
-.. sidebar:: Untrained Policy
-
-   Our `RandomActionAgent <getting_started.html#basic-example>`_
-   completes a handful of episodes on the Las Vegas North Road track (with little success)
-
-.. image:: ../assets/untrained.gif
-    :width: 55 %
-
+The `RandomAgent <getting_started.html#basic-example>`_ executes actions, completely at random. The `MPCAgent <getting_started.html#basic-example>`_ recursively plans trajectories according to a dynamics model of the vehicle, then executes actions according to the current plan. The `SACAgent <getting_started.html#basic-example>`_ is a learning-based method, which relies on the optimisation of a stochastic policy, model-free.
 
 Action Space
 ------------
@@ -137,11 +135,10 @@ Please cite this work if you use L2R as a part of your research.
 
 .. code-block:: text
 
-  @misc{herman2021learntorace,
-        title={Learn-to-Race: A Multimodal Control Environment for Autonomous Racing}, 
-        author={James Herman and Jonathan Francis and Siddha Ganju and Bingqing Chen and Anirudh Koul and Abhinav Gupta and Alexey Skabelkin and Ivan Zhukov and Andrey Gostev and Max Kumskoy and Eric Nyberg},
-        year={2021},
-        eprint={2103.11575},
-        archivePrefix={arXiv},
-        primaryClass={cs.RO}
-  }
+  @inproceedings{herman2021learn,
+              title={Learn-to-Race: A Multimodal Control Environment for Autonomous Racing},
+              author={Herman, James and Francis, Jonathan and Ganju, Siddha and Chen, Bingqing and Koul, Anirudh and Gupta, Abhinav and Skabelkin, Alexey and Zhukov, Ivan and Kumskoy, Max and Nyberg, Eric},
+              booktitle={Proceedings of the IEEE/CVF International Conference on Computer Vision},
+              pages={9793--9802},
+              year={2021}
+            }
