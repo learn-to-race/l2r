@@ -2,9 +2,6 @@
 Environment Overview
 ====================
 
-.. warning::
-   The L2R framework is coupled with the Arrival Racing simulator which has not yet been released. To gain access to the racing simulator, you must sign a licensing agreement with Arrival, the creator and owner of the simulation software. The simulator is expected to be available in May, 2021. Please complete this `form <https://forms.gle/PXNM6hHkEgiAzhoa8>`_ to be notified of its release.
-
 
 Introduction
 -------------
@@ -137,11 +134,10 @@ Please cite this work if you use L2R as a part of your research.
 
 .. code-block:: text
 
-  @misc{herman2021learntorace,
-        title={Learn-to-Race: A Multimodal Control Environment for Autonomous Racing}, 
-        author={James Herman and Jonathan Francis and Siddha Ganju and Bingqing Chen and Anirudh Koul and Abhinav Gupta and Alexey Skabelkin and Ivan Zhukov and Andrey Gostev and Max Kumskoy and Eric Nyberg},
-        year={2021},
-        eprint={2103.11575},
-        archivePrefix={arXiv},
-        primaryClass={cs.RO}
-  }
+  @inproceedings{herman2021learn,
+              title={Learn-to-Race: A Multimodal Control Environment for Autonomous Racing},
+              author={Herman, James and Francis, Jonathan and Ganju, Siddha and Chen, Bingqing and Koul, Anirudh and Gupta, Abhinav and Skabelkin, Alexey and Zhukov, Ivan and Kumskoy, Max and Nyberg, Eric},
+              booktitle={Proceedings of the IEEE/CVF International Conference on Computer Vision},
+              pages={9793--9802},
+              year={2021}
+            }
