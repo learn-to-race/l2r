@@ -19,12 +19,30 @@ For more information, please read a couple of our conference papers:
 
 Baseline Models
 ---------------
-We provide 'out-of-the-box' baseline models to demonstrate how to use the environment including a ``RandomActionAgent`` as a starting point. We also provide a model predictive control (MPC) agent, which is non-learning, as well as a `Soft Actor-Critic <https://arxiv.org/abs/1801.01290v1>`_ agent, which only relies on the vehicle's camera as input, and finally, an imitation learning implementation based on the MPC's demonstrations.
+We provide three baseline models, to demonstrate how to use L2R: a random agent, a model predictive control (MPC) agent, a `Soft Actor-Critic <https://arxiv.org/abs/1801.01290v1>`_ reinforcement learning (RL) agent, and an imitation learning agent based on the MPC's demonstrations.
 
-.. sidebar:: Untrained Policy
+.. sidebar:: Random agent
 
-   Our `RandomActionAgent <getting_started.html#basic-example>`_
-   completes a handful of episodes on the Las Vegas North Road track (with little success)
+   The `RandomAgent <getting_started.html#basic-example>`_
+   executes actions, completely at random.
+
+.. image:: ../assets/untrained.gif
+    :width: 55 %
+
+
+.. sidebar:: MPC agent
+
+   The `MPCAgent <getting_started.html#basic-example>`_
+   plans trajectories according to a dynamics model of the vehicle, then executes actions according to that plan.
+
+.. image:: ../assets/untrained.gif
+    :width: 55 %
+
+
+.. sidebar:: SAC agent
+
+   The `SACAgent <getting_started.html#basic-example>`_
+   is a learning-based method, which relies on the optimisation of a stochastic policy, model-free.
 
 .. image:: ../assets/untrained.gif
     :width: 55 %
