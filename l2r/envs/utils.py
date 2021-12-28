@@ -78,7 +78,7 @@ class ActionInterface(object):
         self.min_steer = min_steer
         self.max_accel = max_accel
         self.min_accel = min_accel
-        if max_steer > MAX_STEER_REQ or min_steer < MIN_ACC_REQ:
+        if max_steer > MAX_STEER_REQ or min_steer < MIN_STEER_REQ:
             raise InvalidActionException('Invalid steering boundaries')
         if max_accel > MAX_ACC_REQ or min_accel < MIN_ACC_REQ:
             raise InvalidActionException('Invalid acceleration boundaries')
