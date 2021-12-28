@@ -21,32 +21,7 @@ Baseline Models
 ---------------
 We provide three baseline models, to demonstrate how to use L2R: a random agent, a model predictive control (MPC) agent, a `Soft Actor-Critic <https://arxiv.org/abs/1801.01290v1>`_ reinforcement learning (RL) agent, and an imitation learning agent based on the MPC's demonstrations.
 
-.. sidebar:: Random agent
-
-   The `RandomAgent <getting_started.html#basic-example>`_
-   executes actions, completely at random.
-
-.. image:: ../assets/untrained.gif
-    :width: 55 %
-
-
-.. sidebar:: MPC agent
-
-   The `MPCAgent <getting_started.html#basic-example>`_
-   plans trajectories according to a dynamics model of the vehicle, then executes actions according to that plan.
-
-.. image:: ../assets/untrained.gif
-    :width: 55 %
-
-
-.. sidebar:: SAC agent
-
-   The `SACAgent <getting_started.html#basic-example>`_
-   is a learning-based method, which relies on the optimisation of a stochastic policy, model-free.
-
-.. image:: ../assets/untrained.gif
-    :width: 55 %
-
+The `RandomAgent <getting_started.html#basic-example>`_ executes actions, completely at random. The `MPCAgent <getting_started.html#basic-example>`_ recursively plans trajectories according to a dynamics model of the vehicle, then executes actions according to the current plan. The `SACAgent <getting_started.html#basic-example>`_ is a learning-based method, which relies on the optimisation of a stochastic policy, model-free.
 
 Action Space
 ------------
