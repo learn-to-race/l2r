@@ -175,11 +175,9 @@ class PoseInterface(AbstractInterface):
 class CameraInterface(AbstractInterface):
     """Receives images from the simulator.
 
-    :param str ip: ip address to listen on
-    :param int port: system port
+    :param dict params: socket connection and interface parameters
     """
 
-    #def __init__(self, Addr=None, ip='tcp://127.0.0.1', port=8008, Format=None, bAutoAdvertise=None, FOVAngle=None):
     def __init__(self, **params):
         ip = params['ip'] if 'ip' in params else 'tcp://127.0.0.1' 
         port = params['port'] if 'port' in params else '8008' 
