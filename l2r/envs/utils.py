@@ -12,6 +12,7 @@ import struct
 import threading
 from math import sqrt, cos, sin
 import ipdb as pdb
+import math
 
 import numpy as np
 import zmq
@@ -357,3 +358,16 @@ class GeoLocation(object):
         enu_up = enu[2]
 
         return np.array([enu_east, enu_north, enu_up])
+
+def smooth_yaw(yaw):
+    for i in range(len(yaw) - 1):
+        dyaw = yaw[i + 1] - yaw[i]
+
+        while dyaw >= math.pi / 2.0:
+            yaw[i + 1] -= math.pi * 2.0
+            dyaw = yaw[i + 1] - yaw[i]
+
+        while dyaw <= -math.pi / 2.0:
+            yaw[i + 1] += math.pi * 2.0
+            dyaw = yaw[i + 1] - yaw[i]
+    return yaw

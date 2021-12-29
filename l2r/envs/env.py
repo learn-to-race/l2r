@@ -11,6 +11,7 @@ import os
 import pathlib
 import random
 import time
+import math
 
 import gym
 import matplotlib.path as mplPath
@@ -506,6 +507,17 @@ class RacingEnv(gym.Env):
 
         self.segment_tree = KDTree(np.expand_dims(np.array(self.local_segment_idxs),axis=1))
 
+        
+        race_x = self.centerline_arr[:, 0]
+        race_y = self.centerline_arr[:, 1]
+        X_diff = np.concatenate([race_x[1:] - race_x[:-1],[race_x[0] - race_x[-1]]])
+        Y_diff = np.concatenate([race_y[1:] - race_y[:-1],[race_y[0] - race_y[-1]]])
+        race_yaw = np.arctan(X_diff/Y_diff)  # (L-1, n) 
+        race_yaw[Y_diff < 0] += np.pi
+        self.race_yaw = utils.smooth_yaw(race_yaw)
+        self.max_yaw = np.max(self.race_yaw)
+        self.min_yaw = np.min(self.race_yaw)
+
         self.tracker = ProgressTracker(
             n_indices=len(self.centerline_arr),
             obs_delay=self.observation_delay,
@@ -596,7 +608,8 @@ class RacingEnv(gym.Env):
             dx = pos[0]-self.tracker.segment_coords['second'][next_segment_idx][0]
             
             pos[2] = LEVEL_Z_DICT[self.active_level] #
-            pos[3] = (np.pi if self.active_level=='VegasNorthRoad' and self.tracker.current_segment<=1 else 0)+np.arctan(dx/dy) # yaw, radians
+
+            pos[3] = self.race_yaw[self.local_segment_idxs[next_segment_idx]]
             
         except:
             pdb.set_trace()
