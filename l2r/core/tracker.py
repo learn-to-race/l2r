@@ -46,6 +46,14 @@ class ProgressTracker(object):
     :param int not_moving_ct: maximum number of vehicle can be stationary before
       being considered stuck
     :param boolean debug: debugging print statement flag
+    :param int n_eval_laps: number of laps required for complete evaluations
+    :param int n_segments: the number of segments into which to divide the track (for segmentwise eval)
+    :param list segment_idxs: the centerline track ids of the segment boundaries
+    :param scipy.spatial.KDTree segment_tree: kdtree projection of the segment boundaries (used to sense
+      boundary crossings)
+    :param eval_mode: instantiate the tracker in evaluation mode, as opposed to training mode
+    :param dict coord_multiplier: dictionary of signed integer corrections on the coordinate signs, 
+      from the racetrack map data
     """
 
     def __init__(self, n_indices, inner_track, outer_track, centerline,
@@ -244,7 +252,6 @@ class ProgressTracker(object):
                 self.segment_success[-1] = True
                 self.segment_success_final = self.segment_success
                 self.current_segment = 0
-                #print(f"[Tracker] In 'check_lap_completion': segment_success_final: {self.segment_success_final}")
 
             return True
 

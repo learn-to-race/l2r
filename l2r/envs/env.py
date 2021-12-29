@@ -331,7 +331,8 @@ class RacingEnv(gym.Env):
         p = np.random.uniform()
         # with prob 1/(1+n) use the default start location. 
         if (random_pos) and (p > 2/(1+len(self.random_poses))) and not self.evaluation:
-            coords, rot = self.random_start_location()
+            #coords, rot = self.random_start_location()
+            coords, rot = self.random_segment_start_location()
             self.controller.set_location(coords, rot)
             time.sleep(MEDIUM_DELAY)
 
@@ -507,7 +508,6 @@ class RacingEnv(gym.Env):
 
         self.segment_tree = KDTree(np.expand_dims(np.array(self.local_segment_idxs),axis=1))
 
-        
         race_x = self.centerline_arr[:, 0]
         race_y = self.centerline_arr[:, 1]
         X_diff = np.concatenate([race_x[1:] - race_x[:-1],[race_x[0] - race_x[-1]]])
@@ -589,6 +589,40 @@ class RacingEnv(gym.Env):
         print(f'setting random location to: {pos}')
         coords = {'x': pos[0], 'y': pos[1], 'z': pos[2]}
         rot = {'yaw': pos[3], 'pitch': 0.0, 'roll': 0.0}
+        return coords, rot
+
+    def random_segment_start_location(self):
+        """Randomly selects an index on the centerline of the track and
+        returns the ENU coordinates of the selected index along with the yaw of
+        the centerline at that point.
+
+        :returns: coordinates of a random segment boundary index on centerline, yaw
+        :rtype: np array, float
+        """
+        rand = np.random.randint(0, len(self.local_segment_idxs))
+        rand_segment_idx = self.local_segment_idxs[rand]
+
+        try:
+            pos = [0]*4
+            pos[0] = self.tracker.segment_coords['first'][rand_segment_idx][0] # x
+            pos[1] = self.tracker.segment_coords['first'][rand_segment_idx][1] # y
+            pos[2] = LEVEL_Z_DICT[self.active_level] #
+            pos[3] = self.race_yaw[self.local_segment_idxs[rand_segment_idx]]
+            
+        except:
+            pdb.set_trace()
+            pass
+
+        coords = {'x': pos[0], 'y': pos[1], 'z': pos[2]}
+        rot = {'yaw': pos[3], 'pitch': 0.0, 'roll': 0.0}
+        self.tracker.current_segment += 1
+
+        print(f"[Env] Spawning to a random segment start location")
+        print(f"[Env] Current segment: {self.tracker.current_segment}")
+        print(f"[Env] Respawns: {self.tracker.respawns}; infractions: {self.tracker.num_infractions}")
+        print(f"[Env] Coords: {coords}")
+        print(f"[Env] Rot: {rot}")
+        
         return coords, rot
 
     
