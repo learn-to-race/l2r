@@ -136,8 +136,11 @@ Interfaces and configuration
 The environment interacts with additional modules in the overall L2R framework, such as the racetrack mapping (for loading and configuring the world), the Controller (which interfaces with an underlying simulator or vehicle stack) and the Tracker (which tracks the vehicle state and measures progress along the racetrack).
 
 Whereas each of these interfaces can be further configured from `params-env.yaml`, the default values provided will be used for official L2R task evaluation, e.g., in our Learn-to-Race Autonomous Racing Virtual Challenges.
+
 - Tracker (l2r/core/tracker.py), configured via `env_kwargs` in `configs/params-env.yaml`
+
 - Controller (l2r/core/controller.py), configured via `env_kwargs.controller_kwargs` in `configs/params-env.yaml`
+
 - racetrack (l2r/racetracks/mapping.py), configured via `sim_kwargs` in `params-env.yaml`
 
 Racetracks
