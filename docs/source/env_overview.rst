@@ -25,7 +25,7 @@ The `RandomAgent <getting_started.html#basic-example>`_ executes actions, comple
 
 Action Space
 ------------
-While you *can* change the gear, in practice we suggest forcing the agent to stay in drive since the others would not be advantageous in completing the tasks we present (we don't include it as a part of the action space). Note that negative acceleration values will brake the vehicle.
+In the Learn-to-Race tasks, agents execute actions in the environment, according to steering and acceleration control, each supported by the simulator on a continuous range from -1.0 to 1.0.
 
 .. table::
    :widths: auto
@@ -38,11 +38,15 @@ While you *can* change the gear, in practice we suggest forcing the agent to sta
    Acceleration Continuous   [-1.0, 1.0]
    ============ ============ ==============
 
-The scaled action space is [-1.0, 1.0] for steering and [-16.0, 6.0] for acceleration. You can modify the boundaries of the action space, limiting acceleration, for example, if you would like by changing the parameters in ``action_if_kwargs`` in ``params.yaml``.
+To provide additional flexibility for learning-based approaches, the L2R framework supports a scaled action space of [-1.0, 1.0] for steering control and [-16.0, 6.0] for acceleration control, by default. You can modify the boundaries of the action space by changing the parameters for `env_kwargs.action_if_kwargs` in `params-env.yaml`.
+
+Negative acceleration commands perform braking actions, until the vehicle is stationary. If negative acceleration commands continue after the vehicle is stationary, the vehicle will reverse.
+
+While you *can* change the gear, in practice we suggest forcing the agent to stay in drive since the others would not be advantageous in completing the tasks we present (we don't include it as a part of the action space). Note that negative acceleration values will brake the vehicle.
 
 Observation Space
 -----------------
-We offer two high-level settings for the observation space: `vision-only <vision.html>`_ and `multimodal <multimodal.html>`_. In both, the agent receives RGB images from the vehicle's front-facing camera, examples below. The latter, however, also provides sensor data, including pose data from the vehicle's IMU sensor.
+We offer two high-level settings for the observation space: `vision-only <vision.html>`_ and `multimodal <multimodal.html>`_. In both, the agent receives RGB images from the vehicle's front-facing camera, examples below. In the latter, the environment also provides sensor data, including pose data from the vehicle's IMU sensor.
 
 .. raw:: html
 
@@ -70,7 +74,7 @@ One of the key features of this environment is the ability to create arbitrary c
 - Depth 2D LiDARs
 - Radars
 
-Additionally, these sensors are parameterized and can be customized further; for example, cameras have modifiable image size, field-of-view, and exposure. We provide a sample configuration below which has front and side facing cameras in both RGB mode and with ground truth segmentation. 
+Additionally, these sensors are parameterized and can be customized further; for example, cameras have modifiable image size, field-of-view, and exposure. Default sensor configurations are provided in `env_kwargs.cameras` and `sim_kwargs` in `params-env.yaml`. We provide further description on `sensor configuration <sensors.html#creating-custom-sensor-configurations>`_
 
 .. raw:: html
 
@@ -107,7 +111,7 @@ Additionally, these sensors are parameterized and can be customized further; for
     </div>
 
 
-You can create cameras anywhere relative to the vehicle, allowing unique points-of-view such as a birdseye perspective which we include in the vehicle configuration file.
+You can create cameras anywhere relative to the vehicle, allowing unique points-of-view such as a birdseye perspective which we include in the vehicle configuration file. 
 
 .. raw:: html
 
@@ -124,9 +128,25 @@ You can create cameras anywhere relative to the vehicle, allowing unique points-
 
 For more information, see `Creating Custom Sensor Configurations <sensors.html#creating-custom-sensor-configurations>`_
 
+Whereas we encourage the use of all sensors for training and experimentation, only the CameraFrontRGB camera will be used for official L2R task evaluation, e.g., in our Learn-to-Race Autonomous Racing Virtual Challenges.
+
+Interfaces and configuration
+----------------------------
+
+The environment interacts with additional modules in the overall L2R framework, such as the racetrack mapping (for loading and configuring the world), the Controller (which interfaces with an underlying simulator or vehicle stack) and the Tracker (which tracks the vehicle state and measures progress along the racetrack).
+
+Whereas each of these interfaces can be further configured from `params-env.yaml`, the default values provided will be used for official L2R task evaluation, e.g., in our Learn-to-Race Autonomous Racing Virtual Challenges.
+- Tracker (l2r/core/tracker.py), configured via `env_kwargs` in `configs/params-env.yaml`
+- Controller (l2r/core/controller.py), configured via `env_kwargs.controller_kwargs` in `configs/params-env.yaml`
+- racetrack (l2r/racetracks/mapping.py), configured via `sim_kwargs` in `params-env.yaml`
+
 Racetracks
 ----------
-We currently support three racetracks in our environment, both of which emulate real tracks. The first is the Vegas North Road track which is located at Las Vegas Motor Speedway in the United States. This track is used as the evaluation track, so users will only have access to this during evaluation. The second is the Thruxton Circuit, modeled off the track at the Thruxton Motorsport Centre in the United Kingdom. We will continue to add more racetracks in the future.
+We currently support two racetracks in our environment, both of which emulate real-world tracks. The first is the Thruxton Circuit, modeled off the track at the Thruxton Motorsport Centre in the United Kingdom. The second is the Anglessey National Circuit, located in Ty Croes, Anglesey, Wales. 
+
+Additional tracks are used for evaluation, e.g., in open Learn-to-Race Autonomous Racing Virtual Challenges, such as the Vegas North Road track, located at Las Vegas Motor Speedway in the United States.
+
+We will continue to add more racetracks in the future, for both training an evaluation.
 
 Research Citation
 -----------------
