@@ -1,81 +1,103 @@
 
-Getting Started
-===============
-
-.. warning::
-   The L2R framework is coupled with the Arrival racing simulator which has not yet been released. To gain access to the racing simulator, you must sign a licensing agreement with Arrival, the creator and owner of the simulation software. The simulator is expected to be available in May, 2021. Please complete this `form <https://forms.gle/PXNM6hHkEgiAzhoa8>`_ to be notified of its release.
-
+Setup & Installation
+====================
    
 Racing Simulator
 ----------------
 
-To use our environment, you mst first complete a licensing agreement with Arrival. Our environment interfaces with the Arrival racing simulator via a `SimulatorController <l2r.core.html#l2r.core.controller.SimulatorController>`_ object which can launch, restart, and control the Arrival simulator. We recommend running the simulator as a Python subprocess by specifying the path of the simulator in your configuration file in the ``env_kwargs.controller_kwargs.sim_path`` field. Alternatively, you can specify that the controller start the simulator as a Docker container by setting ``env_kwargs.controller_kwargs.start_container`` to True. If you choose the latter, you can load the docker image:
+To use the Learn-to-Race environment, you must first `request access <https://learn-to-race.org/sim>`_, by filling out and returning a signed academic-use license. 
+
+Our environment interfaces with the Arrival Autonomous Racing Simulator via a `SimulatorController <l2r.core.html#l2r.core.controller.SimulatorController>`_ object which can launch, restart, and control the simulator. 
+
+Simulator Requirements
+**********************
+
+**Operating System**: The racing simulator has been tested on Ubuntu Linux 18.04 OS.
+
+**Graphics Hardware**: The simulator has been tested to run smoothly on NVIDIA GeForce GTX 970 graphics cards. The simulator has been additionally tested on the following cards:
+
+* NVIDIA GeForce GTX 1070
+* NVIDIA GeForce GTX 1080, 1080 Ti
+* NVIDIA GeForce GTX 2080, 2080 Ti
+* NVIDIA GeForce GTX 3080, 3080 Ti
+* NVIDIA GeForce GTX 3090 
+
+**Software Dependencies**:
+
+* Please install the appropriate CUDA and NVIDIA drivers.
+* Please additionally install the following software dependencies:
 
 .. code-block:: shell
 
-	$ docker load < arrival-sim-image.tar.gz
+	$ sudo apt-get install libhdf5-dev libglib2.0-dev libglib2.0-dev ffmpeg libsm6 libxext6 apt-transport-https
 
-Requirements
-------------
 
-**Python**: We use Learn-to-Race with Python 3.6 and 3.7
+Running the Simulator
+*********************
 
-**Graphics Hardware**: The racing simulator runs in a container with a `Ubuntu 18.04 cudagl <https://gitlab.com/nvidia/container-images/cudagl/-/tree/ubuntu18.04>`_ base image. Running the container requires a GPU with Nvidia drivers installed. A Nvidia 970 GTX graphics card is minimally sufficient.
+After the signed academic-use license is returned and approved, you will be given the opportunity to download the Arrival Autonomous Racing Simulator (*.tar.gz file). The simulator is currently being distributed as part of the Learn-to-Race Autonomous Racing Virtual Challenge, with a base file footprint of 2.8 GB. 
 
-**Docker**: If you would like to run the racing simulator in a `Docker <https://www.docker.com/>`_ image, you will need Docker installed.
-
-**Container GPU Access**: If using Docker, the container needs to access the GPU, so `nvidia-container-runtime <https://github.com/NVIDIA/nvidia-container-runtime>`_ is also required. For Ubuntu distributions:
+Open a temrinal screen and untar the simulator source, to a location of your choice:
 
 .. code-block:: shell
 
-	$ curl -s -L https://nvidia.github.io/nvidia-container-runtime/gpgkey | \
-	  sudo apt-key add -
-	$ distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
-	$ curl -s -L https://nvidia.github.io/nvidia-container-runtime/$distribution/nvidia-container-runtime.list | \
-	  sudo tee /etc/apt/sources.list.d/nvidia-container-runtime.list
-	$ sudo apt-get update
+	$ cd /path/to/simulator/download/location
+	$ tar -xvzf /path/to/simulator/ArrivalSim-linux-{VERSION}.tar.gz
+	$ chmod -R 777 /path/to/simulator/ArrivalSim-linux-{VERSION}/
 
-And finally,
+We recommend running the simulator as a dedicated Python process, by executing: 
 
 .. code-block:: shell
 
-	$ sudo apt-get install nvidia-container-runtime
+	$ bash /path/to/simulator/ArrivalSim-linux-0.7.0.182276/LinuxNoEditor/ArrivalSim.sh -openGL
 
 
-.. note:: This documentation assumes a Debian-based operating system (Ubuntu), but this OS is not required.	
+Learn-to-Race Framework
+-----------------------
 
 Installation 
-------------
+************
 
-Package Code & Dependencies
-***************************
-Simply download the source code from the `Github repository <https://github.com/hermgerm29/learn-to-race>`_. We recommend using a `virtual Python environment <https://docs.python.org/3.6/library/venv.html>`_. Once activated, install the package requirements located in the top-level directory of the repo.
+Simply download the source code from the `Github repository <https://github.com/hermgerm29/learn-to-race>`_. 
+
+We recommend using a python virtual environment, such as `Anaconda <https://www.anaconda.com/products/individual>`_. Please download the appropriate version for your system. We have tested Learn-to-Race with Python versions 3.6 and 3.7.
+
+Create a new conda environment, activate it, then install the Learn-to-Race python package dependencies:
 
 .. code-block:: shell
 
-	$ pip install virtualenv
-	$ virtualenv venv                         # create virtual environment
-	$ source venv/bin/activated               # activate the environment
-	(venv) $ pip install -r requirements.txt
+	$ conda env create -n l2r -m python=3.6		# create virtual environment
+	$ conda activate l2r               		# activate the environment
+	(l2r) $ cd /path/to/repository/
+	(l2r) $ pip install -r requirements.txt
 
-Environment Caveats
-*******************
+Runtime Steps
+-------------
 
-.. important:: Our autonomous racing environment is `OpenAI gym <https://gym.openai.com/>`_ compliant with a few important notes:
+1. Start the simulator (e.g., in a separate terminal window), if it has not already been started:
 
-	- The simulator must be running to instantiate a `RacingEnv <l2r.envs.html#module-roboracer.envs.env>`_ which is, more or less, a set of interfaces which allow the agent to communicate with the simulator. When a RacingEnv object is constructed, it attempts to establish a connection with the simulator; if it is not running, you will see an error similiar to the one below:
+.. code-block:: shell
 
-	.. code-block:: shell
+	$ bash /path/to/simulator/ArrivalSim-linux-0.7.0.182276/LinuxNoEditor/ArrivalSim.sh -openGL
 
-	   $ ConnectionRefusedError: [Errno 111] Connection refused
+2. Run/train/evaluate an agent, using the Learn-to-Race framework (e.g., within a `tmux` window):
 
-	- Unlike many simplistic reinforcement learning baseline environments, the simulator that our environment uses is not time-invariant. If you, for example, run a gradient update step in the middle of an episode, the agent will continue to move, and perhaps slow down, which may result in unwanted additions to your replay buffer (assuming you are using one). This is clearly undesirable, so a *de-facto* restriction of the environment is that you treat each episode as if it were true inference.
+.. code-block:: shell
+
+	$ cd /path/to/repository
+	$ cd l2r
+	$ tmux new -s development
+	$ conda activate l2r
+	(l2r) $ chmod +x run.bash
+	(l2r) $ ./run.bash -b random
 
 
-Basic Example
-*************
+Basic Agent Example (Random Agent)
+**********************************
 
-Let's first get familiar with our environment by creating an agent the simply chooses random actions from the action space. We provide such an agent called a ``RandomActionAgent`` with the source code below:
+Here is an example of an agent that chooses random actions from the action space, provided by the environment. 
+
+We provide such an agent called a ``RandomAgent`` with the source code below:
 
 .. code-block:: python
 
@@ -143,31 +165,7 @@ Let's first get familiar with our environment by creating an agent the simply ch
          for k, v in self.env.observation_space.spaces.items():
             print(f'\t{k}: {v}')
 
-
-
-**Step 1: Start the simulator (optional)** 
-
-The `SimulatorController <l2r.core.html#l2r.core.controller.SimulatorController>`_ will run the simulator as Python subprocess if ``env_kwargs.controller_kwargs.sim_path`` is specified or start the container containing the simulator if ``env_kwargs.controller_kwargs.start_container`` is set to True. If you would like to run the container manually, you can do so as follows:
-
-.. code-block:: shell
-
-   $ docker run -it --rm \              # interactive mode, clean-up on exit 
-       --user=ubuntu \                  # login to container as user "ubuntu"
-       --gpus all \                     # allow container to access all host GPUs
-       --name racing-simulator \        # name of the container
-       --net=host \                     # allow container to share host's namespace
-       --entrypoint="./ArrivalSim.sh"   # run the simulator start up script on entry
-       arrival-sim                      # name of the docker image
-
-
-Please note that running the container, by default, will not render a display. Alternatively, you can run the launch script:
-
-.. code-block:: shell
-
-	$ ./ArrivalSim-linux-0.7.0.182276/LinuxNoEditor/ArrivalSim.sh -openGL
-
-
-**Step 2: Run the random agent baseline model**
+**Run the random agent baseline model**
 
 For convenience, we have provided a number of files to assist with training a model. To run the random agent baseline, you can simply run the script in the top level of the repository with the baseline flag ``-b`` with argument ``random``:
 
