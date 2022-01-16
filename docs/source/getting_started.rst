@@ -51,6 +51,8 @@ We recommend running the simulator as a dedicated Python process, by executing:
 
 	$ bash /path/to/simulator/ArrivalSim-linux-0.7.0.182276/LinuxNoEditor/ArrivalSim.sh -openGL
 
+Note: Users may receive a pop-up window, warning about OpenGL being deprecated in favour of Vulkan. It is safe to click 'Ok', to continue initialisation and use of the simulator.
+
 
 Learn-to-Race Framework
 -----------------------
