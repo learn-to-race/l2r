@@ -26,6 +26,9 @@ if __name__ == "__main__":
     # overrrides                                    
     env_kwargs['action_if_kwargs']['max_accel'] = 6.
     env_kwargs['action_if_kwargs']['min_accel'] = -4
+    env_kwargs['eval_mode'] = False
+
+    print(f"Running agent in {'evaluation' if env_kwargs['eval_mode'] else 'training'} mode")
 
     # instantiate and run agent
     agent = RandomActionAgent(agent_kwargs)
