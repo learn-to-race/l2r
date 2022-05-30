@@ -44,14 +44,18 @@ class VAE(nn.Module):
         self.fc3 = nn.Linear(z_dim, h_dim)
 
         self.decoder = nn.Sequential(
-            nn.Unflatten(
-                1, em_shape), nn.ConvTranspose2d(
-                em_shape[0], 128, kernel_size=4, stride=2, padding=1, output_padding=(
-                    1, 0)), nn.ReLU(), nn.ConvTranspose2d(
-                    128, 64, kernel_size=4, stride=2, padding=1), nn.ReLU(), nn.ConvTranspose2d(
-                        64, 32, kernel_size=4, stride=2, padding=1, output_padding=(
-                            1, 0)), nn.ReLU(), nn.ConvTranspose2d(
-                                32, im_c, kernel_size=4, stride=2, padding=1), nn.Sigmoid(), )
+            nn.Unflatten(1, em_shape),
+            nn.ConvTranspose2d(
+                em_shape[0], 128, kernel_size=4, stride=2, padding=1, output_padding=(1, 0)),
+            nn.ReLU(),
+            nn.ConvTranspose2d(128, 64, kernel_size=4, stride=2, padding=1),
+            nn.ReLU(),
+            nn.ConvTranspose2d(64, 32, kernel_size=4, stride=2,
+                               padding=1, output_padding=(1, 0)),
+            nn.ReLU(),
+            nn.ConvTranspose2d(32, im_c, kernel_size=4, stride=2, padding=1),
+            nn.Sigmoid(),
+        )
 
     def reparameterize(self, mu, logvar):
         std = logvar.mul(0.5).exp_()
