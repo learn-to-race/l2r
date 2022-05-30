@@ -1,11 +1,15 @@
-import os, sys
-import logging, shutil, re
+import os
+import sys
+import logging
+import shutil
+import re
 import numpy as np
 import pandas as pd
 import ipdb as pdb
 import torch.nn as nn
 from tensorboardX import SummaryWriter
 from datetime import datetime
+
 
 def setup_tb_logging(log_dir, exp_name, resume):
     """ Set up tensorboard logger"""
@@ -48,37 +52,44 @@ def setup_logging(logdir, experiment_name, resume):
     tb_logger = setup_tb_logging(logdir, experiment_name, resume)
     return (file_logger, tb_logger)
 
+
 def find_envvar_patterns(config, key):
-    pattern = re.compile('.*?\${(\w+)}.*?')
+    pattern = re.compile(r'.*?\${(\w+)}.*?')
     try:
         envvars = re.findall(pattern, config[key])
-    except:
+    except BaseException:
         envvars = []
         pass
     return envvars
 
+
 def replace_envvar_patterns(config, key, envvars, args):
     for i, var in enumerate(envvars):
         if var == "DIRHASH":
-            dirhash = '{}/'.format(args.dirhash) if not args.runtime == 'local' else ''
-            config[key] = config[key].replace('${'+var+'}', dirhash)
+            dirhash = '{}/'.format(
+                args.dirhash) if not args.runtime == 'local' else ''
+            config[key] = config[key].replace('${' + var + '}', dirhash)
         if var == "PREFIX":
             prefix = {'local': '/data', 'phoebe': '/mnt'}
-            config[key] = config[key].replace('${'+var+'}', prefix[args.runtime])
+            config[key] = config[key].replace(
+                '${' + var + '}', prefix[args.runtime])
         else:
-            config[key] = config[key].replace('${'+var+'}', os.environ.get(var, var))
+            config[key] = config[key].replace(
+                '${' + var + '}', os.environ.get(var, var))
+
 
 def resolve_envvars(config, args):
 
     for key in list(config.keys()):
 
-        if isinstance(config[key],dict):
+        if isinstance(config[key], dict):
             # second level
             for sub_key in list(config[key].keys()):
                 sub_envvars = find_envvar_patterns(config[key], sub_key)
                 if len(sub_envvars) > 0:
                     for sub_var in sub_envvars:
-                        replace_envvar_patterns(config[key], sub_key, sub_envvars, args)
+                        replace_envvar_patterns(
+                            config[key], sub_key, sub_envvars, args)
 
         envvars = find_envvar_patterns(config, key)
         if len(envvars) > 0:
@@ -86,7 +97,8 @@ def resolve_envvars(config, args):
 
     return config
 
-def is_number(s): 
+
+def is_number(s):
     """
     Somehow, the most pythonic way to check string for float number; used for safe user input parsing
     src: https://stackoverflow.com/questions/354038/how-do-i-check-if-a-string-is-a-number-float
@@ -97,9 +109,16 @@ def is_number(s):
     except ValueError:
         return False
 
+
 class RecordExperience:
 
-    def __init__(self, record_dir, track, experiment_name, logger, agent=False):
+    def __init__(
+            self,
+            record_dir,
+            track,
+            experiment_name,
+            logger,
+            agent=False):
 
         self.record_dir = record_dir
         self.track = track
@@ -108,7 +127,10 @@ class RecordExperience:
         self.agent = agent
         self.logger = logger
 
-        self.path = os.path.join(self.record_dir, self.track, self.experiment_name)
+        self.path = os.path.join(
+            self.record_dir,
+            self.track,
+            self.experiment_name)
 
         self.logger('Recording agent experience')
 
@@ -117,7 +139,10 @@ class RecordExperience:
         filename = f"{self.path}/{record['stage']}/{record['episode']}/{self.filename}_{self.experiment_name}_{record['step']}"
 
         os.makedirs(self.path, exist_ok=True)
-        os.makedirs(os.path.join(self.path, record['stage'], str(record['episode'])), exist_ok=True)
+        os.makedirs(
+            os.path.join(
+                self.path, record['stage'], str(
+                    record['episode'])), exist_ok=True)
 
         np.savez_compressed(filename, **record)
 
@@ -134,4 +159,3 @@ class RecordExperience:
             self.logger('[RecordExperience] Saving experience.')
             for record in batch:
                 self.save(record)
-

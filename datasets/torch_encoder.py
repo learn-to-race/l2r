@@ -135,5 +135,6 @@ class VAE(nn.Module):
 
         images = np.array(images).astype("float32") / 255
         data = TensorDataset(torch.from_numpy(images))
-        self.dataloader = DataLoader(data, batch_size=batch_size, shuffle=shuffle)
+        self.dataloader = DataLoader(
+            data, batch_size=batch_size, shuffle=shuffle)
         self.test_img = images[0]

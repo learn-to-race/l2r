@@ -8,6 +8,7 @@
 
 import json
 
+
 class LevelNotFoundError(Exception):
     pass
 

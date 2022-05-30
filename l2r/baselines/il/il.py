@@ -66,8 +66,8 @@ class ILAgent(AbstractAgent):
                 Target: n x 2
                 '''
 
-                imgs, sensors, target = imgs.transpose(2, 3).type(torch.FloatTensor).to(DEVICE), \
-                    sensors.to(DEVICE), target.to(DEVICE)
+                imgs, sensors, target = imgs.transpose(2, 3).type(
+                    torch.FloatTensor).to(DEVICE), sensors.to(DEVICE), target.to(DEVICE)
 
                 assert imgs.shape == torch.Size(
                     [imgs.shape[0], 3, 512, 384]), "FATAL: unexpectd image shape"
@@ -97,7 +97,12 @@ class ILAgent(AbstractAgent):
         model_cpu = self.model.cpu()
 
         for e in range(self.num_episodes):
-            print('=' * 10 + f' Episode {e+1} of {self.num_episodes} ' + '=' * 10)
+            print(
+                '=' *
+                10 +
+                f' Episode {e+1} of {self.num_episodes} ' +
+                '=' *
+                10)
             ep_reward, ep_timestep, best_ep_reward = 0, 0, 0
             obs = self.env.reset()
             obs, reward, done, info = self.env.step([0, 1])

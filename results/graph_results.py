@@ -28,16 +28,37 @@ if __name__ == "__main__":
     df['episode'] = df['episode'].astype(str)
     st.write("Original Data:")
     st.write(df)
-    metric = st.sidebar.selectbox("Metric", ("pct_complete", "total_time", "total_distance", "average_speed_kph", "average_displacement_error", "trajectory_efficiency", "trajectory_admissibility", "movement_smoothness", "timestep/sec"))
+    metric = st.sidebar.selectbox(
+        "Metric",
+        ("pct_complete",
+         "total_time",
+         "total_distance",
+         "average_speed_kph",
+         "average_displacement_error",
+         "trajectory_efficiency",
+         "trajectory_admissibility",
+         "movement_smoothness",
+         "timestep/sec"))
 
-    group_size = int(st.sidebar.selectbox("Episode Group Size", ("1", "10", "100", "1000", "10000")))
+    group_size = int(
+        st.sidebar.selectbox(
+            "Episode Group Size",
+            ("1",
+             "10",
+             "100",
+             "1000",
+             "10000")))
 
     if group_size < len(df.index):
         sub_df = df[["episode", metric]]
-        sub_df['group'] = sub_df.apply(lambda row: find_group(int(row['episode']), group_size), axis=1)
+        sub_df['group'] = sub_df.apply(lambda row: find_group(
+            int(row['episode']), group_size), axis=1)
 
-        sub_df = sub_df.groupby('group').agg({'episode': list, metric: np.mean}).reset_index()
-        sub_df['range'] = sub_df.apply(lambda row: get_range(row['episode']), axis=1)
+        sub_df = sub_df.groupby('group').agg(
+            {'episode': list, metric: np.mean}).reset_index()
+        sub_df['range'] = sub_df.apply(
+            lambda row: get_range(
+                row['episode']), axis=1)
         sub_df.drop(['episode'], axis=1, inplace=True)
         st.write("Aggregated Data:")
         st.write(sub_df)
@@ -50,4 +71,5 @@ if __name__ == "__main__":
         st.plotly_chart(fig)
 
     else:
-        st.write("The group size must be less than the number of data points available.")
+        st.write(
+            "The group size must be less than the number of data points available.")

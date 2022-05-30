@@ -12,9 +12,22 @@ def read_data(filename):
         for c in content:
             episode = re.findall(r'^\[[A-Z|a-z| |0-9]+\]', c)
             if len(episode) != 0:
-                episode = int(episode[0].replace('[', '').replace(']', '').replace('Ep ', ''))
+                episode = int(
+                    episode[0].replace(
+                        '[',
+                        '').replace(
+                        ']',
+                        '').replace(
+                        'Ep ',
+                        ''))
                 data_string = '{' + c.split('] {')[1]
-                data_string = data_string.replace("'", "\"").replace('False', '"False"').replace('True', '"True"')
+                data_string = data_string.replace(
+                    "'",
+                    "\"").replace(
+                    'False',
+                    '"False"').replace(
+                    'True',
+                    '"True"')
                 data_dict = json.loads(data_string)
                 data_dict['episode'] = episode
                 for metric in data_dict['metrics'].keys():

@@ -64,7 +64,8 @@ class GranTurismo(AbstractReward):
         if not oob_flag:
             return 0.0
 
-        return min(-1.0 * self.min_oob_penalty, -1.0 * self.oob_penalty * velocity)
+        return min(-1.0 * self.min_oob_penalty, -
+                   1.0 * self.oob_penalty * velocity)
 
     def _reward_progress(self, race_idx):
         """Reward for progressing down the track. This is simply a reward of 1

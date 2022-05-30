@@ -1,4 +1,5 @@
-# From: https://github.com/felipecode/coiltraine/blob/29060ab5fd2ea5531686e72c621aaaca3b23f4fb/coilutils/attribute_dict.py#L9
+# From:
+# https://github.com/felipecode/coiltraine/blob/29060ab5fd2ea5531686e72c621aaaca3b23f4fb/coilutils/attribute_dict.py#L9
 class AttributeDict(dict):
 
     IMMUTABLE = '__immutable__'
@@ -23,9 +24,8 @@ class AttributeDict(dict):
                 self[name] = value
         else:
             raise AttributeError(
-                'Attempted to set "{}" to "{}", but AttributeDict is immutable'.
-                format(name, value)
-            )
+                'Attempted to set "{}" to "{}", but AttributeDict is immutable'. format(
+                    name, value))
 
     def immutable(self, is_immutable):
         """Set immutability to is_immutable and recursively apply the setting

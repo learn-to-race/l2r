@@ -22,16 +22,20 @@ class Conv(nn.Module):
             raise ValueError(" Missing the end module parameter ")
 
         if len(params['dropouts']) != len(params['channels']) - 1:
-            raise ValueError("Dropouts should be from the len of channel_sizes minus 1")
+            raise ValueError(
+                "Dropouts should be from the len of channel_sizes minus 1")
 
         """" ------------------ IMAGE MODULE ---------------- """
-        # Conv2d(input channel, output channel, kernel size, stride), Xavier initialization and 0.1 bias initialization
+        # Conv2d(input channel, output channel, kernel size, stride), Xavier
+        # initialization and 0.1 bias initialization
 
         self.layers = []
 
         for i in range(0, len(params['channels']) - 1):
-            conv = nn.Conv2d(in_channels=params['channels'][i], out_channels=params['channels'][i + 1],
-                             kernel_size=params['kernels'][i], stride=params['strides'][i])
+            conv = nn.Conv2d(in_channels=params['channels'][i],
+                             out_channels=params['channels'][i + 1],
+                             kernel_size=params['kernels'][i],
+                             stride=params['strides'][i])
 
             dropout = nn.Dropout2d(p=params['dropouts'][i])
             relu = nn.ReLU(inplace=True)

@@ -34,7 +34,8 @@ class BikeModel(nn.Module):
             self.params = torch.tensor(init_params, requires_grad=True)
 
     def forward(self, x_init, u):
-        # k1 and k2 maps the action in [-1, 1] to actual acceleration and steering angle
+        # k1 and k2 maps the action in [-1, 1] to actual acceleration and
+        # steering angle
         l, k1, k2 = torch.unbind(self.params)
         n = x_init.shape[0]
         x, y, v, phi = torch.unbind(x_init, dim=-1)
@@ -138,7 +139,9 @@ class MPC(nn.Module):
         assert cost_type.lower() in ['target', 'reference']
         self.cost_type = cost_type.lower()
 
-        self.C = torch.diag(self.cost_weight).repeat(self.T, 1, 1)  # T x (m+n) x (m+n)
+        self.C = torch.diag(
+            self.cost_weight).repeat(
+            self.T, 1, 1)  # T x (m+n) x (m+n)
         if self.cost_type == 'target':
             self.C[:-1, :self.n_state, :self.n_state] = 0
 

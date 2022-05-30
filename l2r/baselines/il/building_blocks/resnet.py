@@ -109,7 +109,8 @@ class ResNet(nn.Module):
         self.layer4 = self._make_layer(block, 512, layers[3], stride=2)
         self.avgpool = nn.AvgPool2d(2, stride=0)
 
-        # TODO: THis is a super hardcoding ..., in order to fit my image size on resnet
+        # TODO: THis is a super hardcoding ..., in order to fit my image size
+        # on resnet
         if block.__name__ == 'Bottleneck':
             self.fc = nn.Linear(6144, num_classes)
         else:
@@ -117,7 +118,8 @@ class ResNet(nn.Module):
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
-                nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
+                nn.init.kaiming_normal_(
+                    m.weight, mode='fan_out', nonlinearity='relu')
             elif isinstance(m, nn.BatchNorm2d):
                 nn.init.constant_(m.weight, 1)
                 nn.init.constant_(m.bias, 0)
