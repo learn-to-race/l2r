@@ -21,7 +21,8 @@ class FC(nn.Module):
             raise ValueError(" Missing the end module parameter ")
 
         if len(params['dropouts']) != len(params['neurons']) - 1:
-            raise ValueError("Dropouts should be from the len of kernels minus 1")
+            raise ValueError(
+                "Dropouts should be from the len of kernels minus 1")
 
         self.layers = []
 
@@ -41,7 +42,7 @@ class FC(nn.Module):
     def forward(self, x):
         # if X is a tuple, just return the other elements, the idea is to re pass
         # the intermediate layers for future attention plotting
-        if type(x) is tuple:
+        if isinstance(x, tuple):
             return self.layers(x[0]), x[1]
         else:
             return self.layers(x)

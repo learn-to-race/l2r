@@ -10,7 +10,7 @@ import sys
 from ruamel.yaml import YAML
 import ipdb as pdb
 
-#pdb.set_trace()
+# pdb.set_trace()
 
 from baselines.control.mpc import MPCAgent
 
@@ -24,7 +24,8 @@ if __name__ == "__main__":
     agent_params = yaml.load(open(sys.argv[1]))
     agent_kwargs = agent_params['agent_kwargs']
 
-    sys_params = yaml.load(open(f"{sys.argv[1].split('/')[0]}/params-env.yaml"))
+    sys_params = yaml.load(
+        open(f"{sys.argv[1].split('/')[0]}/params-env.yaml"))
     env_kwargs = sys_params['env_kwargs']
     sim_kwargs = sys_params['sim_kwargs']
 
@@ -40,4 +41,3 @@ if __name__ == "__main__":
     agent = MPCAgent(agent_kwargs)
     agent.create_env(env_kwargs, sim_kwargs)
     agent.race()
-

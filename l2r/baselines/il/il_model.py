@@ -14,7 +14,8 @@ g_conf.INPUTS = np.arange(30)
 g_conf.PRE_TRAINED = False
 g_conf.TARGETS = ['steer', 'acceleration']
 
-# From: https://github.com/felipecode/coiltraine/blob/29060ab5fd2ea5531686e72c621aaaca3b23f4fb/network/models/coil_icra.py
+# From:
+# https://github.com/felipecode/coiltraine/blob/29060ab5fd2ea5531686e72c621aaaca3b23f4fb/network/models/coil_icra.py
 
 
 class CILModel(nn.Module):
@@ -47,26 +48,33 @@ class CILModel(nn.Module):
         number_first_layer_channels = 0
 
         for _, sizes in g_conf.SENSORS.items():
-            number_first_layer_channels += sizes[0] * g_conf.NUMBER_FRAMES_FUSION
+            number_first_layer_channels += sizes[0] * \
+                g_conf.NUMBER_FRAMES_FUSION
 
         # Get one item from the dict
         sensor_input_shape = next(iter(g_conf.SENSORS.values()))
-        sensor_input_shape = [number_first_layer_channels, sensor_input_shape[1],
-                              sensor_input_shape[2]]
+        sensor_input_shape = [
+            number_first_layer_channels,
+            sensor_input_shape[1],
+            sensor_input_shape[2]]
 
         # For this case we check if the perception layer is of the type "conv"
         if 'conv' in params['perception']:
-            perception_convs = Conv(params={
-                'channels': [number_first_layer_channels] + params['perception']['conv']['channels'],
-                'kernels': params['perception']['conv']['kernels'],
-                'strides': params['perception']['conv']['strides'],
-                'dropouts': params['perception']['conv']['dropouts'],
-                'end_layer': True})
+            perception_convs = Conv(
+                params={
+                    'channels': [number_first_layer_channels] + params['perception']['conv']['channels'],
+                    'kernels': params['perception']['conv']['kernels'],
+                    'strides': params['perception']['conv']['strides'],
+                    'dropouts': params['perception']['conv']['dropouts'],
+                    'end_layer': True})
 
-            perception_fc = FC(params={
-                'neurons': [perception_convs.get_conv_output(sensor_input_shape)] + params['perception']['fc']['neurons'],
-                'dropouts': params['perception']['fc']['dropouts'],
-                'end_layer': False})
+            perception_fc = FC(
+                params={
+                    'neurons': [
+                        perception_convs.get_conv_output(sensor_input_shape)] +
+                    params['perception']['fc']['neurons'],
+                    'dropouts': params['perception']['fc']['dropouts'],
+                    'end_layer': False})
 
             self.perception = nn.Sequential(*[perception_convs, perception_fc])
 
@@ -75,9 +83,11 @@ class CILModel(nn.Module):
         elif 'res' in params['perception']:  # pre defined residual networks
             resnet_module = importlib.import_module(
                 'network.models.building_blocks.resnet')
-            resnet_module = getattr(resnet_module, params['perception']['res']['name'])
-            self.perception = resnet_module(pretrained=g_conf.PRE_TRAINED,
-                                            num_classes=params['perception']['res']['num_classes'])
+            resnet_module = getattr(
+                resnet_module, params['perception']['res']['name'])
+            self.perception = resnet_module(
+                pretrained=g_conf.PRE_TRAINED,
+                num_classes=params['perception']['res']['num_classes'])
 
             number_output_neurons = params['perception']['res']['num_classes']
 

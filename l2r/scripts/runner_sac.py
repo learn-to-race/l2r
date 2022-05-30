@@ -5,21 +5,24 @@
 # Description:                                                              #
 #    Convenience script to load parameters and train an sac agent           #
 # ========================================================================= #
-import json, os, sys
+import ipdb as pdb
+from envs.env import RacingEnv
+from common.utils import setup_logging, resolve_envvars
+from baselines.rl.sac import SACAgent
+import json
+import os
+import sys
 
 from ruamel.yaml import YAML
 from datetime import date, datetime, timezone
 from types import SimpleNamespace
 
 l2r_path = os.path.abspath(os.path.join(''))
-if l2r_path not in sys.path: sys.path.append(l2r_path)
-import ipdb as pdb
+if l2r_path not in sys.path:
+    sys.path.append(l2r_path)
 
-from baselines.rl.sac import SACAgent
-from common.utils import setup_logging, resolve_envvars
-from envs.env import RacingEnv
 
-args = {'runtime': 'local', 'dirhash':''}
+args = {'runtime': 'local', 'dirhash': ''}
 args = SimpleNamespace(**args)
 
 if __name__ == "__main__":
@@ -29,7 +32,8 @@ if __name__ == "__main__":
     agent_params = yaml.load(open(sys.argv[1]))
     agent_kwargs = resolve_envvars(agent_params['agent_kwargs'], args)
 
-    sys_params = yaml.load(open(f"{sys.argv[1].split('/')[0]}/params-env.yaml"))
+    sys_params = yaml.load(
+        open(f"{sys.argv[1].split('/')[0]}/params-env.yaml"))
     env_kwargs = resolve_envvars(sys_params['env_kwargs'], args)
     sim_kwargs = resolve_envvars(sys_params['sim_kwargs'], args)
 
@@ -49,11 +53,10 @@ if __name__ == "__main__":
 
     loggers = setup_logging(save_path, agent_kwargs['experiment_name'], True)
 
-    # create the environment               
+    # create the environment
     env = RacingEnv(env_kwargs, sim_kwargs)
-    env.make()                             
+    env.make()
 
     # deploy an agent
     agent = SACAgent(env, agent_kwargs, loggers=loggers)
     agent.sac_train()
-

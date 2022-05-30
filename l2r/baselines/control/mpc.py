@@ -48,9 +48,8 @@ class MPCAgent(AbstractAgent):
 
         self.car = BikeModel(dt=DT,
                              init_params=np.array([WB, 10, 6]))
-        self.controller = MPC(T=T,
-                              cost_weight=torch.FloatTensor([1, 1, 1, 16, 0.1, 1]),
-                              cost_type='reference')
+        self.controller = MPC(T=T, cost_weight=torch.FloatTensor(
+            [1, 1, 1, 16, 0.1, 1]), cost_type='reference')
 
     def race(self):
         """Race following the environment's step until completion framework
@@ -62,7 +61,12 @@ class MPCAgent(AbstractAgent):
             self._actions = []
 
         for e in range(self.num_episodes):
-            print('=' * 10 + f' Episode {e+1} of {self.num_episodes} ' + '=' * 10)
+            print(
+                '=' *
+                10 +
+                f' Episode {e+1} of {self.num_episodes} ' +
+                '=' *
+                10)
             ep_reward, ep_timestep = 0, 0
             obs, info = self.env.reset()
             obs, reward, done, info = self.env.step([0, 1])
@@ -78,8 +82,10 @@ class MPCAgent(AbstractAgent):
                         yaw += 2 * np.pi
                 x0 = [x, y, v, yaw]  # current state
 
-                print(f'State: @{idx}, loc=({x}, {y}), v={v}, yaw={yaw*180/np.pi}')
-                print(f'Target: loc=({xref[0, 0]}, {xref[1, 0]}), v={xref[2, 0]}, yaw={xref[3, 0]*180/np.pi}')
+                print(
+                    f'State: @{idx}, loc=({x}, {y}), v={v}, yaw={yaw*180/np.pi}')
+                print(
+                    f'Target: loc=({xref[0, 0]}, {xref[1, 0]}), v={xref[2, 0]}, yaw={xref[3, 0]*180/np.pi}')
 
                 if self.plot:
                     plt.plot([x], [y], 'bo', markersize=4)
@@ -137,7 +143,14 @@ class MPCAgent(AbstractAgent):
         target_y = [self.race_y[i] for i in target_idxs]
 
         target_yaw = np.array([self.race_yaw[i] for i in target_idxs])
-        if np.any((target_yaw > 5 / 6 * np.pi) | (target_yaw < -5 / 6 * np.pi)):
+        if np.any(
+            (target_yaw > 5 /
+             6 *
+             np.pi) | (
+                target_yaw < -
+                5 /
+                6 *
+                np.pi)):
             to2pi_flag = True
             target_yaw[target_yaw < 0] += 2 * np.pi
         else:
@@ -160,7 +173,8 @@ class MPCAgent(AbstractAgent):
 
         target_v = [vt] * n_targets
 
-        return np.array([target_x, target_y, target_v, target_yaw], dtype=np.float32), to2pi_flag
+        return np.array([target_x, target_y, target_v,
+                         target_yaw], dtype=np.float32), to2pi_flag
 
     @staticmethod
     def unpack_state(state):

@@ -34,8 +34,13 @@ class CustomReward(GranTurismo):
     :type dist_threshold: float, optional
     """
 
-    def __init__(self, oob_penalty=5.0, min_oob_penalty=25.0, max_oob_penalty=None,
-                 centerline_bonus=1.0, dist_threshold=1.0):
+    def __init__(
+            self,
+            oob_penalty=5.0,
+            min_oob_penalty=25.0,
+            max_oob_penalty=None,
+            centerline_bonus=1.0,
+            dist_threshold=1.0):
         self.oob_penalty = oob_penalty
         self.min_oob_penalty = min_oob_penalty
         self.c_bonus = centerline_bonus
@@ -51,7 +56,8 @@ class CustomReward(GranTurismo):
         :type oob_flag: boolean, optional
         """
         (pose_data, race_idx) = state
-        velocity = np.linalg.norm(pose_data[VELOCITY_IDX_LOW:VELOCITY_IDX_HIGH])
+        velocity = np.linalg.norm(
+            pose_data[VELOCITY_IDX_LOW:VELOCITY_IDX_HIGH])
         loc = np.array([pose_data[EAST_IDX], pose_data[NORTH_IDX]])
         oob_reward = self._reward_oob(velocity, oob_flag)
         progress_reward = self._reward_progress(race_idx)

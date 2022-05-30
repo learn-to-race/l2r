@@ -180,16 +180,15 @@ class CameraInterface(AbstractInterface):
     """
 
     def __init__(self, **params):
-        ip = params['ip'] if 'ip' in params else 'tcp://127.0.0.1' 
-        port = params['port'] if 'port' in params else '8008' 
-        addr = params['Addr'] if 'Addr' in params else f'{ip}:{port}' 
-        
+        ip = params['ip'] if 'ip' in params else 'tcp://127.0.0.1'
+        port = params['port'] if 'port' in params else '8008'
+        addr = params['Addr'] if 'Addr' in params else f'{ip}:{port}'
+
         ctx = zmq.Context()
         self.sock = ctx.socket(zmq.SUB)
         self.sock.setsockopt(zmq.SUBSCRIBE, b'')
         self.sock.setsockopt(zmq.CONFLATE, 1)
         self.sock.connect(addr)
-
 
     def start(self, img_dims):
         """Starts a thread to listen for images on.
@@ -328,13 +327,15 @@ class GeoLocation(object):
         slon = sin(y * self.D2R)
 
         # Compute reference position vector in ECEF coordinates
-        r0Ref = self.EARTHSEMIMAJOR / (sqrt(1.0 - self.EARTHECCEN2 * slatRef * slatRef))
+        r0Ref = self.EARTHSEMIMAJOR / \
+            (sqrt(1.0 - self.EARTHECCEN2 * slatRef * slatRef))
         ecefRef = [0.0] * 3
         ecefRef[0] = (ref_z + r0Ref) * clatRef * clonRef
         ecefRef[1] = (ref_z + r0Ref) * clatRef * slonRef
         ecefRef[2] = (ref_z + r0Ref * (1.0 - self.EARTHECCEN2)) * slatRef
 
-        # Compute data position vectors relative to reference point in ECEF co-ordinates
+        # Compute data position vectors relative to reference point in ECEF
+        # co-ordinates
         r0 = self.EARTHSEMIMAJOR / (sqrt(1.0 - self.EARTHECCEN2 * slat * slat))
         dECEF = [0.0] * 3
         dECEF[0] = (z + r0) * clat * clon - ecefRef[0]
@@ -342,8 +343,8 @@ class GeoLocation(object):
         dECEF[2] = (z + r0 * (1.0 - self.EARTHECCEN2)) * slat - ecefRef[2]
 
         # Define rotation from ECEF to ENU
-        R = [[-slonRef, clonRef, 0], [-slatRef * clonRef, -slatRef * slonRef, clatRef],
-             [clatRef * clonRef, clatRef * slonRef, slatRef]]
+        R = [[-slonRef, clonRef, 0], [-slatRef * clonRef, -slatRef * \
+            slonRef, clatRef], [clatRef * clonRef, clatRef * slonRef, slatRef]]
 
         enu = [0.0] * 3
 
@@ -358,6 +359,7 @@ class GeoLocation(object):
         enu_up = enu[2]
 
         return np.array([enu_east, enu_north, enu_up])
+
 
 def smooth_yaw(yaw):
     for i in range(len(yaw) - 1):

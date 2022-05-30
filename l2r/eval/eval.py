@@ -44,6 +44,7 @@ class Evaluator(object):
     :param int pre_eval_time: duration of pre-evaluation phase, in seconds
     :param int eval_episodes: number of evaluation episodes
     """
+
     def __init__(self, config, pre_eval_time, eval_episodes):
         """Do not modify.
         """

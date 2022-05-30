@@ -59,27 +59,27 @@ class ProgressTracker(object):
     :param scipy.spatial.KDTree segment_tree: kdtree projection of the segment boundaries (used to sense
       boundary crossings)
     :param eval_mode: instantiate the tracker in evaluation mode, as opposed to training mode
-    :param dict coord_multiplier: dictionary of signed integer corrections on the coordinate signs, 
+    :param dict coord_multiplier: dictionary of signed integer corrections on the coordinate signs,
       from the racetrack map data
     """
 
-    def __init__(self, 
-        n_indices,
-        inner_track,
-        outer_track,
-        centerline,
-        car_dims,
-        obs_delay,
-        max_timesteps,
-        not_moving_ct,
-        debug=False,
-        n_eval_laps=1,
-        n_segments=10,
-        segment_idxs=None,
-        segment_tree=None,
-        eval_mode=False,
-        coord_multiplier=dict()
-    ):
+    def __init__(self,
+                 n_indices,
+                 inner_track,
+                 outer_track,
+                 centerline,
+                 car_dims,
+                 obs_delay,
+                 max_timesteps,
+                 not_moving_ct,
+                 debug=False,
+                 n_eval_laps=1,
+                 n_segments=10,
+                 segment_idxs=None,
+                 segment_tree=None,
+                 eval_mode=False,
+                 coord_multiplier=dict()
+                 ):
         self.n_indices = n_indices
         self.inner_track = inner_track
         self.outer_track = outer_track
@@ -93,13 +93,13 @@ class ProgressTracker(object):
         self.n_eval_laps = n_eval_laps
         self.coord_multiplier = coord_multiplier
         self.idx_dir = 0
-        self.idx_sequence = [0]*5
+        self.idx_sequence = [0] * 5
 
         self.respawns = 0
         self.laps_completed = 0
         self.num_infractions = 0
         self.eval_mode, self.train_mode = eval_mode, not eval_mode
-    
+
         self.n_segments = n_segments
         self.current_segment = SEGM_RESET
         self.last_segment = 1
@@ -109,7 +109,8 @@ class ProgressTracker(object):
         self.segment_success = [0] * self.n_segments
         self.segment_success_final = [0] * self.n_segments
         self.segment_idxs = segment_idxs
-        self.segment_coords = self.get_segment_coords(self.centerline, self.segment_idxs)
+        self.segment_coords = self.get_segment_coords(
+            self.centerline, self.segment_idxs)
         self.segment_tree = segment_tree
 
     def reset(self, start_idx, segmentwise=False):
@@ -169,14 +170,16 @@ class ProgressTracker(object):
         idx -= self.start_idx
         idx += self.n_indices if idx < 0 else 0
 
-        # validate vehicle isn't just oscillating near the starting point; set halfway flag, if necessary
+        # validate vehicle isn't just oscillating near the starting point; set
+        # halfway flag, if necessary
         if self.last_idx <= self.halfway_idx and idx >= self.halfway_idx:
             self.halfway_flag = True
 
         self._store(e, n, u, idx, yaw, c_dist, dt, ac, bp, n_out)
 
         self.last_segment = self.current_segment
-        self.current_segment = self.monitor_segment_progression([idx, self.absolute_idx])
+        self.current_segment = self.monitor_segment_progression(
+            [idx, self.absolute_idx])
 
         if self.check_lap_completion(idx, now):
             self.segment_success_final = self.segment_success
@@ -213,38 +216,41 @@ class ProgressTracker(object):
         closest_border_abs = self.segment_tree.query([absolute_idx])
         print(f"[Tracker] Track index: {absolute_idx}")
         print(f"[Tracker] Current segment: {self.current_segment}")
-        print(f"[Tracker] Dist. to closest segment border: ({closest_border_abs[0]}, {closest_border_abs[1]})")
-   
-        if (closest_border_abs[0] < 50) and (self.last_segment_dist <= closest_border_abs[0]):
+        print(
+            f"[Tracker] Dist. to closest segment border: ({closest_border_abs[0]}, {closest_border_abs[1]})")
+
+        if (closest_border_abs[0] < 50) and (
+                self.last_segment_dist <= closest_border_abs[0]):
             # border crossing
-            current_segment_proposal = closest_border_abs[1]+1
+            current_segment_proposal = closest_border_abs[1] + 1
         else:
             # approaching the next border
             current_segment_proposal = self.current_segment
 
         current_segment = (
-            current_segment_proposal if self.eval_mode else (1 + self.respawns + self.segment_crossings)
-        )
+            current_segment_proposal if self.eval_mode else (
+                1 + self.respawns + self.segment_crossings))
 
         if current_segment != self.last_segment:
-            self.segment_crossings +=1
-            self.segment_success[current_segment-2] = True
+            self.segment_crossings += 1
+            self.segment_success[current_segment - 2] = True
 
-        print(f"segm_crossings: {self.segment_crossings}, respawns: {self.respawns}")
+        print(
+            f"segm_crossings: {self.segment_crossings}, respawns: {self.respawns}")
 
         self.last_segment_dist = closest_border_abs[0]
-        
-        #if current_segment > SEGM_RESET+1:
+
+        # if current_segment > SEGM_RESET+1:
         #    self.segment_success[current_segment-2] = (
         #        True if self.segment_success[current_segment-2] is not False else False
         #    )
 
         print(f"[Tracker] Segment success: {self.segment_success}")
 
-        if self.eval_mode: 
+        if self.eval_mode:
             print(f"[Tracker] Crossed halfway point: {self.halfway_flag}\n")
 
-        return current_segment 
+        return current_segment
 
     def check_lap_completion(self, shifted_idx, now):
         """Check if we completed a lap. To prevent vehicles from oscillating
@@ -264,7 +270,7 @@ class ProgressTracker(object):
             return False
 
         if (
-            (self.eval_mode and (shifted_idx < MAX_PROGRESSION)) 
+            (self.eval_mode and (shifted_idx < MAX_PROGRESSION))
             or (self.train_mode and (self.current_segment > self.n_segments))
         ):
             ct = shifted_idx + (self.n_indices - self.last_idx)
@@ -279,16 +285,17 @@ class ProgressTracker(object):
             self.segment_success_final = self.segment_success
             self.current_segment = SEGM_RESET
 
-            if self.eval_mode: print(f"[Tracker] Completed a lap!")
+            if self.eval_mode:
+                print(f"[Tracker] Completed a lap!")
 
             return True
 
         return False
 
     def is_complete(self):
-        """Determine if the episode is complete due to finishing 'n_eval_laps' 
-        number of laps, remaining in the same position for too long (stuck), 
-        exceeding the maximum number of timestepsor, or going out-of-bounds. 
+        """Determine if the episode is complete due to finishing 'n_eval_laps'
+        number of laps, remaining in the same position for too long (stuck),
+        exceeding the maximum number of timestepsor, or going out-of-bounds.
         If all laps were successfully completed, the total time is also returned.
 
         :return: complete, info which includes metrics if successful
@@ -305,11 +312,15 @@ class ProgressTracker(object):
             or info["end_last_segment"]
             or info["wrong_way"]
         ):
-            if not info["success"]: self.segment_success_final = self.segment_success
-            if not info["success"]: self.respawns += 1
-            if info["oob"]: self.num_infractions += 1
-            if info["wrong_way"]: self.num_infractions += 1
-        
+            if not info["success"]:
+                self.segment_success_final = self.segment_success
+            if not info["success"]:
+                self.respawns += 1
+            if info["oob"]:
+                self.num_infractions += 1
+            if info["wrong_way"]:
+                self.num_infractions += 1
+
             return True, self.append_metrics(info)
 
         return False, info
@@ -334,24 +345,30 @@ class ProgressTracker(object):
         accel = transitions[-3]
         sampling_freq = len(self.transitions) / total_time
         ms = ProgressTracker._log_dimensionless_jerk(accel, sampling_freq)
-        proportion_unsafe = np.dot(transitions[-4], transitions[-1]) / total_time
+        proportion_unsafe = np.dot(
+            transitions[-4], transitions[-1]) / total_time
 
         metrics = dict()
         metrics["num_infractions"] = self.num_infractions
         metrics["total_time"] = round(total_time, 2)
         metrics["total_distance"] = round(total_distance, 2)
         metrics["average_speed_kph"] = round(avg_speed, 2)
-        metrics["average_displacement_error"] = round(avg_cline_displacement, 2)
-        metrics["trajectory_efficiency"] = round(track_curvature / avg_curvature, 3)
-        metrics["trajectory_admissibility"] = round(1 - (proportion_unsafe**0.5), 3)
+        metrics["average_displacement_error"] = round(
+            avg_cline_displacement, 2)
+        metrics["trajectory_efficiency"] = round(
+            track_curvature / avg_curvature, 3)
+        metrics["trajectory_admissibility"] = round(
+            1 - (proportion_unsafe**0.5), 3)
         metrics["movement_smoothness"] = round(ms, 3)
         metrics["timestep/sec"] = round(len(path[0]) / total_time, 2)
         metrics["laps_completed"] = self.laps_completed
 
-        if self.eval_mode: 
-            metrics["pct_complete"] = np.min([100,round(100*total_idxs/(self.n_eval_laps*self.n_indices),1)])
+        if self.eval_mode:
+            metrics["pct_complete"] = np.min(
+                [100, round(100 * total_idxs / (self.n_eval_laps * self.n_indices), 1)])
 
-        metrics["success_rate"] = sum(self.segment_success_final) / self.n_segments
+        metrics["success_rate"] = sum(
+            self.segment_success_final) / self.n_segments
 
         info["metrics"] = metrics
 
@@ -388,7 +405,8 @@ class ProgressTracker(object):
         dy = 0.5 * (y[2:] - y[:-2])
         d2x = x[2:] - 2 * x[1:-1] + x[0:-2]
         d2y = y[2:] - 2 * y[1:-1] + y[0:-2]
-        k = (dx * d2y - dy * d2x) / (np.square(dx) + np.square(dy) + EPSILON)**(3.0 / 2.0)
+        k = (dx * d2y - dy * d2x) / (np.square(dx) +
+                                     np.square(dy) + EPSILON)**(3.0 / 2.0)
         k_rms = np.sqrt(np.mean(np.square(k)))
 
         return k_rms
@@ -410,7 +428,7 @@ class ProgressTracker(object):
         if data_type not in ("speed", "accl", "jerk"):
             raise ValueError("\n".join(
                 ("The argument data_type must be either",
-                                        "'speed', 'accl' or 'jerk'.")))
+                 "'speed', 'accl' or 'jerk'.")))
 
         movement = np.array(movement)
         movement_peak = max(abs(movement))
@@ -458,16 +476,20 @@ class ProgressTracker(object):
             "lap_times": self.lap_times
         }
 
-        # correct for zero-index and for current_segment being greater than n_segments (post-lap completion)
-        curr_seg_sanitized = (self.n_segments-1) \
-                if self.current_segment > self.n_segments else (self.current_segment-1) # for train, remove -1
+        # correct for zero-index and for current_segment being greater than
+        # n_segments (post-lap completion)
+        curr_seg_sanitized = (
+            self.n_segments -
+            1) if self.current_segment > self.n_segments else (
+            self.current_segment -
+            1)  # for train, remove -1
 
         info["segment_success"] = self.segment_success_final
 
         if len(self.lap_times) >= self.n_eval_laps:
             info["success"] = True
             info["total_time"] = round(sum(self.lap_times), 2) \
-                    if len(self.lap_times) > 1 else round(sum(self.lap_times))
+                if len(self.lap_times) > 1 else round(sum(self.lap_times))
 
         if len(self.transitions) > self.not_moving_ct:
             if self.transitions[-1][3] == self.transitions[-self.not_moving_ct][3]:
@@ -513,17 +535,19 @@ class ProgressTracker(object):
         car_corners = GeoLocation.get_corners((e, n), yaw, self.car_dims)
 
         # At most 1 wheel can be out-of-track
-        n_out_inside = np.count_nonzero(self.inner_track.contains_points(car_corners))
+        n_out_inside = np.count_nonzero(
+            self.inner_track.contains_points(car_corners))
         if n_out_inside > 0:
             return n_out_inside
 
-        return 4 - np.count_nonzero(self.outer_track.contains_points(car_corners))
+        return 4 - \
+            np.count_nonzero(self.outer_track.contains_points(car_corners))
 
     def get_segment_coords(self, centerline, segment_idxs):
 
         segment_coords = {
-                "first": [self.coord_multiplier*centerline[index] for index in segment_idxs],
-                "second": [self.coord_multiplier*centerline[index+1] for index in segment_idxs],
-                }
-        
+            "first": [self.coord_multiplier * centerline[index] for index in segment_idxs],
+            "second": [self.coord_multiplier * centerline[index + 1] for index in segment_idxs],
+        }
+
         return segment_coords

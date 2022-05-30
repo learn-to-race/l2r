@@ -64,8 +64,9 @@ MIN_OBS_ARR = [
     -100.0, -100.0, -100.0,             # acceleration
     -1.0, -1.0, -5.0,                   # angular velocity
     -6.2832, -6.2832, -6.2832,          # yaw, pitch, roll
-    -2000.0, 2000.0, 2000.0,            # location coordinates in the format (y, x, z)
-    -2000.0, -2000.0, -2000.0, -2000.0, # rpm (per wheel)
+    # location coordinates in the format (y, x, z)
+    -2000.0, 2000.0, 2000.0,
+    -2000.0, -2000.0, -2000.0, -2000.0,  # rpm (per wheel)
     -1.0, -1.0, -1.0, -1.0,             # brake (per wheel)
     -1.0, -1.0, -1300.0, -1300.0,       # torq (per wheel)
 ]
@@ -76,8 +77,9 @@ MAX_OBS_ARR = [
     100.0, 100.0, 100.0,            # acceleration
     1.0, 1.0, 5.0,                  # angular velocity
     6.2832, 6.2832, 6.2832,         # yaw, pitch, roll
-    2000.0, 2000.0, 2000.0,         # location coordinates in the format (y, x, z)
-    2500.0, 2500.0, 2500.0, 2500.0, # rpm (per wheel)
+    # location coordinates in the format (y, x, z)
+    2000.0, 2000.0, 2000.0,
+    2500.0, 2500.0, 2500.0, 2500.0,  # rpm (per wheel)
     1.0, 1.0, 2.0, 2.0,             # brake (per wheel)
     1.0, 1.0, 1300.0, 1300.0,       # torq (per wheel)
 ]
@@ -126,13 +128,12 @@ class RacingEnv(gym.Env):
         # switches
         self.manual_segments = manual_segments
         self.provide_waypoints = (
-            provide_waypoints if provide_waypoints else env_kwargs["provide_waypoints"]
-        )
+            provide_waypoints if provide_waypoints else env_kwargs["provide_waypoints"])
         self.zone = zone
         self.multi_agent = multi_agent  # currently not supported; future
         self.evaluation = env_kwargs["eval_mode"]
         self.training = True if not self.evaluation else False
-       
+
         # global config mappings
         self.n_eval_laps = env_kwargs["n_eval_laps"]
         self.max_timesteps = env_kwargs["max_timesteps"]
@@ -171,7 +172,13 @@ class RacingEnv(gym.Env):
         )
 
         # openAI gym compliance - action space
-        self.action_space = Box(low=-1.0, high=1.0, shape=(2,), dtype=np.float64)
+        self.action_space = Box(
+            low=-1.0,
+            high=1.0,
+            shape=(
+                2,
+            ),
+            dtype=np.float64)
         self.multimodal = env_kwargs["multimodal"]
 
         # misc
@@ -193,7 +200,7 @@ class RacingEnv(gym.Env):
         cameras=False,
     ):
         """
-        Make does not start the simulator process. It does, however, configure the simulator's settings. 
+        Make does not start the simulator process. It does, however, configure the simulator's settings.
         The simulator process must be running prior to calling this method, otherwise an error
         will occur when trying to establish a connection with the simulator.
 
@@ -223,11 +230,11 @@ class RacingEnv(gym.Env):
             else self.cameras
         )
 
-        if type(level) == str:
+        if isinstance(level, str):
             self.level = level
             self.levels = None
             self.active_level = level
-        elif type(level) == list:
+        elif isinstance(level, list):
             self.levels = level
             self.active_level = random.choice(self.levels)
         else:
@@ -261,7 +268,6 @@ class RacingEnv(gym.Env):
                 cam.start(img_dims=(params["Width"], params["Height"], 3))
 
         self.multimodal = multimodal if multimodal else self.multimodal
-
 
     def _restart_simulator(self):
         """Periodically need to restart the container for long runtimes"""
@@ -310,7 +316,8 @@ class RacingEnv(gym.Env):
         _ = self._check_restart(done)
 
         if self.provide_waypoints:
-            print(f"[Env] WARNING: 'self.provide_waypoints' is set to {self.provide_waypoints}")
+            print(
+                f"[Env] WARNING: 'self.provide_waypoints' is set to {self.provide_waypoints}")
             info["track_idx"] = self.nearest_idx
             info["waypoints"] = self._waypoints()
 
@@ -337,7 +344,7 @@ class RacingEnv(gym.Env):
         else:
             new_level = self.level
             print(f"[Env] Continuing with level: {new_level}")
-            
+
         if new_level is self.active_level:
             self.controller.reset_level()
 
@@ -345,7 +352,7 @@ class RacingEnv(gym.Env):
             self.active_level = new_level
             self.controller.set_level(self.active_level)
             self._load_map()
-        
+
         self.nearest_idx, info = None, {}
 
         # give the simulator time to reset
@@ -383,7 +390,8 @@ class RacingEnv(gym.Env):
         self.tracker.reset(start_idx=self.nearest_idx, segmentwise=segment_pos)
 
         if self.provide_waypoints:
-            print(f"[Env] WARNING: 'self.provide_waypoints' is set to {self.provide_waypoints}")
+            print(
+                f"[Env] WARNING: 'self.provide_waypoints' is set to {self.provide_waypoints}")
             info["waypoints"] = self._waypoints()
             info["track_idx"] = self.nearest_idx
             return observation, info
@@ -441,8 +449,9 @@ class RacingEnv(gym.Env):
 
         if self._multimodal:
             _spaces["sensors"] = Box(
-                low=np.array(MIN_OBS_ARR), high=np.array(MAX_OBS_ARR), dtype=np.float64
-            )
+                low=np.array(MIN_OBS_ARR),
+                high=np.array(MAX_OBS_ARR),
+                dtype=np.float64)
         self.observation_space = Dict(_spaces)
 
     def _observe(self):
@@ -492,7 +501,8 @@ class RacingEnv(gym.Env):
 
         :param str level: the racetrack name
         """
-        map_file, self.random_poses, self.segment_poses = level_2_trackmap(self.active_level)
+        map_file, self.random_poses, self.segment_poses = level_2_trackmap(
+            self.active_level)
 
         with open(os.path.join(pathlib.Path().absolute(), map_file), "r") as f:
             self.original_map = json.load(f)
@@ -513,8 +523,10 @@ class RacingEnv(gym.Env):
         self.n_indices = len(self.centerline_arr)
         self.kdtree = KDTree(self.centerline_arr)
 
-        local_segment_idxs_manual = self.poses_to_local_segment_idxs(self.segment_poses)
-        local_segment_idxs_linspace = np.round(np.linspace(0, self.n_indices-2, N_SEGMENTS+1)).astype(int)
+        local_segment_idxs_manual = self.poses_to_local_segment_idxs(
+            self.segment_poses)
+        local_segment_idxs_linspace = np.round(np.linspace(
+            0, self.n_indices - 2, N_SEGMENTS + 1)).astype(int)
 
         self.local_segment_idxs = (
             local_segment_idxs_linspace
@@ -522,13 +534,19 @@ class RacingEnv(gym.Env):
             else local_segment_idxs_manual
         )
 
-        self.segment_tree = KDTree(np.expand_dims(np.array(self.local_segment_idxs),axis=1))
+        self.segment_tree = KDTree(
+            np.expand_dims(
+                np.array(
+                    self.local_segment_idxs),
+                axis=1))
 
         race_x = self.centerline_arr[:, 0]
         race_y = self.centerline_arr[:, 1]
-        X_diff = np.concatenate([race_x[1:] - race_x[:-1],[race_x[0] - race_x[-1]]])
-        Y_diff = np.concatenate([race_y[1:] - race_y[:-1],[race_y[0] - race_y[-1]]])
-        race_yaw = np.arctan(X_diff/Y_diff)  # (L-1, n) 
+        X_diff = np.concatenate(
+            [race_x[1:] - race_x[:-1], [race_x[0] - race_x[-1]]])
+        Y_diff = np.concatenate(
+            [race_y[1:] - race_y[:-1], [race_y[0] - race_y[-1]]])
+        race_yaw = np.arctan(X_diff / Y_diff)  # (L-1, n)
         race_yaw[Y_diff < 0] += np.pi
         self.race_yaw = utils.smooth_yaw(race_yaw)
         self.max_yaw = np.max(self.race_yaw)
@@ -559,7 +577,6 @@ class RacingEnv(gym.Env):
         )
 
         # self.segment_coords = self.tracker.get_segment_coords(self.centerline_arr, self.tracker.segment_idxs)
-
 
     def record_manually(
         self, output_dir, fname="thruxton", num_imgs=5000, sleep_time=0.03
@@ -608,23 +625,23 @@ class RacingEnv(gym.Env):
         rot = {"yaw": pos[3], "pitch": 0.0, "roll": 0.0}
         return coords, rot
 
-    
     def next_segment_start_location(self):
 
         if self.evaluation:
             segment_idx = self.tracker.current_segment
             segment_idx = segment_idx % (N_SEGMENTS)
         else:
-            segment_idx = np.random.randint(0, len(self.local_segment_idxs)-1)
-        
+            segment_idx = np.random.randint(
+                0, len(self.local_segment_idxs) - 1)
+
         try:
-            pos = [0]*4
-            pos[0] = self.tracker.segment_coords["first"][segment_idx][0] # x
-            pos[1] = self.tracker.segment_coords["first"][segment_idx][1] # y
-            pos[2] = LEVEL_Z_DICT[self.active_level] #
+            pos = [0] * 4
+            pos[0] = self.tracker.segment_coords["first"][segment_idx][0]  # x
+            pos[1] = self.tracker.segment_coords["first"][segment_idx][1]  # y
+            pos[2] = LEVEL_Z_DICT[self.active_level]
             pos[3] = self.race_yaw[self.local_segment_idxs[segment_idx]]
-            
-        except:
+
+        except BaseException:
             pdb.set_trace()
             pass
 
@@ -633,16 +650,18 @@ class RacingEnv(gym.Env):
 
         self.tracker.current_segment += 1
 
-        print(f"[Env] Spawning to {'next' if self.evaluation else 'random'} segment start location")
+        print(
+            f"[Env] Spawning to {'next' if self.evaluation else 'random'} segment start location")
         print(f"[Env] Current segment: {self.tracker.current_segment}")
-        print(f"[Env] Respawns: {self.tracker.respawns}; infractions: {self.tracker.num_infractions}")
+        print(
+            f"[Env] Respawns: {self.tracker.respawns}; infractions: {self.tracker.num_infractions}")
         print(f"[Env] Coords: {coords}")
         print(f"[Env] Rot: {rot}")
 
         return coords, rot
-    
+
     def poses_to_local_segment_idxs(self, poses):
-        
+
         segment_idxs = []
         for (x, y, z, yaw) in poses:
             # enu_x, enu_y, enu_z = self.geo_location.convert_to_ENU((x, y, z))
@@ -652,7 +671,6 @@ class RacingEnv(gym.Env):
 
         return segment_idxs
 
-
     def _waypoints(self, goal="center", ct=3, step=8):
         """Return position of goal"""
         num = len(self.centerline_arr)
@@ -661,4 +679,3 @@ class RacingEnv(gym.Env):
             return np.asarray([self.centerline_arr[idx % num] for idx in idxs])
         else:
             raise NotImplementedError
-

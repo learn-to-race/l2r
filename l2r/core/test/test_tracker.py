@@ -40,7 +40,8 @@ def test_completed_laps(tracker):
     """Unit test cases for 3 completed laps
     """
     print('\n' + '=' * 50 + '\nTEST GROUP - COMPLETED 3 LAPS')
-    for n, case in enumerate(COMPLETED_3_LAPS_CASES):  # COMPLETED_3_LAPS_CASES):
+    # COMPLETED_3_LAPS_CASES):
+    for n, case in enumerate(COMPLETED_3_LAPS_CASES):
         start_idx, updates, expected = case
         tk.reset(start_idx)
 

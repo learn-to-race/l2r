@@ -6,9 +6,11 @@
 #    an agent that randomly chooses actions                                 #
 # ========================================================================= #
 
-import os, random
+import os
+import random
 from core.templates import AbstractAgent
 from envs.env import RacingEnv
+
 
 class RandomActionAgent(AbstractAgent):
     """Reinforcement learning agent that simply chooses random actions.
@@ -27,7 +29,12 @@ class RandomActionAgent(AbstractAgent):
         """Demonstrative agent method."""
 
         for e in range(self.num_episodes):
-            print('='*10 + f' Episode {e+1} of {self.num_episodes} ' + '='*10)
+            print(
+                '=' *
+                10 +
+                f' Episode {e+1} of {self.num_episodes} ' +
+                '=' *
+                10)
             ep_reward, ep_timestep = 0, 0
             state, done = self.env.reset(), False
 

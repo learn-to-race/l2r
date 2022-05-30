@@ -14,7 +14,13 @@ AUGMENT_LATERAL_STEERINGS = 6
 
 class ILDataset(Dataset):
 
-    def __init__(self, root_dir, dataset_name, split_name, lookahead=1, preload_name=None):
+    def __init__(
+            self,
+            root_dir,
+            dataset_name,
+            split_name,
+            lookahead=1,
+            preload_name=None):
 
         self.root_dir = root_dir
         self.data_dir = os.path.join(root_dir, dataset_name, split_name)
@@ -56,7 +62,8 @@ class ILDataset(Dataset):
 #        try: next_measurement = self.measurements[idx+self.lookahead]
 #        except IndexError: next_measurement = measurement
 
-        # mappings: http://ec2-3-90-183-136.compute-1.amazonaws.com/multimodal.html#environment-observations
+        # mappings:
+        # http://ec2-3-90-183-136.compute-1.amazonaws.com/multimodal.html#environment-observations
 
         input_image = Image.fromarray(measurement['img'])
         image_tensor = self.transform_op(input_image)
@@ -221,14 +228,19 @@ class ILDataset(Dataset):
 
             print('Episode ', episode)
 
-            transitions_list = sorted(glob.glob(os.path.join(episode, 'transition*')))
+            transitions_list = sorted(
+                glob.glob(
+                    os.path.join(
+                        episode,
+                        'transition*')))
             sort_nicely(transitions_list)
 
             if len(transitions_list) == 0:
                 print("EMPTY EPISODE")
                 continue
 
-            # A simple count to keep track how many measurements were added this episode.
+            # A simple count to keep track how many measurements were added
+            # this episode.
             count_added_measurements = 0
 
             sample = 0
@@ -247,7 +259,8 @@ class ILDataset(Dataset):
                 count_added_measurements += 1
 
             # last_data_point_number = transitions_list[-1].split('_')[-1].split('.')[0]
-            number_of_hours_pre_loaded += (float(count_added_measurements) / 3600.0)
+            number_of_hours_pre_loaded += (
+                float(count_added_measurements) / 3600.0)
             print(" Loaded ", number_of_hours_pre_loaded, " hours of data")
 
         # Make the path to save the pre loaded datasets

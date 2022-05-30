@@ -19,16 +19,18 @@ if __name__ == "__main__":
     agent_params = yaml.load(open(sys.argv[1]))
     agent_kwargs = agent_params['agent_kwargs']
 
-    sys_params = yaml.load(open(f"{sys.argv[1].split('/')[0]}/params-env.yaml"))
+    sys_params = yaml.load(
+        open(f"{sys.argv[1].split('/')[0]}/params-env.yaml"))
     env_kwargs = sys_params['env_kwargs']
     sim_kwargs = sys_params['sim_kwargs']
 
-    # overrrides                                    
+    # overrrides
     env_kwargs['action_if_kwargs']['max_accel'] = 6.
     env_kwargs['action_if_kwargs']['min_accel'] = -4
     env_kwargs['eval_mode'] = False
 
-    print(f"Running agent in {'evaluation' if env_kwargs['eval_mode'] else 'training'} mode")
+    print(
+        f"Running agent in {'evaluation' if env_kwargs['eval_mode'] else 'training'} mode")
 
     # instantiate and run agent
     agent = RandomActionAgent(agent_kwargs)
