@@ -37,8 +37,6 @@ DEVICE = torch.device('cuda') if torch.cuda.is_available() else "cpu"
 # np.random.seed(seed)
 
 
-
-
 class SACAgent(AbstractAgent):
     """
     Soft Actor-Critic (SAC)

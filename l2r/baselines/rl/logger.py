@@ -5,9 +5,9 @@ base_config = {
     "total_time": "val/ep_total_time",
     "total_distance": "val/ep_total_distance",
     "average_speed_kph": "val/ep_avg_speed",
-    "average_displacement_error":"val/ep_avg_disp_err",
-    "trajectory_admissibility":"val/ep_traj_admissibility",
-    "movement_smoothness":"val/movement_smoothness"
+    "average_displacement_error": "val/ep_avg_disp_err",
+    "trajectory_admissibility": "val/ep_traj_admissibility",
+    "movement_smoothness": "val/movement_smoothness"
 }
 
 
