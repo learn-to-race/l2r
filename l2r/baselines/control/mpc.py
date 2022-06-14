@@ -15,8 +15,6 @@ from core.templates import AbstractAgent
 from envs.env import RacingEnv
 from racetracks.mapping import level_2_trackmap
 
-import ipdb as pdb
-
 if float(torch.__version__[0:3]) > 1.4:
     raise Exception('MPC agent requires torch version of 1.4 or lower')
 

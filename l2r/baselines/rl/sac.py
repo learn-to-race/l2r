@@ -8,27 +8,19 @@ Source:
 https://github.com/openai/spinningup/blob/master/spinup/algos/pytorch/sac/sac.py
 """
 import itertools
-import os
 import queue
-import sys
 import threading
 from copy import deepcopy
 
 import torch
-import cv2
-import ipdb as pdb
 import numpy as np
 from torch.optim import Adam
-from torchvision import transforms
 
 from core.templates import AbstractAgent
-import baselines.core as core
-from common.models.network import resnet18, ActorCritic
+from common.models.network import ActorCritic
 from common.models.vae import VAE
 from common.utils import RecordExperience
 from baselines.rl.simplebuffer import ReplayBuffer
-# For Debugging
-from matplotlib import image
 
 DEVICE = torch.device('cuda') if torch.cuda.is_available() else "cpu"
 

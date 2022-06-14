@@ -12,8 +12,6 @@ import numpy as np
 
 from envs.utils import GeoLocation
 
-import ipdb as pdb
-
 SEGMENTS_COMPLETE_NUM = 9
 A_BIG_NUMBER = 1000
 
