@@ -10,6 +10,7 @@ runtime
 
 datasets/lvms-resized/
 datasets/thruxton-resized/
+deprecated/
 
 assets/vids/
 assets/checkpoints/
