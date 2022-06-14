@@ -4,7 +4,7 @@ Learn-to-Race is an [OpenAI gym](https://gym.openai.com/) compliant, multimodal 
 
 <div align="center">
   <br>
-  <img src='./assets/imgs/main_figure.png' alt='missing'/ width=80%>
+  <img src='./docs/readme-assets/main_figure.png' alt='missing'/ width=80%>
   <p style="padding: 20px 20px 20px 20px;"><i>An overview of the Learn-to-Race framework</i></p>
   <br>
 </div>
@@ -23,13 +23,13 @@ We provide multiple baseline agents to demonstrate how to use Learn-to-Race incl
 
 <div align="center">
   <br>
-  <img src='./assets/imgs/lvms_1.gif' alt='missing'/ width=42%>
+  <img src='./docs/readme-assets/lvms_1.gif' alt='missing'/ width=42%>
   <p style="padding: 10px 15px 15px;"><i>Episode 1</i></p>
   
-  <img src='./assets/imgs/lvms_100.gif' alt='missing' width=42%/>
+  <img src='./docs/readme-assets/lvms_100.gif' alt='missing' width=42%/>
   <p style="padding: 10px 15px 15px;"><i>Episode 100</i></p>
   
-  <img src='./assets/imgs/lvms_1000.gif' alt='missing' width=42%/>
+  <img src='./docs/readme-assets/lvms_1000.gif' alt='missing' width=42%/>
   <p style="padding: 10px 15px 15px;"><i>Episode 1000</i></p>
   <br>
 </div>
@@ -51,8 +51,8 @@ Additionally, these sensors are parameterized and can be customized further; for
 
 Left Facing                |  Front Facing             |  Right Facing             |  Birdseye
 :-------------------------:|:-------------------------:|:-------------------------:|:-------------------------:
-![LeftRGB](./assets/imgs/sample_vehicle_imgs/CameraLeftRGB.png)  | ![FrontRGB](./assets/imgs/sample_vehicle_imgs/CameraFrontRGB.png)  |  ![RightRGB](./assets/imgs/sample_vehicle_imgs/CameraRightRGB.png)  |  ![Front](./assets/imgs/sample_vehicle_imgs/CameraBirdsEye.png)
-![Left, Segmented](./assets/imgs/sample_vehicle_imgs/CameraLeftSegm.png) | ![Front, Segmented](./assets/imgs/sample_vehicle_imgs/CameraFrontSegm.png) |  ![Right, Segmented](./assets/imgs/sample_vehicle_imgs/CameraRightSegm.png) | ![Birdseye, Segmented](./assets/imgs/sample_vehicle_imgs/CameraBirdsSegm.png) 
+![LeftRGB](./docs/readme-assets/sample_vehicle_imgs/CameraLeftRGB.png)  | ![FrontRGB](./docs/readme-assets/sample_vehicle_imgs/CameraFrontRGB.png)  |  ![RightRGB](./docs/readme-assets/sample_vehicle_imgs/CameraRightRGB.png)  |  ![Front](./docs/readme-assets/sample_vehicle_imgs/CameraBirdsEye.png)
+![Left, Segmented](./docs/readme-assets/sample_vehicle_imgs/CameraLeftSegm.png) | ![Front, Segmented](./docs/readme-assets/sample_vehicle_imgs/CameraFrontSegm.png) |  ![Right, Segmented](./docs/readme-assets/sample_vehicle_imgs/CameraRightSegm.png) | ![Birdseye, Segmented](./docs/readme-assets/sample_vehicle_imgs/CameraBirdsSegm.png) 
 
 Please visit our documentation for more information about sensor customization.
 
