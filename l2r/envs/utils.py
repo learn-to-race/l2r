@@ -343,8 +343,8 @@ class GeoLocation(object):
         dECEF[2] = (z + r0 * (1.0 - self.EARTHECCEN2)) * slat - ecefRef[2]
 
         # Define rotation from ECEF to ENU
-        R = [[-slonRef, clonRef, 0], [-slatRef * clonRef, -slatRef * \
-            slonRef, clatRef], [clatRef * clonRef, clatRef * slonRef, slatRef]]
+        R = [[-slonRef, clonRef, 0], [-slatRef * clonRef, -slatRef *
+                                      slonRef, clatRef], [clatRef * clonRef, clatRef * slonRef, slatRef]]
 
         enu = [0.0] * 3
 
