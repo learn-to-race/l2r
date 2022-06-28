@@ -17,7 +17,7 @@ import numpy as np
 from torch.optim import Adam
 
 from core.templates import AbstractAgent
-from network_architecture.sac import ActorCritic
+from baselines.network_architecture.sac import ActorCritic
 from cv.vae import VAE
 from common.utils import RecordExperience
 from baselines.rl.simplebuffer import ReplayBuffer
@@ -486,44 +486,16 @@ class SACRunner():
 
             # End of trajectory handling
             if d or (ep_len == self.agent.cfg['max_ep_len']):
+                
+                info['metrics']['episodic_return'] = ep_ret
+                info['metrics']['ep_n_steps'] = t - t_start
                 self.agent.metadata['info'] = info
                 self.agent.episode_num += 1
                 msg = f'[Ep {self.agent.episode_num }] {self.agent.metadata}'
                 self.agent.file_logger(msg)
 
-                self.agent.tb_logger.add_scalar(
-                    'train/episodic_return', ep_ret, self.agent.episode_num)
-                #self.agent.tb_logger.add_scalar('train/ep_pct_complete', self.agent.metadata['info']['metrics']['pct_complete'], self.agent.episode_num)
-                self.agent.tb_logger.add_scalar(
-                    'train/ep_total_time',
-                    self.agent.metadata['info']['metrics']['total_time'],
-                    self.agent.episode_num)
-                self.agent.tb_logger.add_scalar(
-                    'train/ep_total_distance',
-                    self.agent.metadata['info']['metrics']['total_distance'],
-                    self.agent.episode_num)
-                self.agent.tb_logger.add_scalar(
-                    'train/ep_avg_speed',
-                    self.agent.metadata['info']['metrics']['average_speed_kph'],
-                    self.agent.episode_num)
-                self.agent.tb_logger.add_scalar(
-                    'train/ep_avg_disp_err',
-                    self.agent.metadata['info']['metrics']['average_displacement_error'],
-                    self.agent.episode_num)
-                self.agent.tb_logger.add_scalar(
-                    'train/ep_traj_efficiency',
-                    self.agent.metadata['info']['metrics']['trajectory_efficiency'],
-                    self.agent.episode_num)
-                self.agent.tb_logger.add_scalar(
-                    'train/ep_traj_admissibility',
-                    self.agent.metadata['info']['metrics']['trajectory_admissibility'],
-                    self.agent.episode_num)
-                self.agent.tb_logger.add_scalar(
-                    'train/movement_smoothness',
-                    self.agent.metadata['info']['metrics']['movement_smoothness'],
-                    self.agent.episode_num)
-                self.agent.tb_logger.add_scalar(
-                    'train/ep_n_steps', t - t_start, self.agent.episode_num)
+
+                self.agent.tb_logger.log(info['metrics'], self.agent.episode_num)
 
                 # Quickly dump recently-completed episode's experience to the multithread queue,
                 # as long as the episode resulted in "success"
@@ -576,7 +548,7 @@ class SACRunner():
                     # Step the env
                     camera2, features2, state2, r, d, info = self.env._step(a)
                     features2 = self.vision_encoder(features2)
-                    
+
                     ep_len += 1
 
                 if self.cfg['record_experience']:
@@ -607,6 +579,8 @@ class SACRunner():
             self.file_logger(f'[eval episode] {info}')
 
             val_ep_rets.append(ep_ret)
+            info['metrics']['episodic_return'] = ep_ret
+            info['metrics']['ep_n_steps'] = n_val_steps
             self.metadata['info'] = info
 
             self.tb_logger.add_scalar('val/episodic_return', ep_ret, n_eps)
@@ -614,32 +588,9 @@ class SACRunner():
             # The metrics are not calculated if the environment is manually
             # terminated.
             try:
-                self.tb_logger.add_scalar(
-                    'val/ep_pct_complete', info['metrics']['pct_complete'], n_eps)
-                self.tb_logger.add_scalar(
-                    'val/ep_total_time', info['metrics']['total_time'], n_eps)
-                self.tb_logger.add_scalar(
-                    'val/ep_total_distance',
-                    info['metrics']['total_distance'],
-                    n_eps)
-                self.tb_logger.add_scalar(
-                    'val/ep_avg_speed', info['metrics']['average_speed_kph'], n_eps)
-                self.tb_logger.add_scalar(
-                    'val/ep_avg_disp_err',
-                    info['metrics']['average_displacement_error'],
-                    n_eps)
-                self.tb_logger.add_scalar(
-                    'val/ep_traj_efficiency',
-                    info['metrics']['trajectory_efficiency'],
-                    n_eps)
-                self.tb_logger.add_scalar(
-                    'val/ep_traj_admissibility',
-                    info['metrics']['trajectory_admissibility'],
-                    n_eps)
-                self.tb_logger.add_scalar(
-                    'val/movement_smoothness',
-                    info['metrics']['movement_smoothness'],
-                    n_eps)
+                self.tb_logger.log(info['metrics'], n_eps)
+                if 'safety_info' in self.metadata:
+                    self.tb_logger.log(self.metadata['safety_info'], n_eps)
             except BaseException:
                 pass
 
