@@ -18,7 +18,7 @@ from torch.optim import Adam
 
 from core.templates import AbstractAgent
 from common.models.network import ActorCritic
-from common.models.vae import VAE
+from cv.vae import VAE
 from common.utils import RecordExperience
 from baselines.rl.simplebuffer import ReplayBuffer
 
@@ -616,7 +616,7 @@ class SACAgent(AbstractAgent):
 
             if ((t + 1) % self.cfg['eval_every'] == 0):
                 # eval on test environment
-                val_returns = self.eval(t // self.cfg['eval_every'])
+                #val_returns = self.eval(t // self.cfg['eval_every'])
                 # Reset
                 camera, feat, state = self._reset()
                 ep_ret, ep_len, self.metadata, experience = 0, 0, {}, []

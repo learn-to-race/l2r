@@ -110,7 +110,6 @@ class CustomGranTurismoReward(BaseGranTurismo):
             self,
             oob_penalty=5.0,
             min_oob_penalty=25.0,
-            max_oob_penalty=None,
             centerline_bonus=1.0,
             dist_threshold=1.0):
         self.oob_penalty = oob_penalty

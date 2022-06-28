@@ -61,6 +61,7 @@ class BikeModel(nn.Module):
 
         return x_init + self.dt * x_dot
 
+"""
     def grad_input(self, x, u):
         '''
         Input:
@@ -112,7 +113,7 @@ class BikeModel(nn.Module):
         # F = torch.cat([A, B], dim = -1) # T-1 x n_batch x m x (m+n)
         # pdb.set_trace()
         return A.squeeze(1), B.squeeze(1)
-
+"""
 
 class MPC(nn.Module):
     def __init__(self, T=6,
@@ -165,7 +166,7 @@ class MPC(nn.Module):
 
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            x_lqr, u_lqr, objs_lqr = mpc.MPC(
+            x_lqr, u_lqr, _ = mpc.MPC(
                 n_state=self.n_state,
                 n_ctrl=self.n_ctrl,
                 T=self.T,

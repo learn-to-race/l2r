@@ -35,14 +35,13 @@ class RandomActionAgent(AbstractAgent):
                 f' Episode {e+1} of {self.num_episodes} ' +
                 '=' *
                 10)
-            ep_reward, ep_timestep = 0, 0
+            ep_reward = 0
             state, done = self.env.reset(), False
 
             while not done:
                 action = self.select_action()
                 state, reward, done, info = self.env.step(action)
                 ep_reward += reward
-                ep_timestep += 1
 
             if self.save_path:
                 save_dir = os.path.join(self.save_path, f'seed_{self.seed}')

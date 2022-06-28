@@ -103,7 +103,7 @@ class ILAgent(AbstractAgent):
                 f' Episode {e+1} of {self.num_episodes} ' +
                 '=' *
                 10)
-            ep_reward, ep_timestep, best_ep_reward = 0, 0, 0
+            ep_reward, best_ep_reward = 0, 0
             obs = self.env.reset()
             obs, reward, done, info = self.env.step([0, 1])
 
@@ -117,7 +117,6 @@ class ILAgent(AbstractAgent):
                 obs, reward, done, info = self.env.step(
                     action.squeeze(0).detach().numpy())
                 ep_reward += reward
-                ep_timestep += 1
 
                 # Save if best (or periodically)
                 if (ep_reward > best_ep_reward and ep_reward > 250):

@@ -25,7 +25,7 @@ class CILModel(nn.Module):
 
     def forward(self, x, a):
         """ ###### APPLY THE PERCEPTION MODULE """
-        x, inter = self.perception(x)
+        x, _ = self.perception(x)
         # Not a variable, just to store intermediate layers for future vizualization
         # self.intermediate_layers = inter
 
@@ -37,6 +37,7 @@ class CILModel(nn.Module):
         branch_outputs = self.branches(j)
         # We only have one branch now.
         out = branch_outputs[0]
+        
         # speed_branch_output = self.speed_branch(x)
 
         # We concatenate speed with the rest.
@@ -82,7 +83,7 @@ class CILModel(nn.Module):
 
         elif 'res' in params['perception']:  # pre defined residual networks
             resnet_module = importlib.import_module(
-                'network.models.building_blocks.resnet')
+                'cv.resnet')
             resnet_module = getattr(
                 resnet_module, params['perception']['res']['name'])
             self.perception = resnet_module(
@@ -109,10 +110,10 @@ class CILModel(nn.Module):
             }
         )
 
-        self.speed_branch = FC(params={
-            'neurons': [params['join']['fc']['neurons'][-1]] + params['speed_branch']['fc']['neurons'] + [1],
-            'dropouts': params['speed_branch']['fc']['dropouts'] + [0.0],
-            'end_layer': True})
+        #self.speed_branch = FC(params={
+        #    'neurons': [params['join']['fc']['neurons'][-1]] + params['speed_branch']['fc']['neurons'] + [1],
+        #    'dropouts': params['speed_branch']['fc']['dropouts'] + [0.0],
+        #    'end_layer': True})
 
         # Create the fc vector separatedely
         branch_fc_vector = []

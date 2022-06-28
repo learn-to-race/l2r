@@ -8,8 +8,8 @@ import os
 from .utils import sort_nicely
 
 # Normalize speed to 0-1
-SPEED_FACTOR = 12.0
-AUGMENT_LATERAL_STEERINGS = 6
+#SPEED_FACTOR = 12.0
+#AUGMENT_LATERAL_STEERINGS = 6
 
 
 class ILDataset(Dataset):
@@ -25,7 +25,7 @@ class ILDataset(Dataset):
         self.root_dir = root_dir
         self.data_dir = os.path.join(root_dir, dataset_name, split_name)
         self.preload_name = preload_name
-        self.lookahead = 1
+        self.lookahead = lookahead
 
         if self.preload_name is not None and os.path.exists(
                 os.path.join('_preloads', self.preload_name + '.npy')):

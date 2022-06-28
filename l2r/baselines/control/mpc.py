@@ -23,11 +23,11 @@ WB = 2.7  # [m]
 
 # State variables
 DT = 0.1  # [s] time tick
-N_STATE = 4  # [x, y, v, yaw]
+#N_STATE = 4  # [x, y, v, yaw]
 
 # Controller
 T = 6
-dl = 0.25
+#dl = 0.25
 
 
 class MPCAgent(AbstractAgent):
@@ -65,7 +65,7 @@ class MPCAgent(AbstractAgent):
                 f' Episode {e+1} of {self.num_episodes} ' +
                 '=' *
                 10)
-            ep_reward, ep_timestep = 0, 0
+            ep_reward = 0
             obs, info = self.env.reset()
             obs, reward, done, info = self.env.step([0, 1])
 
@@ -105,8 +105,7 @@ class MPCAgent(AbstractAgent):
                 # so we'll take the first one to give to the environment
                 obs, reward, done, info = self.env.step([di, ai])
                 ep_reward += reward
-                ep_timestep += 1
-
+                
                 if self.save_transitions:
                     (data, img) = obs
                     self._imgs.append(img)

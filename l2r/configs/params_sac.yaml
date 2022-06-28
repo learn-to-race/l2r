@@ -7,7 +7,7 @@ agent_kwargs:
     encoder_switch: 1
     use_encoder_type: "vae" 
     vae:
-        vae_chkpt_statedict: './common/models/vae_144w_42h_32latent.pth'
+        vae_chkpt_statedict: './cv/vae_144w_42h_32latent.pth'
         latent_dims: 32
         hiddens: [32, 64, 64, 32, 32]
         speed_hiddens:  [8, 8]
