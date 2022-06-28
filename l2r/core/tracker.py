@@ -12,13 +12,13 @@ import numpy as np
 
 from envs.utils import GeoLocation
 
-SEGMENTS_COMPLETE_NUM = 9
+#SEGMENTS_COMPLETE_NUM = 9
 A_BIG_NUMBER = 1000
 
 # Assumed max progression, in number of indicies, in one RacingEnv.step()
 MAX_PROGRESSION = 100
 
-BOUNDARY_MARGIN = 1.0
+#BOUNDARY_MARGIN = 1.0
 
 # Early termination for very poor performance
 PROGRESS_THRESHOLD = 100
@@ -29,10 +29,10 @@ MPS_TO_KPH = 3.6
 EPSILON = 1e-6
 GRAVITY = 9.81
 
-SEGM_RESET = 0
-SEGM_CROSS_OFF = 0
-SEGM_CROSS_ON = 1
-SEGM_CROSS_LATCH = 3
+#SEGM_RESET = 0
+#SEGM_CROSS_OFF = 0
+#SEGM_CROSS_ON = 1
+#SEGM_CROSS_LATCH = 3
 
 
 class ProgressTracker(object):

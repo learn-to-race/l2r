@@ -9,9 +9,6 @@ from datetime import datetime
 
 def setup_tb_logging(log_dir, exp_name, resume):
     """ Set up tensorboard logger"""
-    now = datetime.now()
-    current_time = now.strftime("%m%d%H%M%S")
-    log_dir = f"{log_dir}/tblogs/{exp_name}_{current_time}"
     '''
     # remove previous log with the same name, if not resume
     if not resume and os.path.exists(log_dir):

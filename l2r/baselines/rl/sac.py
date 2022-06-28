@@ -17,7 +17,7 @@ import numpy as np
 from torch.optim import Adam
 
 from core.templates import AbstractAgent
-from common.models.network import ActorCritic
+from network_architecture.sac import ActorCritic
 from cv.vae import VAE
 from common.utils import RecordExperience
 from baselines.rl.simplebuffer import ReplayBuffer
@@ -320,37 +320,196 @@ class SACAgent(AbstractAgent):
             self.record['transition_actor'] = 'random'
         return a
 
-    def _step(self, a, test=False):
-        o, r, d, info = self.test_env.step(a) if test else self.env.step(a)
-        return o[1], self._encode(o), o[0], r, d, info
 
-    def _reset(self, test=False):
-        camera = 0
-        while (np.mean(camera) == 0) | (np.mean(camera) == 255):
-            obs = self.test_env.reset(random_pos=False) \
-                if test else self.env.reset(random_pos=True)
-            (state, camera), _ = obs
-        return camera, self._encode((state, camera)), state
 
-    def _encode(self, o):
-        state, img = o
 
-        if self.cfg['use_encoder_type'] == 'vae':
-            img_embed = self.backbone.encode_raw(np.array(img), DEVICE)[0][0]
-            speed = torch.tensor((state[4]**2 +
-                                  state[3]**2 +
-                                  state[5]**2)**0.5).float().reshape(1, -
-                                                                     1).to(DEVICE)
-            out = torch.cat([img_embed.unsqueeze(0), speed],
-                            dim=-1).squeeze(0)  # torch.Size([33])
-            self.using_speed = 1
-        else:
-            raise NotImplementedError
 
-        assert not torch.sum(torch.isnan(out)), "found a nan value"
-        out[torch.isnan(out)] = 0
 
-        return out
+class SACRunner():
+
+    def __init__(self, agent, env):
+
+        self.a = 1
+        self.agent = agent
+        self.env = env
+
+    def train(self):
+
+        # List of parameters for both Q-networks (save this for convenience)
+        self.agent.q_params = itertools.chain(
+            self.agent.actor_critic.q1.parameters(),
+            self.agent.actor_critic.q2.parameters())
+
+        # Set up optimizers for policy and q-function
+        self.agent.pi_optimizer = Adam(
+            self.agent.actor_critic.policy.parameters(),
+            lr=self.agent.cfg['lr'])
+        self.agent.q_optimizer = Adam(self.agent.q_params, lr=self.agent.cfg['lr'])
+        self.agent.pi_scheduler = torch.optim.lr_scheduler.StepLR(
+            self.agent.pi_optimizer, 1, gamma=0.5)
+
+        # Freeze target networks with respect to optimizers (only update via
+        # polyak averaging)
+        for p in self.agent.actor_critic_target.parameters():
+            p.requires_grad = False
+
+        # Count variables (protip: try to get a feel for how different size networks behave!)
+        # var_counts = tuple(core.count_vars(module) for module in [ac.pi, ac.q1, ac.q2])
+
+        # Prepare for interaction with environment
+        # start_time = time.time()
+        best_ret, ep_ret, ep_len = 0, 0, 0
+        camera, feat, state = self.agent._reset()
+        camera, feat, state, r, d, info = self.env._step([0, 1])
+
+        experience = []
+        speed_dim = 1 if self.agent.using_speed else 0
+        assert len(feat) == self.agent.cfg[self.agent.cfg['use_encoder_type']]['latent_dims'] + \
+            speed_dim, "'o' has unexpected dimension or is a tuple"
+
+        t_start = self.agent.t_start
+        # Main loop: collect experience in env and update/log each epoch
+        for t in range(self.agent.t_start, self.agent.cfg['total_steps']):
+
+            a = self.agent.select_action(t, feat, state)
+
+            # Step the env
+            camera2, feat2, state2, r, d, info = self.env._step(a)
+
+            # Check that the camera is turned on
+            assert (np.mean(camera2) > 0) & (np.mean(camera2) < 255)
+
+            # Prevents the agent from getting stuck by sampling random actions
+            # self.agent.atol for SafeRandom and SPAR are set to -1 so that this
+            # condition does not activate
+            if np.allclose(state2[15:16], state[15:16],
+                           atol=self.agent.atol, rtol=0):
+                self.agent.file_logger("Sampling random action to get unstuck")
+                a = self.agent.env.action_space.sample()
+
+                # Step the env
+                camera2, feat2, state2, r, d, info = self.env._step(a)
+                ep_len += 1
+
+            state = state2
+            ep_ret += r
+            ep_len += 1
+
+            # Ignore the "done" signal if it comes from hitting the time
+            # horizon (that is, when it's an artificial terminal signal
+            # that isn't based on the agent's state)
+            d = False if ep_len == self.agent.cfg['max_ep_len'] else d
+
+            # Store experience to replay buffer
+            if (not np.allclose(state2[15:16],
+                                state[15:16],
+                                atol=3e-1,
+                                rtol=0)) | (r != 0):
+                self.agent.replay_buffer.store(feat, a, r, feat2, d)
+            else:
+                print('Skip')
+
+            if self.agent.cfg['record_experience']:
+                self.agent.recording = {
+                    'step': t,
+                    'nearest_idx': self.agent.env.nearest_idx,
+                    'camera': camera,
+                    'feature': feat.detach().cpu().numpy(),
+                    'state': state,
+                    'action_taken': a,
+                    'next_camera': camera2,
+                    'next_feature': feat2.detach().cpu().numpy(),
+                    'next_state': state2,
+                    'reward': r,
+                    'episode': self.agent.episode_num,
+                    'stage': 'training',
+                    'done': d,
+                    'transition_actor': self.agent.record['transition_actor'],
+                    'metadata': info}
+
+                experience.append(self.agent.recording)
+
+                # quickly pass data to save thread
+                # if len(experience) == self.agent.save_batch_size:
+                #    self.agent.save_queue.put(experience)
+                #    experience = []
+
+            # Super critical, easy to overlook step: make sure to update
+            # most recent observation!
+            feat = feat2
+            state = state2  # in case we, later, wish to store the state in the replay as well
+            camera = camera2  # in case we, later, wish to store the state in the replay as well
+
+            # Update handling
+            if (t >= self.agent.cfg['update_after']) & (
+                    t % self.agent.cfg['update_every'] == 0):
+                for j in range(self.agent.cfg['update_every']):
+                    batch = self.agent.replay_buffer.sample_batch(
+                        self.agent.cfg['batch_size'])
+                    self.agent.update(data=batch)
+
+            if ((t + 1) % self.agent.cfg['eval_every'] == 0):
+                # eval on test environment
+                #val_returns = self.agent.eval(t // self.agent.cfg['eval_every'])
+                # Reset
+                camera, feat, state = self.env._reset()
+                ep_ret, ep_len, self.agent.metadata, experience = 0, 0, {}, []
+                t_start = t + 1
+                camera, feat, state2, r, d, info = self.env._step([0, 1])
+
+            # End of trajectory handling
+            if d or (ep_len == self.agent.cfg['max_ep_len']):
+                self.agent.metadata['info'] = info
+                self.agent.episode_num += 1
+                msg = f'[Ep {self.agent.episode_num }] {self.agent.metadata}'
+                self.agent.file_logger(msg)
+
+                self.agent.tb_logger.add_scalar(
+                    'train/episodic_return', ep_ret, self.agent.episode_num)
+                #self.agent.tb_logger.add_scalar('train/ep_pct_complete', self.agent.metadata['info']['metrics']['pct_complete'], self.agent.episode_num)
+                self.agent.tb_logger.add_scalar(
+                    'train/ep_total_time',
+                    self.agent.metadata['info']['metrics']['total_time'],
+                    self.agent.episode_num)
+                self.agent.tb_logger.add_scalar(
+                    'train/ep_total_distance',
+                    self.agent.metadata['info']['metrics']['total_distance'],
+                    self.agent.episode_num)
+                self.agent.tb_logger.add_scalar(
+                    'train/ep_avg_speed',
+                    self.agent.metadata['info']['metrics']['average_speed_kph'],
+                    self.agent.episode_num)
+                self.agent.tb_logger.add_scalar(
+                    'train/ep_avg_disp_err',
+                    self.agent.metadata['info']['metrics']['average_displacement_error'],
+                    self.agent.episode_num)
+                self.agent.tb_logger.add_scalar(
+                    'train/ep_traj_efficiency',
+                    self.agent.metadata['info']['metrics']['trajectory_efficiency'],
+                    self.agent.episode_num)
+                self.agent.tb_logger.add_scalar(
+                    'train/ep_traj_admissibility',
+                    self.agent.metadata['info']['metrics']['trajectory_admissibility'],
+                    self.agent.episode_num)
+                self.agent.tb_logger.add_scalar(
+                    'train/movement_smoothness',
+                    self.agent.metadata['info']['metrics']['movement_smoothness'],
+                    self.agent.episode_num)
+                self.agent.tb_logger.add_scalar(
+                    'train/ep_n_steps', t - t_start, self.agent.episode_num)
+
+                # Quickly dump recently-completed episode's experience to the multithread queue,
+                # as long as the episode resulted in "success"
+                # and self.agent.metadata['info']['success']:
+                if self.agent.cfg['record_experience']:
+                    self.agent.file_logger("Writing experience")
+                    self.agent.save_queue.put(experience)
+
+                # Reset
+                camera, feat, state = self.env._reset()
+                ep_ret, ep_len, self.agent.metadata, experience = 0, 0, {}, []
+                t_start = t + 1
+                camera, feat, state2, r, d, info = self.env._step([0, 1])
 
     def eval(self, n_eps):
         print('Evaluation:')
@@ -360,16 +519,16 @@ class SACAgent(AbstractAgent):
         assert self.cfg['num_test_episodes'] == 1
 
         for j in range(self.cfg['num_test_episodes']):
-            camera, features, state = self._reset(test=True)
+            camera, features, state = self.env._reset(test=True)
             d, ep_ret, ep_len, n_val_steps, self.metadata = False, 0, 0, 0, {}
-            camera, features, state2, r, d, info = self._step(
+            camera, features, state2, r, d, info = self.env._step(
                 [0, 1], test=True)
             experience, t = [], 0
 
             while (not d) & (ep_len <= self.cfg['max_ep_len']):
                 # Take deterministic actions at test time
                 a = self.select_action(1e6, features, state, True)
-                camera2, features2, state2, r, d, info = self._step(
+                camera2, features2, state2, r, d, info = self.env._step(
                     a, test=True)
                 # Check that the camera is turned on
                 assert (np.mean(camera2) > 0) & (np.mean(camera2) < 255)
@@ -384,7 +543,7 @@ class SACAgent(AbstractAgent):
                     self.file_logger("Sampling random action to get unstuck")
                     a = self.test_env.action_space.sample()
                     # Step the env
-                    camera2, features2, state2, r, d, info = self._step(a)
+                    camera2, features2, state2, r, d, info = self.env._step(a)
                     ep_len += 1
 
                 if self.cfg['record_experience']:
@@ -500,179 +659,40 @@ class SACAgent(AbstractAgent):
 
         return val_ep_rets
 
-    def sac_train(self):
-        # List of parameters for both Q-networks (save this for convenience)
-        self.q_params = itertools.chain(
-            self.actor_critic.q1.parameters(),
-            self.actor_critic.q2.parameters())
 
-        # Set up optimizers for policy and q-function
-        self.pi_optimizer = Adam(
-            self.actor_critic.policy.parameters(),
-            lr=self.cfg['lr'])
-        self.q_optimizer = Adam(self.q_params, lr=self.cfg['lr'])
-        self.pi_scheduler = torch.optim.lr_scheduler.StepLR(
-            self.pi_optimizer, 1, gamma=0.5)
+class EnvWrapper():
+    def __init__(self, test_env, train_env):
+        self.test_env = test_env
+        self.train_env = train_env
+    
+    def _encode(self, o):
+        state, img = o
 
-        # Freeze target networks with respect to optimizers (only update via
-        # polyak averaging)
-        for p in self.actor_critic_target.parameters():
-            p.requires_grad = False
+        if self.cfg['use_encoder_type'] == 'vae':
+            img_embed = self.backbone.encode_raw(np.array(img), DEVICE)[0][0]
+            speed = torch.tensor((state[4]**2 +
+                                  state[3]**2 +
+                                  state[5]**2)**0.5).float().reshape(1, -
+                                                                     1).to(DEVICE)
+            out = torch.cat([img_embed.unsqueeze(0), speed],
+                            dim=-1).squeeze(0)  # torch.Size([33])
+            self.using_speed = 1
+        else:
+            raise NotImplementedError
 
-        # Count variables (protip: try to get a feel for how different size networks behave!)
-        # var_counts = tuple(core.count_vars(module) for module in [ac.pi, ac.q1, ac.q2])
+        assert not torch.sum(torch.isnan(out)), "found a nan value"
+        out[torch.isnan(out)] = 0
 
-        # Prepare for interaction with environment
-        # start_time = time.time()
-        best_ret, ep_ret, ep_len = 0, 0, 0
-        camera, feat, state = self._reset()
-        camera, feat, state, r, d, info = self._step([0, 1])
+        return out
 
-        experience = []
-        speed_dim = 1 if self.using_speed else 0
-        assert len(feat) == self.cfg[self.cfg['use_encoder_type']]['latent_dims'] + \
-            speed_dim, "'o' has unexpected dimension or is a tuple"
+    def _step(self, a, test=False):
+        o, r, d, info = self.test_env.step(a) if test else self.train_env.step(a)
+        return o[1], self._encode(o), o[0], r, d, info
 
-        t_start = self.t_start
-        # Main loop: collect experience in env and update/log each epoch
-        for t in range(self.t_start, self.cfg['total_steps']):
-
-            a = self.select_action(t, feat, state)
-
-            # Step the env
-            camera2, feat2, state2, r, d, info = self._step(a)
-
-            # Check that the camera is turned on
-            assert (np.mean(camera2) > 0) & (np.mean(camera2) < 255)
-
-            # Prevents the agent from getting stuck by sampling random actions
-            # self.atol for SafeRandom and SPAR are set to -1 so that this
-            # condition does not activate
-            if np.allclose(state2[15:16], state[15:16],
-                           atol=self.atol, rtol=0):
-                self.file_logger("Sampling random action to get unstuck")
-                a = self.env.action_space.sample()
-
-                # Step the env
-                camera2, feat2, state2, r, d, info = self._step(a)
-                ep_len += 1
-
-            state = state2
-            ep_ret += r
-            ep_len += 1
-
-            # Ignore the "done" signal if it comes from hitting the time
-            # horizon (that is, when it's an artificial terminal signal
-            # that isn't based on the agent's state)
-            d = False if ep_len == self.cfg['max_ep_len'] else d
-
-            # Store experience to replay buffer
-            if (not np.allclose(state2[15:16],
-                                state[15:16],
-                                atol=3e-1,
-                                rtol=0)) | (r != 0):
-                self.replay_buffer.store(feat, a, r, feat2, d)
-            else:
-                print('Skip')
-
-            if self.cfg['record_experience']:
-                self.recording = {
-                    'step': t,
-                    'nearest_idx': self.env.nearest_idx,
-                    'camera': camera,
-                    'feature': feat.detach().cpu().numpy(),
-                    'state': state,
-                    'action_taken': a,
-                    'next_camera': camera2,
-                    'next_feature': feat2.detach().cpu().numpy(),
-                    'next_state': state2,
-                    'reward': r,
-                    'episode': self.episode_num,
-                    'stage': 'training',
-                    'done': d,
-                    'transition_actor': self.record['transition_actor'],
-                    'metadata': info}
-
-                experience.append(self.recording)
-
-                # quickly pass data to save thread
-                # if len(experience) == self.save_batch_size:
-                #    self.save_queue.put(experience)
-                #    experience = []
-
-            # Super critical, easy to overlook step: make sure to update
-            # most recent observation!
-            feat = feat2
-            state = state2  # in case we, later, wish to store the state in the replay as well
-            camera = camera2  # in case we, later, wish to store the state in the replay as well
-
-            # Update handling
-            if (t >= self.cfg['update_after']) & (
-                    t % self.cfg['update_every'] == 0):
-                for j in range(self.cfg['update_every']):
-                    batch = self.replay_buffer.sample_batch(
-                        self.cfg['batch_size'])
-                    self.update(data=batch)
-
-            if ((t + 1) % self.cfg['eval_every'] == 0):
-                # eval on test environment
-                #val_returns = self.eval(t // self.cfg['eval_every'])
-                # Reset
-                camera, feat, state = self._reset()
-                ep_ret, ep_len, self.metadata, experience = 0, 0, {}, []
-                t_start = t + 1
-                camera, feat, state2, r, d, info = self._step([0, 1])
-
-            # End of trajectory handling
-            if d or (ep_len == self.cfg['max_ep_len']):
-                self.metadata['info'] = info
-                self.episode_num += 1
-                msg = f'[Ep {self.episode_num }] {self.metadata}'
-                self.file_logger(msg)
-
-                self.tb_logger.add_scalar(
-                    'train/episodic_return', ep_ret, self.episode_num)
-                #self.tb_logger.add_scalar('train/ep_pct_complete', self.metadata['info']['metrics']['pct_complete'], self.episode_num)
-                self.tb_logger.add_scalar(
-                    'train/ep_total_time',
-                    self.metadata['info']['metrics']['total_time'],
-                    self.episode_num)
-                self.tb_logger.add_scalar(
-                    'train/ep_total_distance',
-                    self.metadata['info']['metrics']['total_distance'],
-                    self.episode_num)
-                self.tb_logger.add_scalar(
-                    'train/ep_avg_speed',
-                    self.metadata['info']['metrics']['average_speed_kph'],
-                    self.episode_num)
-                self.tb_logger.add_scalar(
-                    'train/ep_avg_disp_err',
-                    self.metadata['info']['metrics']['average_displacement_error'],
-                    self.episode_num)
-                self.tb_logger.add_scalar(
-                    'train/ep_traj_efficiency',
-                    self.metadata['info']['metrics']['trajectory_efficiency'],
-                    self.episode_num)
-                self.tb_logger.add_scalar(
-                    'train/ep_traj_admissibility',
-                    self.metadata['info']['metrics']['trajectory_admissibility'],
-                    self.episode_num)
-                self.tb_logger.add_scalar(
-                    'train/movement_smoothness',
-                    self.metadata['info']['metrics']['movement_smoothness'],
-                    self.episode_num)
-                self.tb_logger.add_scalar(
-                    'train/ep_n_steps', t - t_start, self.episode_num)
-
-                # Quickly dump recently-completed episode's experience to the multithread queue,
-                # as long as the episode resulted in "success"
-                # and self.metadata['info']['success']:
-                if self.cfg['record_experience']:
-                    self.file_logger("Writing experience")
-                    self.save_queue.put(experience)
-
-                # Reset
-                camera, feat, state = self._reset()
-                ep_ret, ep_len, self.metadata, experience = 0, 0, {}, []
-                t_start = t + 1
-                camera, feat, state2, r, d, info = self._step([0, 1])
+    def _reset(self, test=False):
+        camera = 0
+        while (np.mean(camera) == 0) | (np.mean(camera) == 255):
+            obs = self.test_env.reset(random_pos=False) \
+                if test else self.env.reset(random_pos=True)
+            (state, camera), _ = obs
+        return camera, self._encode((state, camera)), state
