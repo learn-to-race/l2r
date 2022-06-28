@@ -200,6 +200,8 @@ class SACAgent(AbstractAgent):
                                         latent_dims=self.obs_dim,
                                         device=DEVICE)
 
+
+
         self.t_start = t_start
         if self.cfg['checkpoint'] and self.cfg['load_checkpoint']:
             self.actor_critic.load_state_dict(
@@ -211,6 +213,13 @@ class SACAgent(AbstractAgent):
 
         self.actor_critic_target = deepcopy(self.actor_critic)
         self.best_pct = 0
+
+        self.pi_optimizer = Adam(
+            self.actor_critic.policy.parameters(),
+            lr=self.agent.cfg['lr'])
+        self.q_optimizer = Adam(self.actor_critic.q_params, lr=self.agent.cfg['lr'])
+        self.pi_scheduler = torch.optim.lr_scheduler.StepLR(
+            self.pi_optimizer, 1, gamma=0.5)
 
     # Set up function for computing SAC Q-losses
     def compute_loss_q(self, data):
@@ -268,7 +277,7 @@ class SACAgent(AbstractAgent):
 
         # Freeze Q-networks so you don't waste computational effort
         # computing gradients for them during the policy learning step.
-        for p in self.q_params:
+        for p in self.actor_critic.q_params:
             p.requires_grad = False
 
         # Next run one gradient descent step for pi.
@@ -278,7 +287,7 @@ class SACAgent(AbstractAgent):
         self.pi_optimizer.step()
 
         # Unfreeze Q-networks so you can optimize it at next DDPG step.
-        for p in self.q_params:
+        for p in self.actor_critic.q_params:
             p.requires_grad = True
 
         # Finally, update target networks by polyak averaging.

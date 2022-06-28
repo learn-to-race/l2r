@@ -13,31 +13,16 @@ class SACRunner():
 
     def train(self):
 
-        # List of parameters for both Q-networks (save this for convenience)
-        self.agent.q_params = itertools.chain(
-            self.agent.actor_critic.q1.parameters(),
-            self.agent.actor_critic.q2.parameters())
-
-        # Set up optimizers for policy and q-function
-        self.agent.pi_optimizer = Adam(
-            self.agent.actor_critic.policy.parameters(),
-            lr=self.agent.cfg['lr'])
-        self.agent.q_optimizer = Adam(self.agent.q_params, lr=self.agent.cfg['lr'])
-        self.agent.pi_scheduler = torch.optim.lr_scheduler.StepLR(
-            self.agent.pi_optimizer, 1, gamma=0.5)
-
         # Freeze target networks with respect to optimizers (only update via
         # polyak averaging)
         for p in self.agent.actor_critic_target.parameters():
             p.requires_grad = False
 
-        # Count variables (protip: try to get a feel for how different size networks behave!)
-        # var_counts = tuple(core.count_vars(module) for module in [ac.pi, ac.q1, ac.q2])
 
         # Prepare for interaction with environment
         # start_time = time.time()
         best_ret, ep_ret, ep_len = 0, 0, 0
-        camera, feat, state = self.agent._reset()
+        camera, feat, state = self.env._reset()
         camera, feat, state, r, d, info = self.env._step([0, 1])
         feat = self.vision_encoder(feat)
 

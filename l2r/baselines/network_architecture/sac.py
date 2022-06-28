@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 from baselines.core import mlp, SquashedGaussianMLPActor
-
+import itertools
 
 
 
@@ -101,9 +101,14 @@ class ActorCritic(nn.Module):
             obs_dim, act_dim, cfg[cfg['use_encoder_type']]['actor_hiddens'], activation, act_limit)
         if safety:
             self.q1 = DuelingNetwork(cfg)
+            self.q_params = self.q1.parameters()
         else:
             self.q1 = Qfunction(cfg)
             self.q2 = Qfunction(cfg)
+            self.q_params = itertools.chain(
+            self.q1.parameters(),
+            self.q2.parameters()
+                )
         self.device = device
         self.to(device)
 
