@@ -43,3 +43,21 @@ class CVAdaptor():
         out[torch.isnan(out)] = 0
 
         return out
+
+
+class EnvAdaptor():
+    def __init__(self, env, test_env=False):
+        self.env = env
+        self.is_test = test_env
+    
+    def _step(self, a):
+        o, r, d, info = self.env.step(a)
+        return o[1], o, o[0], r, d, info
+
+    def _reset(self):
+        camera = 0
+        while (np.mean(camera) == 0) | (np.mean(camera) == 255):
+            obs = self.env.reset(random_pos=False) \
+                if self.is_test else self.env.reset(random_pos=True)
+            (state, camera), _ = obs
+        return camera, (state, camera), state
