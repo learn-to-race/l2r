@@ -7,11 +7,13 @@ def tryint(s):
     except Exception:
         return s
 
+
 """
 def unique(sequence):
     seen = set()
     return [x for x in sequence if not (x in seen or seen.add(x))]
 """
+
 
 def alphanum_key(s):
     """ Turn a string into a list of string and number chunks.

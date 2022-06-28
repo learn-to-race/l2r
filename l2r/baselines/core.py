@@ -16,14 +16,12 @@ from torch.distributions.normal import Normal
 import ipdb as pdb
 
 
-
 def mlp(sizes, activation=nn.ReLU, output_activation=nn.Identity):
     layers = []
     for j in range(len(sizes) - 1):
         act = activation if j < len(sizes) - 2 else output_activation
         layers += [nn.Linear(sizes[j], sizes[j + 1]), act()]
     return nn.Sequential(*layers)
-
 
 
 LOG_STD_MAX = 2
@@ -88,5 +86,3 @@ class MLPQFunction(nn.Module):
     def forward(self, obs, act):
         q = self.q(torch.cat([obs, act], dim=-1))
         return torch.squeeze(q, -1)  # Critical to ensure q has right shape.
-
-

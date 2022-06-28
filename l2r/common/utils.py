@@ -14,19 +14,19 @@ base_config = {
     "total_distance": "ep_total_distance",
     "average_speed_kph": "ep_avg_speed",
     "average_displacement_error": "ep_avg_disp_err",
-    "trajectory_efficiency":"ep_traj_efficiency",
+    "trajectory_efficiency": "ep_traj_efficiency",
     "trajectory_admissibility": "ep_traj_admissibility",
     "movement_smoothness": "movement_smoothness",
-    "ep_n_steps":"ep_n_steps",
-    "episodic_return":"episodic_return",
-    "ep_interventions":"ep_interventions"
+    "ep_n_steps": "ep_n_steps",
+    "episodic_return": "episodic_return",
+    "ep_interventions": "ep_interventions"
 }
 
 
 class TBLogger:
     """TensorBoard Logger instance."""
 
-    def __init__(self,  log_dir, exp_name, config=base_config):
+    def __init__(self, log_dir, exp_name, config=base_config):
         """Initialize logger."""
         now = datetime.now()
         current_time = now.strftime("%m%d%H%M%S")
@@ -50,8 +50,7 @@ class TBLogger:
         for local_metric_name, tb_metric_name in self.config:
             if local_metric_name in data:
                 self.writer.add_scalar(tb_metric_name,
-                                   data[local_metric_name], iter_no)
-
+                                       data[local_metric_name], iter_no)
 
 
 def setup_tb_logging(log_dir, exp_name, resume):
@@ -60,8 +59,9 @@ def setup_tb_logging(log_dir, exp_name, resume):
     if not resume and os.path.exists(log_dir):
         try:
             shutil.rmtree(log_dir)
-        except:
-            warnings.warn('Experiment existed in TensorBoard, but failed to remove')
+        except BaseException:
+            warnings.warn(
+                'Experiment existed in TensorBoard, but failed to remove')
 
     return TBLogger(log_dir=log_dir)
 
@@ -135,9 +135,6 @@ def resolve_envvars(config, args):
             replace_envvar_patterns(config, key, envvars, args)
 
     return config
-
-
-
 
 
 class RecordExperience:

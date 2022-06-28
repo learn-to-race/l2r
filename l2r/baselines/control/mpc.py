@@ -23,7 +23,7 @@ WB = 2.7  # [m]
 
 # State variables
 DT = 0.1  # [s] time tick
-#N_STATE = 4  # [x, y, v, yaw]
+# N_STATE = 4  # [x, y, v, yaw]
 
 # Controller
 T = 6
@@ -105,7 +105,7 @@ class MPCAgent(AbstractAgent):
                 # so we'll take the first one to give to the environment
                 obs, reward, done, info = self.env.step([di, ai])
                 ep_reward += reward
-                
+
                 if self.save_transitions:
                     (data, img) = obs
                     self._imgs.append(img)

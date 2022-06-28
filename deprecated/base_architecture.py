@@ -5,6 +5,7 @@ from torch.distributions.normal import Normal
 
 from baselines.core import *
 
+
 class MLPActorCritic(nn.Module):
 
     def __init__(
