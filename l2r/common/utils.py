@@ -63,7 +63,7 @@ def setup_tb_logging(log_dir, exp_name, resume):
         except:
             warnings.warn('Experiment existed in TensorBoard, but failed to remove')
 
-    return SummaryWriter(log_dir=log_dir)
+    return TBLogger(log_dir=log_dir)
 
 
 def setup_file_logging(logdir, experiment_name):

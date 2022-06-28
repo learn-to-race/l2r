@@ -1,0 +1,45 @@
+import torch
+import numpy as np
+from torch.optim import Adam
+from cv.vae import VAE
+from constants import DEVICE
+
+class CVAdaptor():
+    
+    def __init__(self, cfg):
+        # vision encoder
+        if cfg['use_encoder_type'] == 'vae':
+            self.model = VAE(
+                im_c=cfg['vae']['im_c'],
+                im_h=cfg['vae']['im_h'],
+                im_w=cfg['vae']['im_w'],
+                z_dim=cfg['vae']['latent_dims']
+            )
+            self.model.load_state_dict(
+                torch.load(
+                    cfg['vae']['vae_chkpt_statedict'],
+                    map_location=DEVICE))
+        else:
+            raise NotImplementedError
+
+        self.model.to(DEVICE)
+    
+    def encode(self, o):
+        state, img = o
+
+        if self.cfg['use_encoder_type'] == 'vae':
+            img_embed = self.model.encode_raw(np.array(img), DEVICE)[0][0]
+            speed = torch.tensor((state[4]**2 +
+                                  state[3]**2 +
+                                  state[5]**2)**0.5).float().reshape(1, -
+                                                                     1).to(DEVICE)
+            out = torch.cat([img_embed.unsqueeze(0), speed],
+                            dim=-1).squeeze(0)  # torch.Size([33])
+            self.using_speed = 1
+        else:
+            raise NotImplementedError
+
+        assert not torch.sum(torch.isnan(out)), "found a nan value"
+        out[torch.isnan(out)] = 0
+
+        return out
