@@ -3,13 +3,7 @@ import torch.nn as nn
 from baselines.core import mlp, SquashedGaussianMLPActor
 
 
-def resnet18(pretrained=True):
-    model = torch.hub.load('pytorch/vision:v0.6.0', 'resnet18',
-                           pretrained=pretrained)
-    for param in model.parameters():
-        param.requires_grad = False
-    model.fc = nn.Identity()
-    return model
+
 
 
 class Qfunction(nn.Module):
@@ -81,11 +75,11 @@ class DuelingNetwork(nn.Module):
 
         out = self.A_network(
             torch.cat([img_embed, spd_embed, action_embed], dim=-1))
-        '''
+        
         if advantage_only == False:
             V = self.V_network(torch.cat([img_embed, spd_embed], dim = -1)) # n x 1
             out += V
-        '''
+        
         return out.view(-1)
 
 

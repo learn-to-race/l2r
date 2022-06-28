@@ -83,7 +83,7 @@ def resolve_envvars(config, args):
             for sub_key in list(config[key].keys()):
                 sub_envvars = find_envvar_patterns(config[key], sub_key)
                 if len(sub_envvars) > 0:
-                    for sub_var in sub_envvars:
+                    for _ in sub_envvars:
                         replace_envvar_patterns(
                             config[key], sub_key, sub_envvars, args)
 
@@ -94,16 +94,7 @@ def resolve_envvars(config, args):
     return config
 
 
-def is_number(s):
-    """
-    Somehow, the most pythonic way to check string for float number; used for safe user input parsing
-    src: https://stackoverflow.com/questions/354038/how-do-i-check-if-a-string-is-a-number-float
-    """
-    try:
-        float(s)
-        return True
-    except ValueError:
-        return False
+
 
 
 class RecordExperience:

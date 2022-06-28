@@ -1,6 +1,6 @@
 import torch.nn as nn
 import torch.utils.model_zoo as model_zoo
-
+import torch
 
 __all__ = ['ResNet', 'resnet18', 'resnet34', 'resnet50', 'resnet101',
            'resnet152']
@@ -157,9 +157,15 @@ class ResNet(nn.Module):
 
         return x, [x0, x1, x2, x3, x4]  # output, intermediate
 
+def resnet18(pretrained=True):
+    model = torch.hub.load('pytorch/vision:v0.6.0', 'resnet18',
+                           pretrained=pretrained)
+    for param in model.parameters():
+        param.requires_grad = False
+    model.fc = nn.Identity()
+    return model
 
-
-def resnet18(pretrained=False, **kwargs):
+def resnet18_1(pretrained=False, **kwargs):
     """Constructs a ResNet-18 model.
     Args:
         pretrained (bool): If True, returns a model pre-trained on ImageNet
