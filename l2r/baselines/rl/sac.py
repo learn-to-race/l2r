@@ -28,6 +28,45 @@ DEVICE = torch.device('cuda') if torch.cuda.is_available() else "cpu"
 # torch.manual_seed(seed)
 # np.random.seed(seed)
 
+class VAEBackbone():
+    def __init__(self, cfg):
+        # vision encoder
+        if cfg['use_encoder_type'] == 'vae':
+            self.model = VAE(
+                im_c=cfg['vae']['im_c'],
+                im_h=cfg['vae']['im_h'],
+                im_w=cfg['vae']['im_w'],
+                z_dim=cfg['vae']['latent_dims']
+            )
+            self.model.load_state_dict(
+                torch.load(
+                    cfg['vae']['vae_chkpt_statedict'],
+                    map_location=DEVICE))
+        else:
+            raise NotImplementedError
+
+        self.model.to(DEVICE)
+    
+    def encode(self, o):
+        state, img = o
+
+        if self.cfg['use_encoder_type'] == 'vae':
+            img_embed = self.model.encode_raw(np.array(img), DEVICE)[0][0]
+            speed = torch.tensor((state[4]**2 +
+                                  state[3]**2 +
+                                  state[5]**2)**0.5).float().reshape(1, -
+                                                                     1).to(DEVICE)
+            out = torch.cat([img_embed.unsqueeze(0), speed],
+                            dim=-1).squeeze(0)  # torch.Size([33])
+            self.using_speed = 1
+        else:
+            raise NotImplementedError
+
+        assert not torch.sum(torch.isnan(out)), "found a nan value"
+        out[torch.isnan(out)] = 0
+
+        return out
+
 
 class SACAgent(AbstractAgent):
     """
@@ -185,22 +224,7 @@ class SACAgent(AbstractAgent):
                                           act_dim=self.act_dim,
                                           size=self.cfg['replay_size'])
 
-        # vision encoder
-        if self.cfg['use_encoder_type'] == 'vae':
-            self.backbone = VAE(
-                im_c=self.cfg['vae']['im_c'],
-                im_h=self.cfg['vae']['im_h'],
-                im_w=self.cfg['vae']['im_w'],
-                z_dim=self.cfg['vae']['latent_dims']
-            )
-            self.backbone.load_state_dict(
-                torch.load(
-                    self.cfg['vae']['vae_chkpt_statedict'],
-                    map_location=DEVICE))
-        else:
-            raise NotImplementedError
 
-        self.backbone.to(DEVICE)
         '''
         ## transform image
         self.transform = transforms.Compose([
@@ -327,11 +351,10 @@ class SACAgent(AbstractAgent):
 
 class SACRunner():
 
-    def __init__(self, agent, env):
-
-        self.a = 1
+    def __init__(self, agent, env, encoder):
         self.agent = agent
         self.env = env
+        self.vision_encoder = encoder
 
     def train(self):
 
@@ -361,6 +384,7 @@ class SACRunner():
         best_ret, ep_ret, ep_len = 0, 0, 0
         camera, feat, state = self.agent._reset()
         camera, feat, state, r, d, info = self.env._step([0, 1])
+        feat = self.vision_encoder(feat)
 
         experience = []
         speed_dim = 1 if self.agent.using_speed else 0
@@ -375,7 +399,7 @@ class SACRunner():
 
             # Step the env
             camera2, feat2, state2, r, d, info = self.env._step(a)
-
+            feat2 = self.vision_encoder(feat2)
             # Check that the camera is turned on
             assert (np.mean(camera2) > 0) & (np.mean(camera2) < 255)
 
@@ -384,11 +408,13 @@ class SACRunner():
             # condition does not activate
             if np.allclose(state2[15:16], state[15:16],
                            atol=self.agent.atol, rtol=0):
+                
                 self.agent.file_logger("Sampling random action to get unstuck")
                 a = self.agent.env.action_space.sample()
 
                 # Step the env
                 camera2, feat2, state2, r, d, info = self.env._step(a)
+                feat2 = self.vision_encoder(feat2)
                 ep_len += 1
 
             state = state2
@@ -456,6 +482,7 @@ class SACRunner():
                 ep_ret, ep_len, self.agent.metadata, experience = 0, 0, {}, []
                 t_start = t + 1
                 camera, feat, state2, r, d, info = self.env._step([0, 1])
+                feat = self.vision_encoder(feat)
 
             # End of trajectory handling
             if d or (ep_len == self.agent.cfg['max_ep_len']):
@@ -510,6 +537,7 @@ class SACRunner():
                 ep_ret, ep_len, self.agent.metadata, experience = 0, 0, {}, []
                 t_start = t + 1
                 camera, feat, state2, r, d, info = self.env._step([0, 1])
+                feat = self.vision_encoder(feat)
 
     def eval(self, n_eps):
         print('Evaluation:')
@@ -523,6 +551,7 @@ class SACRunner():
             d, ep_ret, ep_len, n_val_steps, self.metadata = False, 0, 0, 0, {}
             camera, features, state2, r, d, info = self.env._step(
                 [0, 1], test=True)
+            features = self.vision_encoder(features)
             experience, t = [], 0
 
             while (not d) & (ep_len <= self.cfg['max_ep_len']):
@@ -530,6 +559,8 @@ class SACRunner():
                 a = self.select_action(1e6, features, state, True)
                 camera2, features2, state2, r, d, info = self.env._step(
                     a, test=True)
+                features2 = self.vision_encoder(features2)
+
                 # Check that the camera is turned on
                 assert (np.mean(camera2) > 0) & (np.mean(camera2) < 255)
 
@@ -544,6 +575,8 @@ class SACRunner():
                     a = self.test_env.action_space.sample()
                     # Step the env
                     camera2, features2, state2, r, d, info = self.env._step(a)
+                    features2 = self.vision_encoder(features2)
+                    
                     ep_len += 1
 
                 if self.cfg['record_experience']:
@@ -665,29 +698,9 @@ class EnvWrapper():
         self.test_env = test_env
         self.train_env = train_env
     
-    def _encode(self, o):
-        state, img = o
-
-        if self.cfg['use_encoder_type'] == 'vae':
-            img_embed = self.backbone.encode_raw(np.array(img), DEVICE)[0][0]
-            speed = torch.tensor((state[4]**2 +
-                                  state[3]**2 +
-                                  state[5]**2)**0.5).float().reshape(1, -
-                                                                     1).to(DEVICE)
-            out = torch.cat([img_embed.unsqueeze(0), speed],
-                            dim=-1).squeeze(0)  # torch.Size([33])
-            self.using_speed = 1
-        else:
-            raise NotImplementedError
-
-        assert not torch.sum(torch.isnan(out)), "found a nan value"
-        out[torch.isnan(out)] = 0
-
-        return out
-
     def _step(self, a, test=False):
         o, r, d, info = self.test_env.step(a) if test else self.train_env.step(a)
-        return o[1], self._encode(o), o[0], r, d, info
+        return o[1], o, o[0], r, d, info
 
     def _reset(self, test=False):
         camera = 0
@@ -695,4 +708,4 @@ class EnvWrapper():
             obs = self.test_env.reset(random_pos=False) \
                 if test else self.env.reset(random_pos=True)
             (state, camera), _ = obs
-        return camera, self._encode((state, camera)), state
+        return camera, (state, camera), state
