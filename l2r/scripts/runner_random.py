@@ -10,7 +10,7 @@ import sys
 import ipdb as pdb
 from ruamel.yaml import YAML
 
-from baselines.random import RandomActionAgent
+from baselines.simple.random import RandomActionAgent
 
 if __name__ == "__main__":
 
