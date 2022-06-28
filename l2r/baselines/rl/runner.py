@@ -55,8 +55,8 @@ class SACRunner():
             # Step the env
             camera2, feat2, state2, r, d, info = self.env._step(a)
             feat2 = self.vision_encoder(feat2)
-            # Check that the camera is turned on
-            assert (np.mean(camera2) > 0) & (np.mean(camera2) < 255)
+            
+            
 
             # Prevents the agent from getting stuck by sampling random actions
             # self.agent.atol for SafeRandom and SPAR are set to -1 so that this

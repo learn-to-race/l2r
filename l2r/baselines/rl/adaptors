@@ -52,6 +52,7 @@ class EnvAdaptor():
     
     def _step(self, a):
         o, r, d, info = self.env.step(a)
+        assert (np.mean(o) > 0) & (np.mean(o) < 255)
         return o[1], o, o[0], r, d, info
 
     def _reset(self):
@@ -60,4 +61,5 @@ class EnvAdaptor():
             obs = self.env.reset(random_pos=False) \
                 if self.is_test else self.env.reset(random_pos=True)
             (state, camera), _ = obs
+        assert (np.mean(camera) > 0) & (np.mean(camera) < 255)
         return camera, (state, camera), state
