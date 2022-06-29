@@ -1,45 +1,18 @@
-# ========================================================================= #
-# Filename:                                                                 #
-#    templates.py                                                           #
-#                                                                           #
-# Description:                                                              #
-#    template classes                                                       #
-# ========================================================================= #
-
 import abc
+from typing import List
 
-
-class AbstractAgent(abc.ABC):
-    """Abstract agent class. A potentially useful template for racing agents.
-    """
-
-    def __init__(self, *args, **kwargs):
-        pass
-
-#    @abc.abstractmethod
-#    def create_env(self):
-#        """Instantiate a racing environment.
-#        """
-#        pass
-
-    @abc.abstractmethod
-    def select_action(self):
-        """Select an action to take.
-        """
-        pass
+import matplotlib.path
 
 
 class AbstractInterface(abc.ABC):
-    """Abstract simulator interface to receive data from the simulator.
-    """
+    """Abstract simulator interface to receive data from the simulator."""
 
     def __init__(self, *args, **kwargs):
         pass
 
     @abc.abstractmethod
     def start(self):
-        """The start method is used to start communication with the simulator.
-        """
+        """The start method is used to start communication with the simulator."""
         pass
 
     @abc.abstractmethod
@@ -50,8 +23,7 @@ class AbstractInterface(abc.ABC):
 
     @abc.abstractmethod
     def reset(self):
-        """Used to reset the interface, often to clear existing data.
-        """
+        """Used to reset the interface, often to clear existing data."""
         pass
 
 
@@ -62,16 +34,22 @@ class AbstractReward(abc.ABC):
     def __init__(self, *args, **kwargs):
         pass
 
-    def set_track(self, inside_path, outside_path, centre_path, car_dims):
+    def set_track(
+        self,
+        inside_path: matplotlib.path,
+        outside_path: matplotlib.path,
+        centre_path: matplotlib.path,
+        car_dims: List[float],
+    ):
         """Store the track and vehicle information as class variables. This is
         useful for evaluating the reward based on the position of the vehicle.
 
         :param inside_path: ENU coordinates of the inside track boundary
-        :type inside_path: matplotlib.Path
+        :type inside_path: matplotlib.path
         :param outside_path: ENU coordinates of the outside track boundary
-        :type outside_path: matplotlib.Path
+        :type outside_path: matplotlib.path
         :param centre_path: ENU coordinates of the track's centerline
-        :type centre_path: matplotlib.Path
+        :type centre_path: matplotlib.path
         :param car_dims: dimensions of the vehicle in meters: [length, width]
         :type car_dims: list
         """
@@ -94,6 +72,5 @@ class AbstractReward(abc.ABC):
 
     @abc.abstractmethod
     def reset(self):
-        """Reset the reward policy.
-        """
+        """Reset the reward policy."""
         pass

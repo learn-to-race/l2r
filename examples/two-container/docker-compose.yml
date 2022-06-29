@@ -1,0 +1,30 @@
+services:
+  l2r:
+    image: l2r:latest
+    command: /bin/bash -c "${L2R_COMMAND}"
+    depends_on:
+      - arrival-sim
+    ports:
+      # Receive observations
+      - 7078/udp
+
+  arrival-sim:
+    image: ${SIM_VERSION}
+    command: >
+      /bin/bash -c
+      "chmod -R ugo+rwx home/LinuxNoEditor/ArrivalSim/Saved/
+      && sudo -u ubuntu ./home/LinuxNoEditor/ArrivalSim.sh"
+    ports:
+      # Used by SimulatorController
+      - 16000
+      # Front camera interface
+      - 8008
+      # Action interface
+      - 7077/udp
+    deploy:
+      resources:
+        # Provide simulator access to GPU
+        reservations:
+          devices:
+            - capabilities: [gpu]
+            

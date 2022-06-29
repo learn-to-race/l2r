@@ -1,0 +1,50 @@
+[tool.poetry]
+name = "l2r"
+version = "0.0.1"
+description = "a OpenAI gym environment for high performance autonomous racing"
+readme = "README.md"
+authors = [
+    "Jimmy Herman <jimmyherman29@gmail.com>",
+    "Jon Francis <jmf1@cs.cmu.edu>"
+]
+
+license = "MIT"
+repository = "https://github.com/learn-to-race/l2r"
+keywords = [
+    "reinforcement learning",
+    "racing",
+    "robotics",
+    "machine learning",
+    "computer vision"
+]
+
+[[tool.poetry.source]]
+name = "public"
+url = "https://pypi.python.org/simple/"
+
+[tool.poetry.dependencies]
+python = "^3.7"
+gast = "^0.5"
+gym = "^0.22"
+Pillow = "^7.2.0"
+pyzmq = "^19.0"
+matplotlib = "^3.4"
+numpy = "^1.21"
+requests = "^2.18"
+PyYAML = "^6.0"
+scipy = "^1.6"
+websocket_client = "^1.3"
+tqdm = "^4.64"
+
+[tool.poetry.dev-dependencies]
+black = "^22.6"
+coverage = "^6.0"
+pre-commit = "^2.14"
+
+[tool.black]
+line-length = 88
+force-exclude = "l2r/constants.py"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

@@ -1,5 +1,0 @@
-# parameters for the baseline RandomActionAgent
-
-agent_kwargs:
-    num_episodes: 10
-    save_path: '/mnt/results/random_agent' # for phoebe, should begin with '/mnt'
