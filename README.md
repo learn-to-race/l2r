@@ -1,3 +1,7 @@
+![PyPI](https://img.shields.io/pypi/v/l2r)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/l2r)
+![GitHub](https://img.shields.io/github/license/learn-to-race/l2r?color=blue)
+
 # Learn-to-Race
 
 Learn-to-Race is an [OpenAI gym](https://gym.openai.com/) compliant, multimodal control environment where agents learn how to race. Unlike many simplistic learning environments, ours is built around Arrival’s high-fidelity racing simulator featuring full software-in-the-loop (SIL), and even hardware-in-the-loop (HIL), simulation capabilities. This simulator has played a key role in bringing autonomous racing technology to real life in the [Roborace series](https://roborace.com/), the world’s first extreme competition of teams developing self-driving AI.

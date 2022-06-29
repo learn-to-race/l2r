@@ -1,0 +1,25 @@
+# Pre-commit hooks to run before commits are made
+# See https://pre-commit.com/hooks.html for more hooks
+# 
+# Pre-requisites:
+#   $ pre-commit install
+default_stages: [commit]
+
+repos:
+-   repo: https://github.com/psf/black
+    rev: 22.6.0
+    hooks:
+    -   id: black
+
+-   repo: https://github.com/PyCQA/flake8
+    rev: 4.0.1
+    hooks:
+    -   id: flake8
+
+-  repo: local
+   hooks:
+   -   id: unit-tests
+       name: Unit Tests
+       language: system
+       entry: python -m unittest discover -s test
+       pass_filenames: false

@@ -1,0 +1,8 @@
+cameras:
+  - Name: CameraFrontRGB
+    Addr: 'tcp://0.0.0.0:8008'
+    Format: ColorBGR8
+    bAutoAdvertise: True
+    FOVAngle: 90
+    Width: 256
+    Height: 192
