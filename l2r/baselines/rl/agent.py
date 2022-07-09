@@ -28,7 +28,6 @@ from constants import DEVICE
 # np.random.seed(seed)
 
 
-
 class SACAgent(AbstractAgent):
     """
     Soft Actor-Critic (SAC)
@@ -185,7 +184,6 @@ class SACAgent(AbstractAgent):
                                           act_dim=self.act_dim,
                                           size=self.cfg['replay_size'])
 
-
         '''
         ## transform image
         self.transform = transforms.Compose([
@@ -199,8 +197,6 @@ class SACAgent(AbstractAgent):
                                         self.cfg,
                                         latent_dims=self.obs_dim,
                                         device=DEVICE)
-
-
 
         self.t_start = t_start
         if self.cfg['checkpoint'] and self.cfg['load_checkpoint']:
@@ -217,7 +213,9 @@ class SACAgent(AbstractAgent):
         self.pi_optimizer = Adam(
             self.actor_critic.policy.parameters(),
             lr=self.agent.cfg['lr'])
-        self.q_optimizer = Adam(self.actor_critic.q_params, lr=self.agent.cfg['lr'])
+        self.q_optimizer = Adam(
+            self.actor_critic.q_params,
+            lr=self.agent.cfg['lr'])
         self.pi_scheduler = torch.optim.lr_scheduler.StepLR(
             self.pi_optimizer, 1, gamma=0.5)
 
@@ -313,7 +311,3 @@ class SACAgent(AbstractAgent):
             a = self.env.action_space.sample()
             self.record['transition_actor'] = 'random'
         return a
-
-
-
-

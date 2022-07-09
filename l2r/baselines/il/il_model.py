@@ -37,7 +37,7 @@ class CILModel(nn.Module):
         branch_outputs = self.branches(j)
         # We only have one branch now.
         out = branch_outputs[0]
-        
+
         # speed_branch_output = self.speed_branch(x)
 
         # We concatenate speed with the rest.
@@ -110,7 +110,7 @@ class CILModel(nn.Module):
             }
         )
 
-        #self.speed_branch = FC(params={
+        # self.speed_branch = FC(params={
         #    'neurons': [params['join']['fc']['neurons'][-1]] + params['speed_branch']['fc']['neurons'] + [1],
         #    'dropouts': params['speed_branch']['fc']['dropouts'] + [0.0],
         #    'end_layer': True})

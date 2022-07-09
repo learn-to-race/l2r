@@ -61,6 +61,7 @@ class BikeModel(nn.Module):
 
         return x_init + self.dt * x_dot
 
+
 """
     def grad_input(self, x, u):
         '''
@@ -114,6 +115,7 @@ class BikeModel(nn.Module):
         # pdb.set_trace()
         return A.squeeze(1), B.squeeze(1)
 """
+
 
 class MPC(nn.Module):
     def __init__(self, T=6,

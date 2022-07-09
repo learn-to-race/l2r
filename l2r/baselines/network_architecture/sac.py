@@ -4,8 +4,6 @@ from baselines.core import mlp, SquashedGaussianMLPActor
 import itertools
 
 
-
-
 class Qfunction(nn.Module):
     '''
     Modified from the core MLPQFunction and MLPActorCritic to include a speed encoder
@@ -75,11 +73,12 @@ class DuelingNetwork(nn.Module):
 
         out = self.A_network(
             torch.cat([img_embed, spd_embed, action_embed], dim=-1))
-        
-        if advantage_only == False:
-            V = self.V_network(torch.cat([img_embed, spd_embed], dim = -1)) # n x 1
+
+        if not advantage_only:
+            V = self.V_network(
+                torch.cat([img_embed, spd_embed], dim=-1))  # n x 1
             out += V
-        
+
         return out.view(-1)
 
 
@@ -106,9 +105,9 @@ class ActorCritic(nn.Module):
             self.q1 = Qfunction(cfg)
             self.q2 = Qfunction(cfg)
             self.q_params = itertools.chain(
-            self.q1.parameters(),
-            self.q2.parameters()
-                )
+                self.q1.parameters(),
+                self.q2.parameters()
+            )
         self.device = device
         self.to(device)
 

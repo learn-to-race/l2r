@@ -11,6 +11,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+
 class VAE(nn.Module):
     """Input should be (bsz, C, H, W) where C=3, H=42, W=144"""
 

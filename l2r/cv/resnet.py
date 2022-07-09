@@ -157,6 +157,7 @@ class ResNet(nn.Module):
 
         return x, [x0, x1, x2, x3, x4]  # output, intermediate
 
+
 def resnet18(pretrained=True):
     model = torch.hub.load('pytorch/vision:v0.6.0', 'resnet18',
                            pretrained=pretrained)
@@ -164,6 +165,7 @@ def resnet18(pretrained=True):
         param.requires_grad = False
     model.fc = nn.Identity()
     return model
+
 
 def resnet18_1(pretrained=False, **kwargs):
     """Constructs a ResNet-18 model.

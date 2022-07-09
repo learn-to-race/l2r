@@ -18,7 +18,6 @@ class SACRunner():
         for p in self.agent.actor_critic_target.parameters():
             p.requires_grad = False
 
-
         # Prepare for interaction with environment
         # start_time = time.time()
         best_ret, ep_ret, ep_len = 0, 0, 0
@@ -28,8 +27,8 @@ class SACRunner():
 
         experience = []
         speed_dim = 1 if self.agent.using_speed else 0
-        assert len(feat) == self.agent.cfg[self.agent.cfg['use_encoder_type']]['latent_dims'] + \
-            speed_dim, "'o' has unexpected dimension or is a tuple"
+        assert len(feat) == self.agent.cfg[self.agent.cfg['use_encoder_type']
+                                           ]['latent_dims'] + speed_dim, "'o' has unexpected dimension or is a tuple"
 
         t_start = self.agent.t_start
         # Main loop: collect experience in env and update/log each epoch
@@ -40,15 +39,13 @@ class SACRunner():
             # Step the env
             camera2, feat2, state2, r, d, info = self.env._step(a)
             feat2 = self.vision_encoder(feat2)
-            
-            
 
             # Prevents the agent from getting stuck by sampling random actions
             # self.agent.atol for SafeRandom and SPAR are set to -1 so that this
             # condition does not activate
             if np.allclose(state2[15:16], state[15:16],
                            atol=self.agent.atol, rtol=0):
-                
+
                 self.agent.file_logger("Sampling random action to get unstuck")
                 a = self.agent.env.action_space.sample()
 
@@ -126,7 +123,7 @@ class SACRunner():
 
             # End of trajectory handling
             if d or (ep_len == self.agent.cfg['max_ep_len']):
-                
+
                 info['metrics']['episodic_return'] = ep_ret
                 info['metrics']['ep_n_steps'] = t - t_start
                 self.agent.metadata['info'] = info
@@ -134,8 +131,8 @@ class SACRunner():
                 msg = f'[Ep {self.agent.episode_num }] {self.agent.metadata}'
                 self.agent.file_logger(msg)
 
-
-                self.agent.tb_logger.log(info['metrics'], self.agent.episode_num)
+                self.agent.tb_logger.log(
+                    info['metrics'], self.agent.episode_num)
 
                 # Quickly dump recently-completed episode's experience to the multithread queue,
                 # as long as the episode resulted in "success"
@@ -282,4 +279,3 @@ class SACRunner():
             self.best_pct = info['metrics']['pct_complete']
 
         return val_ep_rets
-
