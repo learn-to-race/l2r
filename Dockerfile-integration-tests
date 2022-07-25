@@ -1,0 +1,13 @@
+FROM python:3.9
+
+SHELL ["/bin/bash", "-c"]
+WORKDIR /root/
+
+# Copy wheels into image
+COPY ./dist/l2r*.whl .
+
+# install l2r
+RUN pip install /root/l2r*.whl
+
+# Add test directory
+COPY test test
