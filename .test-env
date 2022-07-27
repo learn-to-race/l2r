@@ -1,0 +1,3 @@
+FRONT_CAMERA_BGR_PORT=8008
+L2R_COMMAND="sleep 12 && python -m unittest discover -s test -p 'sim_test*.py'"
+SIM_VERSION=arrival-sim:0.7.1.188691
