@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "l2r"
-version = "0.0.1"
+version = "0.0.2"
 description = "a OpenAI gym environment for high performance autonomous racing"
 readme = "README.md"
 authors = [
