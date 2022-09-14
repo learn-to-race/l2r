@@ -5,10 +5,12 @@ import struct
 import threading
 from typing import Dict
 from typing import List
+from typing import Optional
 from typing import Tuple
 
 import numpy as np
 import zmq
+from zmq import Socket
 
 from .classes import CameraConfig
 from .templates import AbstractInterface
@@ -141,7 +143,9 @@ class PoseInterface(AbstractInterface):
       assumed to be of type float
     """
 
-    def __init__(self, ip: str = "0.0.0.0", port: int = 7078, data_elems: int = 30):
+    def __init__(
+        self, ip: str = "0.0.0.0", port: int = 7078, data_elems: int = 30
+    ) -> None:
         addr = (ip, port)
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -179,18 +183,24 @@ class PoseInterface(AbstractInterface):
 class CameraInterface(AbstractInterface):
     """Receives images from the simulator.
 
-    :param l2r.core.CameraConfig cfg: socket connection and interface parameters
+    :param cfg: socket connection and interface parameters
+    :param context: a zmq context object
     """
 
-    def __init__(self, cfg: CameraConfig) -> None:
+    def __init__(self, cfg: CameraConfig, socket: Optional[Socket] = None) -> None:
         self.cfg = cfg
+        self.img_dims = (cfg.Height, cfg.Width, 3)
 
-        # Build socket and connect
-        ctx = zmq.Context()
-        self.sock = ctx.socket(zmq.SUB)
-        self.sock.setsockopt(zmq.SUBSCRIBE, b"")
-        self.sock.setsockopt(zmq.CONFLATE, 1)
-        self.sock.connect(cfg.sim_addr)
+        # Provide a more convenient interface for testing
+        # by allowing a mock socket to be used
+        if socket:
+            self.sock = socket
+        else:
+            ctx = zmq.Context()
+            self.sock = ctx.socket(zmq.SUB)
+            self.sock.setsockopt(zmq.SUBSCRIBE, b"")
+            self.sock.setsockopt(zmq.CONFLATE, 1)
+            self.sock.connect(cfg.sim_addr)
 
     @property
     def camera_name(self) -> str:
@@ -204,7 +214,6 @@ class CameraInterface(AbstractInterface):
 
     def start(self) -> None:
         """Starts a thread to listen for images on."""
-        self.img_dims = (self.cfg.Width, self.cfg.Height, 3)
         self.reset()
         self.thread = threading.Thread(target=self._receive, daemon=True)
         self.thread.start()

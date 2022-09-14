@@ -2,6 +2,8 @@ import unittest
 from unittest import mock
 
 from l2r.core import ActionInterface
+from l2r.core import CameraConfig
+from l2r.core import CameraInterface
 from l2r.core.interfaces import InvalidActionError
 
 
@@ -59,7 +61,7 @@ class ActionInterfaceTest(unittest.TestCase):
         self.assertAlmostEqual(scaled_accel, 0.9)
 
 
-class PoseInterface(unittest.TestCase):
+class PoseInterfaceTest(unittest.TestCase):
     """
     Tests associated with the l2r position interface
     """
@@ -67,9 +69,21 @@ class PoseInterface(unittest.TestCase):
     pass
 
 
-class CameraInterface(unittest.TestCase):
+class CameraInterfaceTest(unittest.TestCase):
     """
     Tests associated with the l2r camera interface
     """
 
-    pass
+    cfg = CameraConfig(Width=256, Height=192)
+    mock_socket = mock.MagicMock()
+
+    def test_img_dims_on_reset(self):
+        """Validate images received are of shape (H, W, 3)"""
+        camera_if = CameraInterface(cfg=self.cfg, socket=self.mock_socket)
+        camera_if.reset()
+        img = camera_if.get_data()
+        self.assertEqual(img.shape, (192, 256, 3))
+
+
+if __name__ == "__main__":
+    unittest.main()
