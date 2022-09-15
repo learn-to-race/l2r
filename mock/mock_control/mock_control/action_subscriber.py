@@ -18,34 +18,35 @@ from rclpy.node import Node
 from std_msgs.msg import String, Float32MultiArray
 
 
-class MinimalPublisher(Node):
+class ActionSubscriber(Node):
 
     def __init__(self):
-        super().__init__('minimal_publisher')
-        self.publisher_ = self.create_publisher(Float32MultiArray, 'topic', 10)
-        timer_period = 0.5  # seconds
-        self.timer = self.create_timer(timer_period, self.timer_callback)
-        self.i = 0
+        super().__init__('action_subscriber')
+        self.subscription = self.create_subscription(
+            Float32MultiArray,
+            'action',
+            self.listener_callback,
+            10)
+        self.subscription  # prevent unused variable warning
 
-    def timer_callback(self):
-        msg = Float32MultiArray()
-        msg.data = [1.0, 2.0]
-        self.publisher_.publish(msg)
-        self.get_logger().info('Publishing: "%s"' % msg.data)
-        self.i += 1
+    def listener_callback(self, msg):
+        if len(msg.data) == 2:
+            self.get_logger().info('Action recved: "%s"' % msg.data)
+        else:
+            self.get_logger().info('Unexpected action: "%s"' % msg.data)
 
 
 def main(args=None):
     rclpy.init(args=args)
 
-    minimal_publisher = MinimalPublisher()
+    action_subscriber = ActionSubscriber()
 
-    rclpy.spin(minimal_publisher)
+    rclpy.spin(action_subscriber)
 
     # Destroy the node explicitly
     # (optional - otherwise it will be done automatically
     # when the garbage collector destroys the node object)
-    minimal_publisher.destroy_node()
+    action_subscriber.destroy_node()
     rclpy.shutdown()
 
 

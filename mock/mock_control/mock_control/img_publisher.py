@@ -16,34 +16,39 @@ import rclpy
 from rclpy.node import Node
 
 from std_msgs.msg import String, Float32MultiArray
+from sensor_msgs.msg import Image
+from cv_bridge import CvBridge
+import cv2
 
-
-class MinimalSubscriber(Node):
+class ImgPublisher(Node):
 
     def __init__(self):
-        super().__init__('minimal_subscriber')
-        self.subscription = self.create_subscription(
-            Float32MultiArray,
-            'topic',
-            self.listener_callback,
-            10)
-        self.subscription  # prevent unused variable warning
+        super().__init__('img_publisher')
+        self.publisher_ = self.create_publisher(Image, 'image', 10)
+        timer_period = 0.5  # seconds
+        self.timer = self.create_timer(timer_period, self.timer_callback)
+        self.i = 0
+        self.cv_image = cv2.imread('test.png')
+        self.bridge = CvBridge()
 
-    def listener_callback(self, msg):
-        self.get_logger().info('I heard: "%s"' % msg.data)
+    def timer_callback(self):
+        msg = self.bridge.cv2_to_imgmsg(self.cv_image)
+        self.publisher_.publish(msg)
+        self.get_logger().info(f'Publishing an image h={msg.height}, w={msg.width}')
+        self.i += 1
 
 
 def main(args=None):
     rclpy.init(args=args)
 
-    minimal_subscriber = MinimalSubscriber()
+    img_publisher = ImgPublisher()
 
-    rclpy.spin(minimal_subscriber)
+    rclpy.spin(img_publisher)
 
     # Destroy the node explicitly
     # (optional - otherwise it will be done automatically
     # when the garbage collector destroys the node object)
-    minimal_subscriber.destroy_node()
+    img_publisher.destroy_node()
     rclpy.shutdown()
 
 

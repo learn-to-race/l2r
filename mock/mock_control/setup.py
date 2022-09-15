@@ -20,8 +20,9 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-                'talker = mock_control.publisher_member_function:main',
-                'listener = mock_control.subscriber_member_function:main',
+                'pose_pub = mock_control.pose_publisher:main',
+                'img_pub = mock_control.img_publisher:main',
+                'action_sub = mock_control.action_subscriber:main',
         ],
     },
 )
