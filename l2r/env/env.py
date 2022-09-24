@@ -1,6 +1,10 @@
 import logging
+import json
+import os
+import pathlib
 import random
 import time
+import math
 from typing import Any
 from typing import List
 from typing import Dict
@@ -9,8 +13,10 @@ from typing import Tuple
 from typing import Union
 
 import gym
+import matplotlib.path as mplPath
 import numpy as np
-from gym.spaces import Box
+from gym.spaces import Box, Dict
+from scipy.spatial import KDTree
 
 from l2r.core import ActionInterface
 from l2r.core import CameraInterface
@@ -20,9 +26,65 @@ from l2r.utils.space import convert_ll_to_enu
 from l2r.track import load_track
 
 from .controller import SimulatorController
-from .reward import GranTurismo
+from .reward import GranTurismo, CustomReward
 from .tracker import ProgressTracker
+from l2r.track import level_2_trackmap
 
+import ipdb as pdb
+
+# Simulator Lag Delay
+MEDIUM_DELAY = 3
+TIMEOUT_DELAY = 30
+LAUNCHING_DELAY = 15
+
+# Restart simulator container every so often
+SIM_RESET = 60 * 20
+
+# Vehicle dimensions in meters
+CAR_DIMS = [3.0, 1.68]
+
+# Raw action space boundaries
+MIN_STEER_REQ = -1.0
+MAX_STEER_REQ = 1.0
+STEER_REQ_RANGE = MAX_STEER_REQ - MIN_STEER_REQ
+
+MIN_ACC_REQ = -16.0
+MAX_ACC_REQ = 6.0
+ACC_REQ_RANGE = MAX_ACC_REQ - MIN_ACC_REQ
+
+NEUTRAL_GEAR = 0
+DRIVE_GEAR = 1
+REVERSE_GEAR = 2
+PARK_GEAR = 3
+GEAR_REQ_RANGE = 4
+
+N_EPISODE_LAPS = 1
+N_SEGMENTS = 10
+
+# Pose observation space boundaries
+MIN_OBS_ARR = [
+    -1.0, -1.0, -1.0,                   # steering, gear, mode
+    -200.0, -200.0, -10.0,              # velocity
+    -100.0, -100.0, -100.0,             # acceleration
+    -1.0, -1.0, -5.0,                   # angular velocity
+    -6.2832, -6.2832, -6.2832,          # yaw, pitch, roll
+    -2000.0, 2000.0, 2000.0,            # location coordinates in the format (y, x, z)
+    -2000.0, -2000.0, -2000.0, -2000.0, # rpm (per wheel)
+    -1.0, -1.0, -1.0, -1.0,             # brake (per wheel)
+    -1.0, -1.0, -1300.0, -1300.0,       # torq (per wheel)
+]
+
+MAX_OBS_ARR = [
+    1.0, 4.0, 1.0,                  # steering, gear, mode
+    200.0, 200.0, 10.0,             # velocity
+    100.0, 100.0, 100.0,            # acceleration
+    1.0, 1.0, 5.0,                  # angular velocity
+    6.2832, 6.2832, 6.2832,         # yaw, pitch, roll
+    2000.0, 2000.0, 2000.0,         # location coordinates in the format (y, x, z)
+    2500.0, 2500.0, 2500.0, 2500.0, # rpm (per wheel)
+    1.0, 1.0, 2.0, 2.0,             # brake (per wheel)
+    1.0, 1.0, 1300.0, 1300.0,       # torq (per wheel)
+]
 
 # Racetrack IDs
 RACETRACKS = {
@@ -31,9 +93,16 @@ RACETRACKS = {
     "AngleseyNational": 2,
 }
 
-LEVEL_Z_DICT = {"Thruxton": 63.0, "VegasNorthRoad": 0.4, "AngleseyNational": 14.0}
+LEVEL_Z_DICT = {
+    "Thruxton": 63.0,
+    "VegasNorthRoad": 0.4,
+    "AngleseyNational": 14.0
+}
 
-COORD_MULTIPLIER = {"Thruxton": -1, "VegasNorthRoad": -1}
+COORD_MULTIPLIER = {
+    "Thruxton": -1,
+    "VegasNorthRoad": -1
+}
 
 
 class RacingEnv(gym.Env):
@@ -48,13 +117,47 @@ class RacingEnv(gym.Env):
         observation_delay: float = OBS_DELAY,
         reward_kwargs: Dict[str, Any] = dict(),
         env_ip: str = "0.0.0.0",
+        env_kwargs: Optional[Dict[str, Union[str, bool]]] = dict(),
+        sim_kwargs: Optional[Dict[str, Union[str, bool]]] = dict(),
+        zone=False,
+        provide_waypoints=False,
+        manual_segments=False,
+        multi_agent=False,
     ):
+
+        self.manual_segments = manual_segments
+        self.provide_waypoints = (
+            provide_waypoints if provide_waypoints else env_kwargs["provide_waypoints"]
+        )
+        self.zone = zone
+        self.multi_agent = multi_agent  # currently not supported; future
+
+        self.evaluation = env_kwargs["eval_mode"]
+        self.training = True if not self.evaluation else False
+       
+        # global config mappings
+        self.n_eval_laps = env_kwargs["n_eval_laps"]
+        self.max_timesteps = env_kwargs["max_timesteps"]
+        self.not_moving_timeout = env_kwargs["not_moving_timeout"]
+        self.observation_delay = env_kwargs["obs_delay"]
+        self.reward_pol = env_kwargs["reward_pol"]
+
+        self.level = sim_kwargs["racetrack"]
+        self.vehicle_params = sim_kwargs["vehicle_params"]
+        self.sensors = sim_kwargs["active_sensors"]
+        self.camera_params = sim_kwargs["camera_params"]
+        self.driver_params = sim_kwargs["driver_params"]
+
         # Interfaces with the simulator
         self.controller = controller
         self.action_interface = action_interface
         self.camera_interfaces = camera_interfaces
         self.pose_interface = pose_interface
-        self.reward = GranTurismo(**reward_kwargs)
+        self.reward = (
+            GranTurismo(**reward_kwargs)
+            if self.reward_pol == "default"
+            else CustomReward(**reward_kwargs)
+        )
 
         # delay between action and observation
         self.observation_delay = observation_delay
@@ -64,6 +167,12 @@ class RacingEnv(gym.Env):
 
         # openAI gym compliance - action space
         self.action_space = Box(low=-1.0, high=1.0, shape=(2,), dtype=np.float64)
+        self.multimodal = env_kwargs["multimodal"]
+        
+        # misc
+        self.last_restart = time.time()
+
+
 
     def make(self, levels: List[str], evaluate: Optional[bool] = False):
         """This sequence of steps must be run when first interacting with the
@@ -216,6 +325,43 @@ class RacingEnv(gym.Env):
         interface, but can also be run on a server.
         """
         return self.imgs
+    
+    @property
+    def multimodal(self):
+        """Getter method for the multimodal property. Changing this value will
+        cause the environment's observation space to change. If true, the
+        environment returns observations as a dictionary with keys:
+        ['sensors', 'img'], otherwise, just the image is returned.
+
+        :return: true if the environment is set to multimodal, false otherwise
+        :rtype: bool
+        """
+        return self._multimodal
+
+    @multimodal.setter
+    def multimodal(self, value):
+        """Setter method for the multimodal property.
+
+        :param bool value: value to self the multimodal property to. true sets
+          the environment to multimodal and makes the observation space a
+          dictionary of the camera images and the sensor data. false is visual
+          only features.
+        """
+        if not isinstance(value, bool):
+            raise TypeError("Multimodal property must be of type: bool")
+
+        self._multimodal = value
+        _spaces = {}
+
+        for name, params, cam in self.cameras:
+            _shape = (params["Width"], params["Height"], 3)
+            _spaces[name] = Box(low=0, high=255, shape=_shape, dtype=np.uint8)
+
+        if self._multimodal:
+            _spaces["sensors"] = Box(
+                low=np.array(MIN_OBS_ARR), high=np.array(MAX_OBS_ARR), dtype=np.float64
+            )
+        self.observation_space = Dict(_spaces)
 
     def _observe(self) -> Dict[str, Union[np.array, Dict[str, np.array]]]:
         """Perform an observation action by getting the most recent data from
@@ -284,6 +430,55 @@ class RacingEnv(gym.Env):
             centre_path=self.racetrack.centre_path,
             car_dims=CAR_DIMS,
         )
+    
+
+    ''' NOT USED CURRENTLY '''
+    def record_manually(
+        self, output_dir, fname="thruxton", num_imgs=5000, sleep_time=0.03
+    ):
+        """Record observations, including images, to an output directory. This
+        is useful for collecting images from the environment. This method does
+        not use the an agent to take environment steps; instead, it just
+        listens for observations while a user manually drives the car in the
+        simulator.
+
+        :param str output_dir: path of the output directory
+        :param str fname: file name for output
+        :param int num_imgs: number of images to record
+        :param float sleep_time: time to sleep between images, in seconds
+        """
+        self.multimodal = True
+        self.reset()
+
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+
+        observations = []
+        for i in range(num_imgs):
+            observations.append(self._observe())
+            time.sleep(sleep_time)
+
+        for n, observation in enumerate(observations):
+            pose, img = observation
+            filename = f"{output_dir}/{fname}_{n}"
+            np.savez_compressed(filename, pose_data=pose, image=img)
+
+        print("Complete")
+
+    def random_start_location(self):
+        """Randomly selects an index on the centerline of the track and
+        returns the ENU coordinates of the selected index along with the yaw of
+        the centerline at that point.
+
+        :returns: coordinates of a random index on centerline, yaw
+        :rtype: np array, float
+        """
+        rand_idx = np.random.randint(0, len(self.random_poses))
+        pos = self.random_poses[rand_idx]
+        print(f"setting random location to: {pos}")
+        coords = {"x": pos[0], "y": pos[1], "z": pos[2]}
+        rot = {"yaw": pos[3], "pitch": 0.0, "roll": 0.0}
+        return coords, rot
 
     def next_segment_start_location(self) -> Tuple[Dict[str, float], Dict[str, float]]:
         """Get spawn location at beginning of next segement"""
@@ -294,12 +489,16 @@ class RacingEnv(gym.Env):
             segment_idx = np.random.randint(
                 0, len(self.racetrack.local_segment_idxs) - 1
             )
-
-        pos = [0] * 4
-        pos[0] = self.tracker.segment_coords["first"][segment_idx][0]  # x
-        pos[1] = self.tracker.segment_coords["first"][segment_idx][1]  # y
-        pos[2] = LEVEL_Z_DICT[self.active_level]  #
-        pos[3] = self.racetrack.race_yaw[self.local_segment_idxs[segment_idx]]
+        
+        try:
+            pos = [0] * 4
+            pos[0] = self.tracker.segment_coords["first"][segment_idx][0]  # x
+            pos[1] = self.tracker.segment_coords["first"][segment_idx][1]  # y
+            pos[2] = LEVEL_Z_DICT[self.active_level]  #
+            pos[3] = self.racetrack.race_yaw[self.local_segment_idxs[segment_idx]]
+        except:
+            pdb.set_trace()
+            pass
 
         coords = {"x": pos[0], "y": pos[1], "z": pos[2]}
         rot = {"yaw": pos[3], "pitch": 0.0, "roll": 0.0}
@@ -321,3 +520,24 @@ class RacingEnv(gym.Env):
         print(f"[Env] Rot: {rot}")
 
         return coords, rot
+    
+    def poses_to_local_segment_idxs(self, poses):
+        
+        segment_idxs = []
+        for (x, y, z, yaw) in poses:
+            # enu_x, enu_y, enu_z = self.geo_location.convert_to_ENU((x, y, z))
+            # idx = self.kdtree.query(np.asarray([enu_x, enu_y]))[1]
+            idx = self.kdtree.query(np.asarray([x, y]))[1]
+            segment_idxs.append(idx)
+
+        return segment_idxs
+
+
+    def _waypoints(self, goal="center", ct=3, step=8):
+        """Return position of goal"""
+        num = len(self.centerline_arr)
+        idxs = [self.nearest_idx + i * step for i in range(ct)]
+        if goal == "center":
+            return np.asarray([self.centerline_arr[idx % num] for idx in idxs])
+        else:
+            raise NotImplementedError
