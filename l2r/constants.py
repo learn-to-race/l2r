@@ -53,6 +53,8 @@ MAX_OBS_ARR = [
 
 VELOCITY_IDX_LOW = 3
 VELOCITY_IDX_HIGH = 6
+NORTH_IDX = 15
+EAST_IDX = 16
 
 ##############################################################################
 # Environment specific

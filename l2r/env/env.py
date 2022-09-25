@@ -117,8 +117,8 @@ class RacingEnv(gym.Env):
         observation_delay: float = OBS_DELAY,
         reward_kwargs: Dict[str, Any] = dict(),
         env_ip: str = "0.0.0.0",
-        env_kwargs: Optional[Dict[str, Union[str, bool]]] = dict(),
-        sim_kwargs: Optional[Dict[str, Union[str, bool]]] = dict(),
+        env_kwargs=dict(),
+        sim_kwargs=dict(),
         zone=False,
         provide_waypoints=False,
         manual_segments=False,
@@ -183,9 +183,18 @@ class RacingEnv(gym.Env):
         self.evaluate = evaluate
 
         # Set the level in the simulator
-        self.levels = levels
-        self.active_level = random.choice(levels)
+        if type(levels) == str:
+            self.level = levels
+            self.levels = None
+            self.active_level = levels
+        elif type(levels) == list:
+            self.levels = levels
+            self.active_level = random.choice(self.levels)
+        else:
+            self.levels = None
+            self.active_level = self.level
         self.controller.set_level(self.active_level)
+        self.controller.set_api_udp()
 
         # Start pose interface
         self.pose_interface.start()
@@ -200,6 +209,9 @@ class RacingEnv(gym.Env):
                 sensor=camera_if.camera_name, params=camera_if.camera_param_dict
             )
             camera_if.start()
+        
+        for sensor in self.sensors:
+            self.controller.enable_sensor(sensor)
 
         # Configure driver
         self.controller.set_sensor_params(
@@ -212,6 +224,23 @@ class RacingEnv(gym.Env):
         )
 
         return self
+    
+    def _restart_simulator(self):
+        """Periodically need to restart the container for long runtimes"""
+        print("[Env] Periodic simulator restart")
+        self.controller.restart_simulator()
+        self.make(
+            levels=self.level,
+        )
+
+    def _check_restart(self, done):
+        """Check if we should restart the simulator"""
+        if not done or not self.controller.start_container:
+            return
+
+        if time.time() - self.last_restart > SIM_RESET:
+            self.last_restart = time.time()
+            self._restart_simulator()
 
     def step(self, action):
         """The primary method of the environment. Executes the desired action,
@@ -240,6 +269,13 @@ class RacingEnv(gym.Env):
         reward = self.reward.get_reward(
             state=(_data, self.nearest_idx), oob_flag=info.get("oob", False)
         )
+
+        _ = self._check_restart(done)
+
+        if self.provide_waypoints:
+            print(f"[Env] WARNING: 'self.provide_waypoints' is set to {self.provide_waypoints}")
+            info["track_idx"] = self.nearest_idx
+            info["waypoints"] = self._waypoints()
 
         return observation, reward, done, info
 
@@ -282,6 +318,25 @@ class RacingEnv(gym.Env):
 
         self.controller.set_mode_ai()
         self.nearest_idx = None
+        info = {}
+
+        # give the simulator time to reset
+        time.sleep(MEDIUM_DELAY)
+
+        # randomly initialize starting location
+        p = np.random.uniform()
+        # with prob 1/(1+n) use the default start location. 
+        if (random_pos) and (p > 2/(1+len(self.racetrack.random_poses))) and not self.evaluation:
+            coords, rot = self.random_start_location()
+            self.controller.set_location(coords, rot)
+            time.sleep(MEDIUM_DELAY)
+
+        elif segment_pos and self.evaluation:
+            coords, rot = self.next_segment_start_location()
+            self.controller.set_location(coords, rot)
+            time.sleep(MEDIUM_DELAY)
+        else:
+            pass
 
         # set location
         # self.controller.set_location(coords, rot)
@@ -291,6 +346,12 @@ class RacingEnv(gym.Env):
         # reset simulator sensors
         self.reward.reset()
         self.pose_interface.reset()
+
+        if self.vehicle_params:
+            self.controller.set_vehicle_params(self.vehicle_params)
+
+        for sensor in self.sensors:
+            self.controller.enable_sensor(sensor)
 
         for camera in self.camera_interfaces:
             camera.reset()

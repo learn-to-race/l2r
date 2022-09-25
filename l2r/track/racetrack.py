@@ -23,6 +23,7 @@ class Racetrack:
     centerline_arr: np.array
     manual_segments: bool
     segment_poses: List[List[float]]
+    random_poses: List[List[float]]
 
     def __post_init__(self) -> None:
         # Path representation of the track boundaries
@@ -87,4 +88,5 @@ def load_track(level: str, manual_segments: bool = False) -> Racetrack:
         centerline_arr=centerline_arr,
         manual_segments=manual_segments,
         segment_poses=segment_poses,
+        random_poses=random_poses,
     )
