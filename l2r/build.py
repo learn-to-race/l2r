@@ -23,7 +23,6 @@ def build_env(
     pose_cfg: Optional[Dict[str, Any]] = dict(),
     env_ip: Optional[str] = "0.0.0.0",
     env_kwargs: Optional[Dict[str, Union[str, bool]]] = dict(),
-    sim_kwargs: Optional[Dict[str, Union[str, bool]]] = dict(),
 ) -> RacingEnv:
     """Build a l2r environment
 
@@ -53,7 +52,6 @@ def build_env(
         pose_interface=pose_interface,
         env_ip=env_ip,
         env_kwargs=env_kwargs,
-        sim_kwargs=sim_kwargs,
     )
 
     return env.make(levels=levels)

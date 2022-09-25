@@ -6,6 +6,8 @@ import struct
 OBS_DELAY = 0.1
 MEDIUM_DELAY = 3
 TIMEOUT_DELAY = 30
+SHORT_DELAY = 0.05
+POLL_DELAY = 0.5
 LAUNCHING_DELAY = 15
 
 ##############################################################################

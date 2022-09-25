@@ -15,7 +15,7 @@ from typing import Union
 import gym
 import matplotlib.path as mplPath
 import numpy as np
-from gym.spaces import Box, Dict
+from gym.spaces import Box
 from scipy.spatial import KDTree
 
 from l2r.core import ActionInterface
@@ -117,20 +117,17 @@ class RacingEnv(gym.Env):
         observation_delay: float = OBS_DELAY,
         reward_kwargs: Dict[str, Any] = dict(),
         env_ip: str = "0.0.0.0",
-        env_kwargs=dict(),
-        sim_kwargs=dict(),
+        env_kwargs: Dict[str, Any]=dict(),
         zone=False,
         provide_waypoints=False,
         manual_segments=False,
-        multi_agent=False,
     ):
 
         self.manual_segments = manual_segments
         self.provide_waypoints = (
             provide_waypoints if provide_waypoints else env_kwargs["provide_waypoints"]
         )
-        self.zone = zone
-        self.multi_agent = multi_agent  # currently not supported; future
+        self.zone = zone  # currently not supported; future
 
         self.evaluation = env_kwargs["eval_mode"]
         self.training = True if not self.evaluation else False
@@ -142,11 +139,8 @@ class RacingEnv(gym.Env):
         self.observation_delay = env_kwargs["obs_delay"]
         self.reward_pol = env_kwargs["reward_pol"]
 
-        self.level = sim_kwargs["racetrack"]
-        self.vehicle_params = sim_kwargs["vehicle_params"]
-        self.sensors = sim_kwargs["active_sensors"]
-        self.camera_params = sim_kwargs["camera_params"]
-        self.driver_params = sim_kwargs["driver_params"]
+        self.vehicle_params = env_kwargs["vehicle_params"]
+        self.sensors = env_kwargs["active_sensors"]
 
         # Interfaces with the simulator
         self.controller = controller
