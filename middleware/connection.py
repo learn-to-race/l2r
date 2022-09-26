@@ -55,6 +55,7 @@ class L2RCamConnection(Connection):
         self.sock.bind(self.ip_port)
     def send(self, data):
         self.sock.send(data)
+        
     def recv(self):
         pass
 

@@ -1,4 +1,5 @@
 import connection
+import threading
 
 class L2RMiddleware:
     def __init__(self):
@@ -39,6 +40,22 @@ class L2RMiddleware:
     def convert_pose(self, target_pose):
         print("Not implemented")
 
+    def start_threads(self):
+        self.action_thread = threading.Thread(target=self.proxy_action)
+        self.pose_thread = threading.Thread(target=self.proxy_pose)
+        self.cam_thread = threading.Thread(target=self.proxy_cam)
+
+        self.action_thread.start()
+        self.pose_thread.start()
+        self.cam_thread.start()
+    
+    def join(self):
+        self.action_thread.join()
+        self.pose_thread.join()
+        self.cam_thread.join()
+
+
+
 class ArrivalMiddleware(L2RMiddleware):
     def __init__(self):
         self.l2r_pose_connection = connection.L2RPoseConnection()
@@ -49,13 +66,10 @@ class ArrivalMiddleware(L2RMiddleware):
         self.target_action_connection = connection.ArrivalActionConnection()
 
     def convert_action(self, l2r_action):
-        # print("action size: {}".format(len(l2r_action)))
         return l2r_action
 
     def convert_camera(self, target_camera):
-        print("cam size: {}".format(len(target_camera)))
         return target_camera
 
     def convert_pose(self, target_pose):
-        # print("pose size: {}".format(len(target_pose)))
         return target_pose
