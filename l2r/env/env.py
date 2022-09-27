@@ -161,7 +161,7 @@ class RacingEnv(gym.Env):
 
         # openAI gym compliance - action space
         self.action_space = Box(low=-1.0, high=1.0, shape=(2,), dtype=np.float64)
-        self.multimodal = env_kwargs["multimodal"]
+        self.multimodal = False
         
         # misc
         self.last_restart = time.time()
