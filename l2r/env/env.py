@@ -161,7 +161,7 @@ class RacingEnv(gym.Env):
 
         # openAI gym compliance - action space
         self.action_space = Box(low=-1.0, high=1.0, shape=(2,), dtype=np.float64)
-        self.multimodal = False
+        #self.multimodal = False
         
         # misc
         self.last_restart = time.time()
@@ -503,7 +503,7 @@ class RacingEnv(gym.Env):
         :param int num_imgs: number of images to record
         :param float sleep_time: time to sleep between images, in seconds
         """
-        self.multimodal = True
+        #self.multimodal = True
         self.reset()
 
         if not os.path.exists(output_dir):
