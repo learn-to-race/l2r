@@ -408,7 +408,7 @@ class RacingEnv(gym.Env):
         self._multimodal = value
         _spaces = {}
 
-        for name, params, cam in self.cameras:
+        for name, params, cam in self.camera_interfaces:
             _shape = (params["Width"], params["Height"], 3)
             _spaces[name] = Box(low=0, high=255, shape=_shape, dtype=np.uint8)
 
