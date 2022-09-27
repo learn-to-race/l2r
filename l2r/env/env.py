@@ -392,7 +392,7 @@ class RacingEnv(gym.Env):
         :rtype: bool
         """
         return self._multimodal
-
+    '''
     @multimodal.setter
     def multimodal(self, value):
         """Setter method for the multimodal property.
@@ -417,6 +417,7 @@ class RacingEnv(gym.Env):
                 low=np.array(MIN_OBS_ARR), high=np.array(MAX_OBS_ARR), dtype=np.float64
             )
         self.observation_space = Dict(_spaces)
+    '''
 
     def _observe(self) -> Dict[str, Union[np.array, Dict[str, np.array]]]:
         """Perform an observation action by getting the most recent data from
