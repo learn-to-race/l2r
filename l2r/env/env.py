@@ -30,7 +30,7 @@ from .reward import GranTurismo, CustomReward
 from .tracker import ProgressTracker
 from l2r.track import level_2_trackmap
 
-import ipdb as pdb
+#import ipdb as pdb
 
 # Simulator Lag Delay
 MEDIUM_DELAY = 3
@@ -553,7 +553,7 @@ class RacingEnv(gym.Env):
             pos[2] = LEVEL_Z_DICT[self.active_level]  #
             pos[3] = self.racetrack.race_yaw[self.local_segment_idxs[segment_idx]]
         except:
-            pdb.set_trace()
+            #pdb.set_trace()
             pass
 
         coords = {"x": pos[0], "y": pos[1], "z": pos[2]}
