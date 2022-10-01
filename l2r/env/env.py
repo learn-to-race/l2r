@@ -264,7 +264,7 @@ class RacingEnv(gym.Env):
             state=(_data, self.nearest_idx), oob_flag=info.get("oob", False)
         )
 
-        _ = self._check_restart(done)
+        #_ = self._check_restart(done)
 
         if self.provide_waypoints:
             print(f"[Env] WARNING: 'self.provide_waypoints' is set to {self.provide_waypoints}")
