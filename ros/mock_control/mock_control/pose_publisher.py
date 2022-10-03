@@ -14,24 +14,40 @@
 
 import rclpy
 from rclpy.node import Node
+import numpy as np
+import struct
+import threading
 
-from std_msgs.msg import String, Float32MultiArray
+from std_msgs.msg import ByteMultiArray
+from .connection import ArrivalPoseConnection
 
+IN_MSG_HEADER_FMT = '=fbbffffffffffffdddffffffffffff'
 
 class PosePublisher(Node):
 
     def __init__(self):
         super().__init__('pose_publisher')
-        self.publisher_ = self.create_publisher(Float32MultiArray, 'pose', 10)
+        self.publisher_ = self.create_publisher(ByteMultiArray, 'pose', 10)
         timer_period = 0.5  # seconds
         self.timer = self.create_timer(timer_period, self.timer_callback)
         self.i = 0
+        self.arrival_pose_connection = ArrivalPoseConnection()
+        self.pose = None
+        self.pose_thread = threading.Thread(target=self._recv_pose)
+        self.pose_thread.start()
+
+    def _recv_pose(self):
+        while True:
+            self.pose = self.arrival_pose_connection.recv()
 
     def timer_callback(self):
-        msg = Float32MultiArray()
-        msg.data = [0.0] * 30
+        msg = ByteMultiArray()
+        if self.pose is None:
+            self.get_logger().info("Waiting for pose from sim")
+            return
+        self.get_logger().info(f'Publishing pose: {struct.unpack(IN_MSG_HEADER_FMT, self.pose)}')
+        msg.data = [bytes([i]) for i in list(self.pose)]
         self.publisher_.publish(msg)
-        self.get_logger().info('Publishing pose: "%s"' % msg.data)
         self.i += 1
 
 

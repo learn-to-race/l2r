@@ -14,26 +14,32 @@
 
 import rclpy
 from rclpy.node import Node
+import struct
 
-from std_msgs.msg import String, Float32MultiArray
+from std_msgs.msg import ByteMultiArray
 
+from .connection import ArrivalActionConnection
+
+OUT_MSG_HEADER_FMT = '=ffb'
+OUT_MSG_HEADER_LENGTH = struct.calcsize(OUT_MSG_HEADER_FMT)
 
 class ActionSubscriber(Node):
 
     def __init__(self):
         super().__init__('action_subscriber')
         self.subscription = self.create_subscription(
-            Float32MultiArray,
+            ByteMultiArray,
             'action',
             self.listener_callback,
             10)
         self.subscription  # prevent unused variable warning
+        self.arrival_action_conn = ArrivalActionConnection()
 
-    def listener_callback(self, msg):
-        if len(msg.data) == 2:
-            self.get_logger().info('Action recved: "%s"' % msg.data)
-        else:
-            self.get_logger().info('Unexpected action: "%s"' % msg.data)
+    def listener_callback(self, msg: ByteMultiArray):
+        action = b''.join(msg.data)
+        self.get_logger().info(f'Action recved: {struct.unpack(OUT_MSG_HEADER_FMT, action)}')
+        self.arrival_action_conn.send(action)
+
 
 
 def main(args=None):

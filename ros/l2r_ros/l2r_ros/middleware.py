@@ -1,7 +1,16 @@
-import connection
-import threading
+import rclpy
+from rclpy.node import Node
+import numpy as np
+import struct
 
-class L2RMiddleware:
+from . import connection
+import threading
+from std_msgs.msg import ByteMultiArray
+
+IN_MSG_HEADER_FMT = '=fbbffffffffffffdddffffffffffff'
+IN_MSG_HEADER_LENGTH = struct.calcsize(IN_MSG_HEADER_FMT)
+
+class L2RMiddleware():
     def __init__(self):
         self.l2r_cam_connection = connection.Connection()
         self.l2r_pose_connection = connection.Connection()
@@ -56,8 +65,9 @@ class L2RMiddleware:
 
 
 
-class ArrivalMiddleware(L2RMiddleware):
+class ArrivalMiddleware(L2RMiddleware, Node):
     def __init__(self):
+        Node.__init__("arrival_middleware")
         self.l2r_pose_connection = connection.L2RPoseConnection()
         self.l2r_cam_connection = connection.L2RCamConnection()
         self.l2r_action_connection = connection.L2RActionConnection()
@@ -73,3 +83,28 @@ class ArrivalMiddleware(L2RMiddleware):
 
     def convert_pose(self, target_pose):
         return target_pose
+
+
+class MockROS2Middleware(L2RMiddleware, Node):
+    def __init__(self):
+        Node.__init__(self, "mock_ros2_middleware")
+        self.l2r_pose_connection = connection.L2RPoseConnection()
+        self.l2r_cam_connection = connection.L2RCamConnection()
+        self.l2r_action_connection = connection.L2RActionConnection()
+        self.target_pose_connection = connection.ROS2SubConnection("pose_sub", "pose", ByteMultiArray)
+        self.target_cam_connection = connection.ArrivalCamConnection()
+        self.target_action_connection = connection.ROS2PubConnection("action_pub", "action", ByteMultiArray)
+        self.spin_pose_thread = threading.Thread(target=self._spin_pose_conn)
+        self.spin_pose_thread.start()
+
+    def _spin_pose_conn(self):
+        rclpy.spin(self.target_pose_connection)
+
+    def convert_action(self, l2r_action):
+        return [bytes([i]) for i in list(l2r_action)]
+
+    def convert_camera(self, target_camera):
+        return target_camera
+
+    def convert_pose(self, target_pose):
+        return b''.join(target_pose)
