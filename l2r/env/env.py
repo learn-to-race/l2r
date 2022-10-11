@@ -129,8 +129,8 @@ class RacingEnv(gym.Env):
         )
         self.zone = zone  # currently not supported; future
 
-        self.evaluation = env_kwargs["eval_mode"]
-        self.training = True if not self.evaluation else False
+        self.evaluate = env_kwargs["eval_mode"]
+        self.training = True if not self.evaluate else False
        
         # global config mappings
         self.n_eval_laps = env_kwargs["n_eval_laps"]
@@ -320,12 +320,12 @@ class RacingEnv(gym.Env):
         # randomly initialize starting location
         p = np.random.uniform()
         # with prob 1/(1+n) use the default start location. 
-        if (random_pos) and (p > 2/(1+len(self.racetrack.random_poses))) and not self.evaluation:
+        if (random_pos) and (p > 2/(1+len(self.racetrack.random_poses))) and not self.evaluate:
             coords, rot = self.random_start_location()
             self.controller.set_location(coords, rot)
             time.sleep(MEDIUM_DELAY)
 
-        elif segment_pos and self.evaluation:
+        elif segment_pos and self.evaluate:
             coords, rot = self.next_segment_start_location()
             self.controller.set_location(coords, rot)
             time.sleep(MEDIUM_DELAY)
