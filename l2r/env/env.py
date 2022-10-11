@@ -278,7 +278,6 @@ class RacingEnv(gym.Env):
         level: Optional[str] = None,
         random_pos: Optional[bool] = False,
         segment_pos: Optional[bool] = True,
-        evaluate: Optional[bool] = False,
     ):
         """Resets the vehicle to start position. A small time delay is used
         allow for the simulator to reset.
@@ -357,7 +356,7 @@ class RacingEnv(gym.Env):
         self.tracker.reset(start_idx=self.nearest_idx, segmentwise=segment_pos)
 
         # Evaluation mode
-        self.evaluate = evaluate
+        #self.evaluate = evaluate
 
         return observation
 
@@ -538,13 +537,8 @@ class RacingEnv(gym.Env):
 
     def next_segment_start_location(self) -> Tuple[Dict[str, float], Dict[str, float]]:
         """Get spawn location at beginning of next segement"""
-        if self.evaluate:
-            segment_idx = self.tracker.current_segment
-            segment_idx = segment_idx % (N_SEGMENTS)
-        else:
-            segment_idx = np.random.randint(
-                0, len(self.racetrack.local_segment_idxs) - 1
-            )
+        segment_idx = self.tracker.current_segment
+        segment_idx = segment_idx % (N_SEGMENTS)
         
         try:
             pos = [0] * 4
@@ -561,11 +555,7 @@ class RacingEnv(gym.Env):
 
         self.tracker.current_segment += 1
 
-        print(
-            "[Env] Spawning to {loc} segment start location".format(
-                loc="next" if self.evaluate else "random"
-            )
-        )
+        print(f"[Env] Spawning to next segment start location")
         print(f"[Env] Current segment: {self.tracker.current_segment}")
         print(
             "[Env] Respawns: {n_spawns}; infractions: {n_infr}".format(
