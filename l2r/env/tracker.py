@@ -183,6 +183,12 @@ class ProgressTracker(object):
             self.segment_success_final = self.segment_success
             self.segment_success = [0] * self.n_segments
         """
+        if self.eval_mode:
+            self.current_segment = self.monitor_segment_progression([idx, self.absolute_idx])
+
+        if self.check_lap_completion(idx, now) and self.eval_mode:
+            self.segment_success_final = self.segment_success
+            self.segment_success = [0] * self.n_segments
 
         self.ep_step_ct += 1
         self.last_update_time = now
@@ -211,7 +217,9 @@ class ProgressTracker(object):
 
         shifted_idx, absolute_idx = idxs
 
-        # closest_border_shft = self.segment_tree.query([shifted_idx])
+        self.last_segment = self.current_segment
+
+        closest_border_shft = self.segment_tree.query([shifted_idx])
         closest_border_abs = self.segment_tree.query([absolute_idx])
         logging.info(f"[Tracker] Track index: {absolute_idx}")
         logging.info(f"[Tracker] Current segment: {self.current_segment}")
@@ -230,7 +238,7 @@ class ProgressTracker(object):
             # approaching the next border
             current_segment_proposal = self.current_segment
 
-        current_segment = (
+        '''current_segment = (
             current_segment_proposal
             if self.eval_mode
             else (1 + self.respawns + self.segment_crossings)
@@ -239,22 +247,26 @@ class ProgressTracker(object):
         if current_segment != self.last_segment:
             self.segment_crossings += 1
             self.segment_success[current_segment - 2] = True
-
+        
         logging.info(
             f"segm_crossings: {self.segment_crossings}, respawns: {self.respawns}"
-        )
+        )'''
 
+        current_segment = current_segment_proposal
         self.last_segment_dist = closest_border_abs[0]
 
-        # if current_segment > SEGM_RESET+1:
-        #    self.segment_success[current_segment-2] = (
-        #        True if self.segment_success[current_segment-2] is not False else False
-        #    )
+        if current_segment >= 10 and self.last_segment <= 1: 
+            # wrong way
+            self.wrong_way = True
+            return current_segment
+
+        if current_segment > SEGM_RESET+1:
+            self.segment_success[current_segment-2] = (
+                True if self.segment_success[current_segment-2] is not False else False
+            )
 
         logging.info(f"[Tracker] Segment success: {self.segment_success}")
-
-        if self.eval_mode:
-            logging.info(f"[Tracker] Crossed halfway point: {self.halfway_flag}\n")
+        logging.info(f"[Tracker] Crossed halfway point: {self.halfway_flag}\n")
 
         return current_segment
 
@@ -272,12 +284,13 @@ class ProgressTracker(object):
           track
         :param float now: time of the update
         """
-        if self.eval_mode and (not self.halfway_flag):
+        if not self.halfway_flag:
             return False
 
-        if (self.eval_mode and (shifted_idx < MAX_PROGRESSION)) or (
+        '''if (self.eval_mode and (shifted_idx < MAX_PROGRESSION)) or (
             self.train_mode and (self.current_segment > self.n_segments)
-        ):
+        ):'''
+        if shifted_idx < MAX_PROGRESSION:
             ct = shifted_idx + (self.n_indices - self.last_idx)
             lap_end = now - (now - self.last_update_time) / ct * shifted_idx
             lap_time = round(lap_end - self.lap_start, 2)
@@ -285,13 +298,13 @@ class ProgressTracker(object):
             self.lap_start = lap_end
             self.halfway_flag = False
 
-            self.laps_completed += 1
-            self.segment_success[-1] = True
-            self.segment_success_final = self.segment_success
-            self.current_segment = SEGM_RESET
-
+            logging.info("[Tracker] Completed a lap!")
             if self.eval_mode:
-                logging.info("[Tracker] Completed a lap!")
+                self.laps_completed += 1
+                self.segment_success[-1] = True
+                self.segment_success_final = self.segment_success
+                self.current_segment = SEGM_RESET
+                
 
             return True
 
@@ -362,19 +375,21 @@ class ProgressTracker(object):
         metrics["trajectory_admissibility"] = round(1 - (proportion_unsafe**0.5), 3)
         metrics["movement_smoothness"] = round(ms, 3)
         metrics["timestep/sec"] = round(len(path[0]) / total_time, 2)
-        metrics["laps_completed"] = self.laps_completed
+        
 
         if self.eval_mode:
+            metrics["laps_completed"] = self.laps_completed
             metrics["pct_complete"] = np.min(
                 [100, round(100 * total_idxs / (self.n_eval_laps * self.n_indices), 1)]
             )
 
-        metrics["success_rate"] = sum(self.segment_success_final) / self.n_segments
+            metrics["success_rate"] = sum(self.segment_success_final) / self.n_segments
 
         info["metrics"] = metrics
 
         if info["success"]:
-            self.segment_success = [0] * self.n_segments
+            if self.eval_mode:
+                self.segment_success = [0] * self.n_segments
 
         return info
 
