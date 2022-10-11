@@ -94,20 +94,20 @@ class ProgressTracker(object):
         self.laps_completed = 0
         self.num_infractions = 0
         self.eval_mode = eval_mode
-        if self.eval_mode:
-            self.n_segments = n_segments
-            self.current_segment = SEGM_RESET
-            self.last_segment = 1
-            self.segment_crossings = 0
-            self.segment_crossing_flag = [False] * self.n_segments
-            self.last_segment_dist = A_BIG_NUMBER
-            self.segment_success = [0] * self.n_segments
-            self.segment_success_final = [0] * self.n_segments
-            self.segment_idxs = segment_idxs
-            self.segment_coords = self.get_segment_coords(
-                self.centerline, self.segment_idxs
-            )
-            self.segment_tree = segment_tree
+        #if self.eval_mode:
+        self.n_segments = n_segments
+        self.current_segment = SEGM_RESET
+        self.last_segment = 1
+        self.segment_crossings = 0
+        self.segment_crossing_flag = [False] * self.n_segments
+        self.last_segment_dist = A_BIG_NUMBER
+        self.segment_success = [0] * self.n_segments
+        self.segment_success_final = [0] * self.n_segments
+        self.segment_idxs = segment_idxs
+        self.segment_coords = self.get_segment_coords(
+            self.centerline, self.segment_idxs
+        )
+        self.segment_tree = segment_tree
 
     def reset(self, start_idx, segmentwise=False):
         """Reset the tracker for the next episode.
