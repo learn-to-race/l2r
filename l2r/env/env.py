@@ -529,8 +529,8 @@ class RacingEnv(gym.Env):
         :returns: coordinates of a random index on centerline, yaw
         :rtype: np array, float
         """
-        rand_idx = np.random.randint(0, len(self.random_poses))
-        pos = self.random_poses[rand_idx]
+        rand_idx = np.random.randint(0, len(self.racetrack.random_poses))
+        pos = self.racetrack.random_poses[rand_idx]
         print(f"setting random location to: {pos}")
         coords = {"x": pos[0], "y": pos[1], "z": pos[2]}
         rot = {"yaw": pos[3], "pitch": 0.0, "roll": 0.0}
