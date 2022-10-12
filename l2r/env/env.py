@@ -175,7 +175,7 @@ class RacingEnv(gym.Env):
         the cameras, sensors, and vehicle need to be configured.
         """
         logging.info("Making l2r environment")
-        self.evaluate = evaluate
+        #self.evaluate = evaluate
 
         # Set the level in the simulator
         if type(levels) == str:
