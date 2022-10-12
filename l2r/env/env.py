@@ -130,7 +130,8 @@ class RacingEnv(gym.Env):
         self.zone = zone  # currently not supported; future
 
         self.evaluate = env_kwargs["eval_mode"]
-        self.training = True if not self.evaluate else False
+        print("[Env] Evaluate", self.evaluate)
+        #self.training = True if not self.evaluate else False
        
         # global config mappings
         self.n_eval_laps = env_kwargs["n_eval_laps"]
