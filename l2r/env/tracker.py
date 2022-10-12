@@ -228,10 +228,6 @@ class ProgressTracker(object):
                 x1=closest_border_abs[0], x2=closest_border_abs[1]
             )
         )
-        print(f"[Tracker] Track index: {absolute_idx}")
-        print(f"[Tracker] Current segment: {self.current_segment}")
-        print(f"[Tracker] Distance to closest segment border: ({closest_border_abs[0]}, {closest_border_abs[1]})")
-   
 
         if (closest_border_abs[0] < 50) and (
             self.last_segment_dist <= closest_border_abs[0]
@@ -271,8 +267,6 @@ class ProgressTracker(object):
 
         logging.info(f"[Tracker] Segment success: {self.segment_success}")
         logging.info(f"[Tracker] Crossed halfway point: {self.halfway_flag}\n")
-        print(f"[Tracker] Segment success: {self.segment_success}")
-        print(f"[Tracker] Crossed halfway point: {self.halfway_flag}\n")
 
         return current_segment
 
