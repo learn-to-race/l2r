@@ -358,7 +358,7 @@ class RacingEnv(gym.Env):
         # Evaluation mode
         #self.evaluate = evaluate
 
-        return observation
+        return observation, None
 
     def poll_simulator(self):
         """Poll the simulator until it receives an action"""
