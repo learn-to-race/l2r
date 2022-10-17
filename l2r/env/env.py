@@ -131,7 +131,6 @@ class RacingEnv(gym.Env):
 
         self.evaluate = env_kwargs["eval_mode"]
         print("[Env] Evaluate", self.evaluate)
-        #self.training = True if not self.evaluate else False
        
         # global config mappings
         self.n_eval_laps = env_kwargs["n_eval_laps"]
@@ -175,7 +174,6 @@ class RacingEnv(gym.Env):
         the cameras, sensors, and vehicle need to be configured.
         """
         logging.info("Making l2r environment")
-        #self.evaluate = evaluate
 
         # Set the level in the simulator
         if type(levels) == str:
@@ -191,11 +189,18 @@ class RacingEnv(gym.Env):
         self.controller.set_level(self.active_level)
         self.controller.set_api_udp()
 
-        # Start pose interface
-        self.pose_interface.start()
-
         # Load active map
         self._load_map()
+
+        # Configure driver
+        self.controller.set_sensor_params(
+            sensor="ArrivalVehicleDriver",
+            params={
+                "DriverAPIClass": "VApiUdp",
+                "DriverAPI_UDP_SendAddress": self.env_ip,
+                "InputSource": "AI",
+            },
+        )
 
         # Camera configuration
         for camera_if in self.camera_interfaces:
@@ -208,15 +213,8 @@ class RacingEnv(gym.Env):
         for sensor in self.sensors:
             self.controller.enable_sensor(sensor)
 
-        # Configure driver
-        self.controller.set_sensor_params(
-            sensor="ArrivalVehicleDriver",
-            params={
-                "DriverAPIClass": "VApiUdp",
-                "DriverAPI_UDP_SendAddress": self.env_ip,
-                "InputSource": "AI",
-            },
-        )
+        # Start pose interface
+        self.pose_interface.start()
 
         return self
     

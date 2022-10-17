@@ -94,20 +94,20 @@ class ProgressTracker(object):
         self.laps_completed = 0
         self.num_infractions = 0
         self.eval_mode = eval_mode
-        #if self.eval_mode:
-        self.n_segments = n_segments
-        self.current_segment = SEGM_RESET
-        self.last_segment = 1
-        self.segment_crossings = 0
-        self.segment_crossing_flag = [False] * self.n_segments
-        self.last_segment_dist = A_BIG_NUMBER
-        self.segment_success = [0] * self.n_segments
-        self.segment_success_final = [0] * self.n_segments
-        self.segment_idxs = segment_idxs
-        self.segment_coords = self.get_segment_coords(
-            self.centerline, self.segment_idxs
-        )
-        self.segment_tree = segment_tree
+        if self.eval_mode:
+            self.n_segments = n_segments
+            self.current_segment = SEGM_RESET
+            #self.last_segment = 1
+            #self.segment_crossings = 0
+            #self.segment_crossing_flag = [False] * self.n_segments
+            self.last_segment_dist = A_BIG_NUMBER
+            self.segment_success = [0] * self.n_segments
+            self.segment_success_final = [0] * self.n_segments
+            self.segment_idxs = segment_idxs
+            self.segment_coords = self.get_segment_coords(
+                self.centerline, self.segment_idxs
+            )
+            self.segment_tree = segment_tree
 
     def reset(self, start_idx, segmentwise=False):
         """Reset the tracker for the next episode.
@@ -260,7 +260,7 @@ class ProgressTracker(object):
             self.wrong_way = True
             return current_segment
 
-        if current_segment > SEGM_RESET+1:
+        if current_segment >= SEGM_RESET+2:
             self.segment_success[current_segment-2] = (
                 True if self.segment_success[current_segment-2] is not False else False
             )
@@ -421,9 +421,7 @@ class ProgressTracker(object):
         dy = 0.5 * (y[2:] - y[:-2])
         d2x = x[2:] - 2 * x[1:-1] + x[0:-2]
         d2y = y[2:] - 2 * y[1:-1] + y[0:-2]
-        k = (dx * d2y - dy * d2x) / (np.square(dx) + np.square(dy) + EPSILON) ** (
-            3.0 / 2.0
-        )
+        k = (dx * d2y - dy * d2x) / (np.square(dx) + np.square(dy) + EPSILON) ** (3.0 / 2.0)
         k_rms = np.sqrt(np.mean(np.square(k)))
 
         return k_rms
