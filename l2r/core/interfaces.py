@@ -56,8 +56,8 @@ class ActionInterface(object):
         self,
         ip: str = "0.0.0.0",
         port: int = 7077,
-        max_steer: float = 1.0,
-        min_steer: float = -1.0,
+        max_steer: float = MAX_STEER_REQ,
+        min_steer: float = MIN_STEER_REQ,
         max_accel: float = MAX_ACC_REQ,
         min_accel: float = MIN_ACC_REQ,
     ) -> None:
