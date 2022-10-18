@@ -544,7 +544,7 @@ class RacingEnv(gym.Env):
             pos[0] = self.tracker.segment_coords["first"][segment_idx][0]  # x
             pos[1] = self.tracker.segment_coords["first"][segment_idx][1]  # y
             pos[2] = LEVEL_Z_DICT[self.active_level]  #
-            pos[3] = self.racetrack.race_yaw[self.local_segment_idxs[segment_idx]]
+            pos[3] = self.racetrack.race_yaw[self.racetrack.local_segment_idxs[segment_idx]]
         except:
             #pdb.set_trace()
             pass
