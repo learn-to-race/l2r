@@ -35,6 +35,15 @@ class Racetrack:
         self.n_indices = len(self.centerline_arr)
         self.kdtree = KDTree(self.centerline_arr)
 
+        local_segment_idxs_manual = self.poses_to_local_segment_idxs(self.segment_poses)
+        local_segment_idxs_linspace = np.round(np.linspace(0, self.n_indices-2, N_SEGMENTS+1)).astype(int)
+
+        self.local_segment_idxs = (
+            local_segment_idxs_linspace
+            if not self.manual_segments
+            else local_segment_idxs_manual
+        )
+
         # Compute yaw values
         race_x = self.centerline_arr[:, 0]
         race_y = self.centerline_arr[:, 1]
@@ -50,11 +59,11 @@ class Racetrack:
         # Local segment indicies
         # If not manual, use linspace to automatically determine segment indices,
         # otherwise use manual points
-        self.local_segment_idxs = (
+        '''self.local_segment_idxs = (
             np.round(np.linspace(0, self.n_indices - 2, N_SEGMENTS + 1)).astype(int)
             if not self.manual_segments
             else [self.nearest_idx(point=[x, y]) for (x, y, _, _) in self.segment_poses]
-        )
+        )'''
 
         self.segment_tree = KDTree(
             np.expand_dims(np.array(self.local_segment_idxs), axis=1)
@@ -63,6 +72,17 @@ class Racetrack:
     def nearest_idx(self, point: np.array) -> int:
         """Get the nearest index on the track to a point"""
         return self.kdtree.query(point)[1]
+    
+    def poses_to_local_segment_idxs(self, poses):
+        
+        segment_idxs = []
+        for (x, y, z, yaw) in poses:
+            # enu_x, enu_y, enu_z = self.geo_location.convert_to_ENU((x, y, z))
+            # idx = self.kdtree.query(np.asarray([enu_x, enu_y]))[1]
+            idx = self.kdtree.query(np.asarray([x, y]))[1]
+            segment_idxs.append(idx)
+
+        return segment_idxs
 
 
 def load_track(level: str, manual_segments: bool = False) -> Racetrack:

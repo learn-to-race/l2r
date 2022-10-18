@@ -484,15 +484,6 @@ class RacingEnv(gym.Env):
             centre_path=self.racetrack.centre_path,
             car_dims=CAR_DIMS,
         )
-
-        local_segment_idxs_manual = self.poses_to_local_segment_idxs(self.segment_poses)
-        local_segment_idxs_linspace = np.round(np.linspace(0, self.n_indices-2, N_SEGMENTS+1)).astype(int)
-
-        self.local_segment_idxs = (
-            local_segment_idxs_linspace
-            if not self.manual_segments
-            else local_segment_idxs_manual
-        )
     
 
     ''' NOT USED CURRENTLY '''
@@ -574,17 +565,6 @@ class RacingEnv(gym.Env):
         print(f"[Env] Rot: {rot}")
 
         return coords, rot
-    
-    def poses_to_local_segment_idxs(self, poses):
-        
-        segment_idxs = []
-        for (x, y, z, yaw) in poses:
-            # enu_x, enu_y, enu_z = self.geo_location.convert_to_ENU((x, y, z))
-            # idx = self.kdtree.query(np.asarray([enu_x, enu_y]))[1]
-            idx = self.kdtree.query(np.asarray([x, y]))[1]
-            segment_idxs.append(idx)
-
-        return segment_idxs
 
 
     def _waypoints(self, goal="center", ct=3, step=8):
