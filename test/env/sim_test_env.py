@@ -32,8 +32,7 @@ class EnvIntegrationTest(unittest.TestCase):
             ],
             action_cfg={"ip": ARRIVAL_SIM_HOST},
             env_ip=L2R_HOST,
-            env_kwargs=
-            {
+            env_kwargs={
                 "multimodal": True,
                 "eval_mode": True,
                 "n_eval_laps": 1,
@@ -42,11 +41,9 @@ class EnvIntegrationTest(unittest.TestCase):
                 "not_moving_timeout": 100,
                 "reward_pol": "custom",
                 "provide_waypoints": False,
-                "active_sensors": [
-                    "CameraFrontRGB", "CameraRightRGB", "CameraLeftRGB"
-                ],
-                "vehicle_params":False,
-            }
+                "active_sensors": ["CameraFrontRGB", "CameraRightRGB", "CameraLeftRGB"],
+                "vehicle_params": False,
+            },
         )
 
         self.assertIsInstance(env, RacingEnv)

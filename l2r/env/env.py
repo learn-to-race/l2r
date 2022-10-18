@@ -1,10 +1,13 @@
 import logging
-import json
+
+# import json
 import os
-import pathlib
+
+# import pathlib
 import random
 import time
-import math
+
+# import math
 from typing import Any
 from typing import List
 from typing import Dict
@@ -13,10 +16,12 @@ from typing import Tuple
 from typing import Union
 
 import gym
-import matplotlib.path as mplPath
+
+# import matplotlib.path as mplPath
 import numpy as np
 from gym.spaces import Box
-from scipy.spatial import KDTree
+
+# from scipy.spatial import KDTree
 
 from l2r.core import ActionInterface
 from l2r.core import CameraInterface
@@ -28,9 +33,10 @@ from l2r.track import load_track
 from .controller import SimulatorController
 from .reward import GranTurismo, CustomReward
 from .tracker import ProgressTracker
-from l2r.track import level_2_trackmap
 
-#import ipdb as pdb
+# from l2r.track import level_2_trackmap
+
+# import ipdb as pdb
 
 # Simulator Lag Delay
 MEDIUM_DELAY = 3
@@ -40,9 +46,6 @@ LAUNCHING_DELAY = 15
 # Restart simulator container every so often
 SIM_RESET = 60 * 20
 
-# Vehicle dimensions in meters
-CAR_DIMS = [3.0, 1.68]
-
 NEUTRAL_GEAR = 0
 DRIVE_GEAR = 1
 REVERSE_GEAR = 2
@@ -50,31 +53,72 @@ PARK_GEAR = 3
 GEAR_REQ_RANGE = 4
 
 N_EPISODE_LAPS = 1
-N_SEGMENTS = 10
 
 # Pose observation space boundaries
 MIN_OBS_ARR = [
-    -1.0, -1.0, -1.0,                   # steering, gear, mode
-    -200.0, -200.0, -10.0,              # velocity
-    -100.0, -100.0, -100.0,             # acceleration
-    -1.0, -1.0, -5.0,                   # angular velocity
-    -6.2832, -6.2832, -6.2832,          # yaw, pitch, roll
-    -2000.0, 2000.0, 2000.0,            # location coordinates in the format (y, x, z)
-    -2000.0, -2000.0, -2000.0, -2000.0, # rpm (per wheel)
-    -1.0, -1.0, -1.0, -1.0,             # brake (per wheel)
-    -1.0, -1.0, -1300.0, -1300.0,       # torq (per wheel)
+    -1.0,
+    -1.0,
+    -1.0,  # steering, gear, mode
+    -200.0,
+    -200.0,
+    -10.0,  # velocity
+    -100.0,
+    -100.0,
+    -100.0,  # acceleration
+    -1.0,
+    -1.0,
+    -5.0,  # angular velocity
+    -6.2832,
+    -6.2832,
+    -6.2832,  # yaw, pitch, roll
+    -2000.0,
+    2000.0,
+    2000.0,  # location coordinates in the format (y, x, z)
+    -2000.0,
+    -2000.0,
+    -2000.0,
+    -2000.0,  # rpm (per wheel)
+    -1.0,
+    -1.0,
+    -1.0,
+    -1.0,  # brake (per wheel)
+    -1.0,
+    -1.0,
+    -1300.0,
+    -1300.0,  # torq (per wheel)
 ]
 
 MAX_OBS_ARR = [
-    1.0, 4.0, 1.0,                  # steering, gear, mode
-    200.0, 200.0, 10.0,             # velocity
-    100.0, 100.0, 100.0,            # acceleration
-    1.0, 1.0, 5.0,                  # angular velocity
-    6.2832, 6.2832, 6.2832,         # yaw, pitch, roll
-    2000.0, 2000.0, 2000.0,         # location coordinates in the format (y, x, z)
-    2500.0, 2500.0, 2500.0, 2500.0, # rpm (per wheel)
-    1.0, 1.0, 2.0, 2.0,             # brake (per wheel)
-    1.0, 1.0, 1300.0, 1300.0,       # torq (per wheel)
+    1.0,
+    4.0,
+    1.0,  # steering, gear, mode
+    200.0,
+    200.0,
+    10.0,  # velocity
+    100.0,
+    100.0,
+    100.0,  # acceleration
+    1.0,
+    1.0,
+    5.0,  # angular velocity
+    6.2832,
+    6.2832,
+    6.2832,  # yaw, pitch, roll
+    2000.0,
+    2000.0,
+    2000.0,  # location coordinates in the format (y, x, z)
+    2500.0,
+    2500.0,
+    2500.0,
+    2500.0,  # rpm (per wheel)
+    1.0,
+    1.0,
+    2.0,
+    2.0,  # brake (per wheel)
+    1.0,
+    1.0,
+    1300.0,
+    1300.0,  # torq (per wheel)
 ]
 
 # Racetrack IDs
@@ -84,16 +128,9 @@ RACETRACKS = {
     "AngleseyNational": 2,
 }
 
-LEVEL_Z_DICT = {
-    "Thruxton": 63.0,
-    "VegasNorthRoad": 0.4,
-    "AngleseyNational": 14.0
-}
+LEVEL_Z_DICT = {"Thruxton": 63.0, "VegasNorthRoad": 0.4, "AngleseyNational": 14.0}
 
-COORD_MULTIPLIER = {
-    "Thruxton": -1,
-    "VegasNorthRoad": -1
-}
+COORD_MULTIPLIER = {"Thruxton": -1, "VegasNorthRoad": -1}
 
 
 class RacingEnv(gym.Env):
@@ -108,7 +145,7 @@ class RacingEnv(gym.Env):
         observation_delay: float = OBS_DELAY,
         reward_kwargs: Dict[str, Any] = dict(),
         env_ip: str = "0.0.0.0",
-        env_kwargs: Dict[str, Any]=dict(),
+        env_kwargs: Dict[str, Any] = dict(),
         zone=False,
         provide_waypoints=False,
         manual_segments=False,
@@ -122,7 +159,7 @@ class RacingEnv(gym.Env):
 
         self.evaluate = env_kwargs["eval_mode"]
         print("[Env] Evaluate", self.evaluate)
-       
+
         # global config mappings
         self.n_eval_laps = env_kwargs["n_eval_laps"]
         self.max_timesteps = env_kwargs["max_timesteps"]
@@ -152,12 +189,10 @@ class RacingEnv(gym.Env):
 
         # openAI gym compliance - action space
         self.action_space = Box(low=-1.0, high=1.0, shape=(2,), dtype=np.float64)
-        #self.multimodal = False
-        
+        # self.multimodal = False
+
         # misc
         self.last_restart = time.time()
-
-
 
     def make(self, levels: List[str], evaluate: Optional[bool] = False):
         """This sequence of steps must be run when first interacting with the
@@ -200,7 +235,7 @@ class RacingEnv(gym.Env):
                 sensor=camera_if.camera_name, params=camera_if.camera_param_dict
             )
             camera_if.start()
-        
+
         for sensor in self.sensors:
             self.controller.enable_sensor(sensor)
 
@@ -208,7 +243,7 @@ class RacingEnv(gym.Env):
         self.pose_interface.start()
 
         return self
-    
+
     def _restart_simulator(self):
         """Periodically need to restart the container for long runtimes"""
         print("[Env] Periodic simulator restart")
@@ -254,10 +289,13 @@ class RacingEnv(gym.Env):
             state=(_data, self.nearest_idx), oob_flag=info.get("oob", False)
         )
 
-        #_ = self._check_restart(done)
+        # _ = self._check_restart(done)
 
         if self.provide_waypoints:
-            print(f"[Env] WARNING: 'self.provide_waypoints' is set to {self.provide_waypoints}")
+            print(
+                f"[Env] WARNING: 'self.provide_waypoints' \
+                    is set to {self.provide_waypoints}"
+            )
             info["track_idx"] = self.nearest_idx
             info["waypoints"] = self._waypoints()
 
@@ -301,15 +339,19 @@ class RacingEnv(gym.Env):
 
         self.controller.set_mode_ai()
         self.nearest_idx = None
-        info = {}
+        # info = {}
 
         # give the simulator time to reset
         time.sleep(MEDIUM_DELAY)
 
         # randomly initialize starting location
         p = np.random.uniform()
-        # with prob 1/(1+n) use the default start location. 
-        if (random_pos) and (p > 2/(1+len(self.racetrack.random_poses))) and not self.evaluate:
+        # with prob 1/(1+n) use the default start location.
+        if (
+            (random_pos)
+            and (p > 2 / (1 + len(self.racetrack.random_poses)))
+            and not self.evaluate
+        ):
             coords, rot = self.random_start_location()
             self.controller.set_location(coords, rot)
             time.sleep(MEDIUM_DELAY)
@@ -346,7 +388,7 @@ class RacingEnv(gym.Env):
         self.tracker.reset(start_idx=self.nearest_idx, segmentwise=segment_pos)
 
         # Evaluation mode
-        #self.evaluate = evaluate
+        # self.evaluate = evaluate
 
         return observation
 
@@ -369,7 +411,7 @@ class RacingEnv(gym.Env):
         interface, but can also be run on a server.
         """
         return self.imgs
-    
+
     @property
     def multimodal(self):
         """Getter method for the multimodal property. Changing this value will
@@ -381,6 +423,7 @@ class RacingEnv(gym.Env):
         :rtype: bool
         """
         return self._multimodal
+
     '''
     @multimodal.setter
     def multimodal(self, value):
@@ -475,9 +518,9 @@ class RacingEnv(gym.Env):
             centre_path=self.racetrack.centre_path,
             car_dims=CAR_DIMS,
         )
-    
 
-    ''' NOT USED CURRENTLY '''
+    """ NOT USED CURRENTLY """
+
     def record_manually(
         self, output_dir, fname="thruxton", num_imgs=5000, sleep_time=0.03
     ):
@@ -492,7 +535,7 @@ class RacingEnv(gym.Env):
         :param int num_imgs: number of images to record
         :param float sleep_time: time to sleep between images, in seconds
         """
-        #self.multimodal = True
+        # self.multimodal = True
         self.reset()
 
         if not os.path.exists(output_dir):
@@ -529,23 +572,19 @@ class RacingEnv(gym.Env):
         """Get spawn location at beginning of next segement"""
         segment_idx = self.tracker.current_segment
         segment_idx = segment_idx % (N_SEGMENTS)
-        
-        try:
-            pos = [0] * 4
-            pos[0] = self.tracker.segment_coords["first"][segment_idx][0]  # x
-            pos[1] = self.tracker.segment_coords["first"][segment_idx][1]  # y
-            pos[2] = LEVEL_Z_DICT[self.active_level]  #
-            pos[3] = self.racetrack.race_yaw[self.racetrack.local_segment_idxs[segment_idx]]
-        except:
-            #pdb.set_trace()
-            pass
+
+        pos = [0] * 4
+        pos[0] = self.tracker.segment_coords["first"][segment_idx][0]  # x
+        pos[1] = self.tracker.segment_coords["first"][segment_idx][1]  # y
+        pos[2] = LEVEL_Z_DICT[self.active_level]  #
+        pos[3] = self.racetrack.race_yaw[self.racetrack.local_segment_idxs[segment_idx]]
 
         coords = {"x": pos[0], "y": pos[1], "z": pos[2]}
         rot = {"yaw": pos[3], "pitch": 0.0, "roll": 0.0}
 
         self.tracker.current_segment += 1
 
-        print(f"[Env] Spawning to next segment start location")
+        print("[Env] Spawning to next segment start location")
         print(f"[Env] Current segment: {self.tracker.current_segment}")
         print(
             "[Env] Respawns: {n_spawns}; infractions: {n_infr}".format(
@@ -556,7 +595,6 @@ class RacingEnv(gym.Env):
         print(f"[Env] Rot: {rot}")
 
         return coords, rot
-
 
     def _waypoints(self, goal="center", ct=3, step=8):
         """Return position of goal"""

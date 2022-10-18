@@ -143,5 +143,3 @@ class CustomReward(GranTurismo):
 
         dist = np.linalg.norm(loc - self.centre_path[race_idx])
         return self.c_bonus if dist < self.d_thresh else 0.0
-
-
