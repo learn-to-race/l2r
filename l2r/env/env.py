@@ -26,7 +26,15 @@ from gym.spaces import Box
 from l2r.core import ActionInterface
 from l2r.core import CameraInterface
 from l2r.core import PoseInterface
-from l2r.constants import CAR_DIMS, N_SEGMENTS, OBS_DELAY
+from l2r.constants import (
+    CAR_DIMS,
+    N_SEGMENTS,
+    OBS_DELAY,
+    RACETRACKS,
+    MEDIUM_DELAY,
+    LEVEL_Z_DICT,
+    COORD_MULTIPLIER,
+)
 from l2r.utils.space import convert_ll_to_enu
 from l2r.track import load_track
 
@@ -37,100 +45,6 @@ from .tracker import ProgressTracker
 # from l2r.track import level_2_trackmap
 
 # import ipdb as pdb
-
-# Simulator Lag Delay
-MEDIUM_DELAY = 3
-TIMEOUT_DELAY = 30
-LAUNCHING_DELAY = 15
-
-# Restart simulator container every so often
-SIM_RESET = 60 * 20
-
-NEUTRAL_GEAR = 0
-DRIVE_GEAR = 1
-REVERSE_GEAR = 2
-PARK_GEAR = 3
-GEAR_REQ_RANGE = 4
-
-N_EPISODE_LAPS = 1
-
-# Pose observation space boundaries
-MIN_OBS_ARR = [
-    -1.0,
-    -1.0,
-    -1.0,  # steering, gear, mode
-    -200.0,
-    -200.0,
-    -10.0,  # velocity
-    -100.0,
-    -100.0,
-    -100.0,  # acceleration
-    -1.0,
-    -1.0,
-    -5.0,  # angular velocity
-    -6.2832,
-    -6.2832,
-    -6.2832,  # yaw, pitch, roll
-    -2000.0,
-    2000.0,
-    2000.0,  # location coordinates in the format (y, x, z)
-    -2000.0,
-    -2000.0,
-    -2000.0,
-    -2000.0,  # rpm (per wheel)
-    -1.0,
-    -1.0,
-    -1.0,
-    -1.0,  # brake (per wheel)
-    -1.0,
-    -1.0,
-    -1300.0,
-    -1300.0,  # torq (per wheel)
-]
-
-MAX_OBS_ARR = [
-    1.0,
-    4.0,
-    1.0,  # steering, gear, mode
-    200.0,
-    200.0,
-    10.0,  # velocity
-    100.0,
-    100.0,
-    100.0,  # acceleration
-    1.0,
-    1.0,
-    5.0,  # angular velocity
-    6.2832,
-    6.2832,
-    6.2832,  # yaw, pitch, roll
-    2000.0,
-    2000.0,
-    2000.0,  # location coordinates in the format (y, x, z)
-    2500.0,
-    2500.0,
-    2500.0,
-    2500.0,  # rpm (per wheel)
-    1.0,
-    1.0,
-    2.0,
-    2.0,  # brake (per wheel)
-    1.0,
-    1.0,
-    1300.0,
-    1300.0,  # torq (per wheel)
-]
-
-# Racetrack IDs
-RACETRACKS = {
-    "VegasNorthRoad": 0,
-    "Thruxton": 1,
-    "AngleseyNational": 2,
-}
-
-LEVEL_Z_DICT = {"Thruxton": 63.0, "VegasNorthRoad": 0.4, "AngleseyNational": 14.0}
-
-COORD_MULTIPLIER = {"Thruxton": -1, "VegasNorthRoad": -1}
 
 
 class RacingEnv(gym.Env):
@@ -189,7 +103,6 @@ class RacingEnv(gym.Env):
 
         # openAI gym compliance - action space
         self.action_space = Box(low=-1.0, high=1.0, shape=(2,), dtype=np.float64)
-        # self.multimodal = False
 
         # misc
         self.last_restart = time.time()
@@ -236,30 +149,13 @@ class RacingEnv(gym.Env):
             )
             camera_if.start()
 
-        for sensor in self.sensors:
-            self.controller.enable_sensor(sensor)
+        """for sensor in self.sensors:
+            self.controller.enable_sensor(sensor)"""
 
         # Start pose interface
         self.pose_interface.start()
 
         return self
-
-    def _restart_simulator(self):
-        """Periodically need to restart the container for long runtimes"""
-        print("[Env] Periodic simulator restart")
-        self.controller.restart_simulator()
-        self.make(
-            levels=self.level,
-        )
-
-    def _check_restart(self, done):
-        """Check if we should restart the simulator"""
-        if not done or not self.controller.start_container:
-            return
-
-        if time.time() - self.last_restart > SIM_RESET:
-            self.last_restart = time.time()
-            self._restart_simulator()
 
     def step(self, action):
         """The primary method of the environment. Executes the desired action,
@@ -288,8 +184,6 @@ class RacingEnv(gym.Env):
         reward = self.reward.get_reward(
             state=(_data, self.nearest_idx), oob_flag=info.get("oob", False)
         )
-
-        # _ = self._check_restart(done)
 
         if self.provide_waypoints:
             print(
@@ -412,45 +306,6 @@ class RacingEnv(gym.Env):
         """
         return self.imgs
 
-    @property
-    def multimodal(self):
-        """Getter method for the multimodal property. Changing this value will
-        cause the environment's observation space to change. If true, the
-        environment returns observations as a dictionary with keys:
-        ['sensors', 'img'], otherwise, just the image is returned.
-
-        :return: true if the environment is set to multimodal, false otherwise
-        :rtype: bool
-        """
-        return self._multimodal
-
-    '''
-    @multimodal.setter
-    def multimodal(self, value):
-        """Setter method for the multimodal property.
-
-        :param bool value: value to self the multimodal property to. true sets
-          the environment to multimodal and makes the observation space a
-          dictionary of the camera images and the sensor data. false is visual
-          only features.
-        """
-        if not isinstance(value, bool):
-            raise TypeError("Multimodal property must be of type: bool")
-
-        self._multimodal = value
-        _spaces = {}
-
-        for name, params, cam in self.camera_interfaces:
-            _shape = (params["Width"], params["Height"], 3)
-            _spaces[name] = Box(low=0, high=255, shape=_shape, dtype=np.uint8)
-
-        if self._multimodal:
-            _spaces["sensors"] = Box(
-                low=np.array(MIN_OBS_ARR), high=np.array(MAX_OBS_ARR), dtype=np.float64
-            )
-        self.observation_space = Dict(_spaces)
-    '''
-
     def _observe(self) -> Dict[str, Union[np.array, Dict[str, np.array]]]:
         """Perform an observation action by getting the most recent data from
         the pose and camera interfaces. To prevent observating immediately
@@ -535,7 +390,6 @@ class RacingEnv(gym.Env):
         :param int num_imgs: number of images to record
         :param float sleep_time: time to sleep between images, in seconds
         """
-        # self.multimodal = True
         self.reset()
 
         if not os.path.exists(output_dir):
