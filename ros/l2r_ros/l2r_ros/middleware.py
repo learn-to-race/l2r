@@ -1,6 +1,6 @@
 import rclpy
 from rclpy.node import Node
-import numpy as np
+import rclpy.executors
 import struct
 
 from . import connection
@@ -92,19 +92,19 @@ class MockROS2Middleware(L2RMiddleware, Node):
         self.l2r_cam_connection = connection.L2RCamConnection()
         self.l2r_action_connection = connection.L2RActionConnection()
         self.target_pose_connection = connection.ROS2SubConnection("pose_sub", "pose", ByteMultiArray)
-        self.target_cam_connection = connection.ArrivalCamConnection()
+        self.target_cam_connection = connection.ROS2SubConnection("image_sub", "image", ByteMultiArray)
         self.target_action_connection = connection.ROS2PubConnection("action_pub", "action", ByteMultiArray)
-        self.spin_pose_thread = threading.Thread(target=self._spin_pose_conn)
-        self.spin_pose_thread.start()
-
-    def _spin_pose_conn(self):
-        rclpy.spin(self.target_pose_connection)
+        self.exec = rclpy.executors.MultiThreadedExecutor()
+        self.exec.add_node(self.target_pose_connection)
+        self.exec.add_node(self.target_cam_connection)
+        self.spin_thread = threading.Thread(target=self.exec.spin, daemon=True)
+        self.spin_thread.start()
 
     def convert_action(self, l2r_action):
         return [bytes([i]) for i in list(l2r_action)]
 
     def convert_camera(self, target_camera):
-        return target_camera
+        return b''.join(target_camera)
 
     def convert_pose(self, target_pose):
         return b''.join(target_pose)

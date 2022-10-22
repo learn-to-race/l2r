@@ -15,27 +15,37 @@
 import rclpy
 from rclpy.node import Node
 
-from std_msgs.msg import String, Float32MultiArray
-from sensor_msgs.msg import Image
-from cv_bridge import CvBridge
-import cv2
+import threading
+
+from std_msgs.msg import ByteMultiArray
+from .connection import ArrivalCamConnection
 
 class ImgPublisher(Node):
 
     def __init__(self):
         super().__init__('img_publisher')
-        self.publisher_ = self.create_publisher(Image, 'image', 10)
+        self.publisher_ = self.create_publisher(ByteMultiArray, 'image', 10)
         timer_period = 0.5  # seconds
         self.timer = self.create_timer(timer_period, self.timer_callback)
         self.i = 0
-        self.cv_image = cv2.imread('test.png')
-        self.bridge = CvBridge()
+        self.arrival_cam_connection = ArrivalCamConnection()
+        self.img = None
+        self.cam_thread = threading.Thread(target=self._recv_img)
+        self.cam_thread.start()
 
     def timer_callback(self):
-        msg = self.bridge.cv2_to_imgmsg(self.cv_image)
+        msg = ByteMultiArray()
+        if self.img is None:
+            self.get_logger().info("Waiting for img from sim")
+            return
+        msg.data = [bytes([i]) for i in list(self.img)]
+        self.get_logger().info(f'Pub topic=image, len={len(msg.data)}')
         self.publisher_.publish(msg)
-        self.get_logger().info(f'Publishing an image h={msg.height}, w={msg.width}')
         self.i += 1
+    
+    def _recv_img(self):
+        while True:
+            self.img = self.arrival_cam_connection.recv()
 
 
 def main(args=None):
