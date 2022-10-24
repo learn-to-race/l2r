@@ -1,6 +1,13 @@
 import logging
+
+# import json
+import os
+
+# import pathlib
 import random
 import time
+
+# import math
 from typing import Any
 from typing import List
 from typing import Dict
@@ -9,31 +16,35 @@ from typing import Tuple
 from typing import Union
 
 import gym
+
+# import matplotlib.path as mplPath
 import numpy as np
 from gym.spaces import Box
+
+# from scipy.spatial import KDTree
 
 from l2r.core import ActionInterface
 from l2r.core import CameraInterface
 from l2r.core import PoseInterface
-from l2r.constants import CAR_DIMS, N_SEGMENTS, OBS_DELAY
+from l2r.constants import (
+    CAR_DIMS,
+    N_SEGMENTS,
+    OBS_DELAY,
+    RACETRACKS,
+    MEDIUM_DELAY,
+    LEVEL_Z_DICT,
+    COORD_MULTIPLIER,
+)
 from l2r.utils.space import convert_ll_to_enu
 from l2r.track import load_track
 
 from .controller import SimulatorController
-from .reward import GranTurismo
+from .reward import GranTurismo, CustomReward
 from .tracker import ProgressTracker
 
+# from l2r.track import level_2_trackmap
 
-# Racetrack IDs
-RACETRACKS = {
-    "VegasNorthRoad": 0,
-    "Thruxton": 1,
-    "AngleseyNational": 2,
-}
-
-LEVEL_Z_DICT = {"Thruxton": 63.0, "VegasNorthRoad": 0.4, "AngleseyNational": 14.0}
-
-COORD_MULTIPLIER = {"Thruxton": -1, "VegasNorthRoad": -1}
+# import ipdb as pdb
 
 
 class RacingEnv(gym.Env):
@@ -48,13 +59,41 @@ class RacingEnv(gym.Env):
         observation_delay: float = OBS_DELAY,
         reward_kwargs: Dict[str, Any] = dict(),
         env_ip: str = "0.0.0.0",
+        env_kwargs: Dict[str, Any] = dict(),
+        zone=False,
+        provide_waypoints=False,
+        manual_segments=False,
     ):
+
+        self.manual_segments = manual_segments
+        self.provide_waypoints = (
+            provide_waypoints if provide_waypoints else env_kwargs["provide_waypoints"]
+        )
+        self.zone = zone  # currently not supported; future
+
+        self.evaluate = env_kwargs["eval_mode"]
+        print("[Env] Evaluate", self.evaluate)
+
+        # global config mappings
+        self.n_eval_laps = env_kwargs["n_eval_laps"]
+        self.max_timesteps = env_kwargs["max_timesteps"]
+        self.not_moving_timeout = env_kwargs["not_moving_timeout"]
+        self.observation_delay = env_kwargs["obs_delay"]
+        self.reward_pol = env_kwargs["reward_pol"]
+
+        self.vehicle_params = env_kwargs["vehicle_params"]
+        self.sensors = env_kwargs["active_sensors"]
+
         # Interfaces with the simulator
         self.controller = controller
         self.action_interface = action_interface
         self.camera_interfaces = camera_interfaces
         self.pose_interface = pose_interface
-        self.reward = GranTurismo(**reward_kwargs)
+        self.reward = (
+            GranTurismo(**reward_kwargs)
+            if self.reward_pol == "default"
+            else CustomReward(**reward_kwargs)
+        )
 
         # delay between action and observation
         self.observation_delay = observation_delay
@@ -65,32 +104,32 @@ class RacingEnv(gym.Env):
         # openAI gym compliance - action space
         self.action_space = Box(low=-1.0, high=1.0, shape=(2,), dtype=np.float64)
 
+        # misc
+        self.last_restart = time.time()
+
     def make(self, levels: List[str], evaluate: Optional[bool] = False):
         """This sequence of steps must be run when first interacting with the
         simulator - including if the simulator process was restarted. In particular,
         the cameras, sensors, and vehicle need to be configured.
         """
         logging.info("Making l2r environment")
-        self.evaluate = evaluate
 
         # Set the level in the simulator
-        self.levels = levels
-        self.active_level = random.choice(levels)
+        if type(levels) == str:
+            self.level = levels
+            self.levels = None
+            self.active_level = levels
+        elif type(levels) == list:
+            self.levels = levels
+            self.active_level = random.choice(self.levels)
+        else:
+            self.levels = None
+            self.active_level = self.level
         self.controller.set_level(self.active_level)
-
-        # Start pose interface
-        self.pose_interface.start()
+        self.controller.set_api_udp()
 
         # Load active map
         self._load_map()
-
-        # Camera configuration
-        for camera_if in self.camera_interfaces:
-            _ = self.controller.enable_sensor(camera_if.camera_name)
-            _ = self.controller.set_sensor_params(
-                sensor=camera_if.camera_name, params=camera_if.camera_param_dict
-            )
-            camera_if.start()
 
         # Configure driver
         self.controller.set_sensor_params(
@@ -101,6 +140,20 @@ class RacingEnv(gym.Env):
                 "InputSource": "AI",
             },
         )
+
+        # Camera configuration
+        for camera_if in self.camera_interfaces:
+            _ = self.controller.enable_sensor(camera_if.camera_name)
+            _ = self.controller.set_sensor_params(
+                sensor=camera_if.camera_name, params=camera_if.camera_param_dict
+            )
+            camera_if.start()
+
+        """for sensor in self.sensors:
+            self.controller.enable_sensor(sensor)"""
+
+        # Start pose interface
+        self.pose_interface.start()
 
         return self
 
@@ -132,6 +185,14 @@ class RacingEnv(gym.Env):
             state=(_data, self.nearest_idx), oob_flag=info.get("oob", False)
         )
 
+        if self.provide_waypoints:
+            print(
+                f"[Env] WARNING: 'self.provide_waypoints' \
+                    is set to {self.provide_waypoints}"
+            )
+            info["track_idx"] = self.nearest_idx
+            info["waypoints"] = self._waypoints()
+
         return observation, reward, done, info
 
     def reset(
@@ -139,7 +200,6 @@ class RacingEnv(gym.Env):
         level: Optional[str] = None,
         random_pos: Optional[bool] = False,
         segment_pos: Optional[bool] = True,
-        evaluate: Optional[bool] = False,
     ):
         """Resets the vehicle to start position. A small time delay is used
         allow for the simulator to reset.
@@ -173,6 +233,29 @@ class RacingEnv(gym.Env):
 
         self.controller.set_mode_ai()
         self.nearest_idx = None
+        # info = {}
+
+        # give the simulator time to reset
+        time.sleep(MEDIUM_DELAY)
+
+        # randomly initialize starting location
+        p = np.random.uniform()
+        # with prob 1/(1+n) use the default start location.
+        if (
+            (random_pos)
+            and (p > 2 / (1 + len(self.racetrack.random_poses)))
+            and not self.evaluate
+        ):
+            coords, rot = self.random_start_location()
+            self.controller.set_location(coords, rot)
+            time.sleep(MEDIUM_DELAY)
+
+        elif segment_pos and self.evaluate:
+            coords, rot = self.next_segment_start_location()
+            self.controller.set_location(coords, rot)
+            time.sleep(MEDIUM_DELAY)
+        else:
+            pass
 
         # set location
         # self.controller.set_location(coords, rot)
@@ -182,6 +265,12 @@ class RacingEnv(gym.Env):
         # reset simulator sensors
         self.reward.reset()
         self.pose_interface.reset()
+
+        if self.vehicle_params:
+            self.controller.set_vehicle_params(self.vehicle_params)
+
+        for sensor in self.sensors:
+            self.controller.enable_sensor(sensor)
 
         for camera in self.camera_interfaces:
             camera.reset()
@@ -193,7 +282,7 @@ class RacingEnv(gym.Env):
         self.tracker.reset(start_idx=self.nearest_idx, segmentwise=segment_pos)
 
         # Evaluation mode
-        self.evaluate = evaluate
+        # self.evaluate = evaluate
 
         return observation
 
@@ -285,32 +374,71 @@ class RacingEnv(gym.Env):
             car_dims=CAR_DIMS,
         )
 
+    """ NOT USED CURRENTLY """
+
+    def record_manually(
+        self, output_dir, fname="thruxton", num_imgs=5000, sleep_time=0.03
+    ):
+        """Record observations, including images, to an output directory. This
+        is useful for collecting images from the environment. This method does
+        not use the an agent to take environment steps; instead, it just
+        listens for observations while a user manually drives the car in the
+        simulator.
+
+        :param str output_dir: path of the output directory
+        :param str fname: file name for output
+        :param int num_imgs: number of images to record
+        :param float sleep_time: time to sleep between images, in seconds
+        """
+        self.reset()
+
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+
+        observations = []
+        for i in range(num_imgs):
+            observations.append(self._observe())
+            time.sleep(sleep_time)
+
+        for n, observation in enumerate(observations):
+            pose, img = observation
+            filename = f"{output_dir}/{fname}_{n}"
+            np.savez_compressed(filename, pose_data=pose, image=img)
+
+        print("Complete")
+
+    def random_start_location(self):
+        """Randomly selects an index on the centerline of the track and
+        returns the ENU coordinates of the selected index along with the yaw of
+        the centerline at that point.
+
+        :returns: coordinates of a random index on centerline, yaw
+        :rtype: np array, float
+        """
+        rand_idx = np.random.randint(0, len(self.racetrack.random_poses))
+        pos = self.racetrack.random_poses[rand_idx]
+        print(f"setting random location to: {pos}")
+        coords = {"x": pos[0], "y": pos[1], "z": pos[2]}
+        rot = {"yaw": pos[3], "pitch": 0.0, "roll": 0.0}
+        return coords, rot
+
     def next_segment_start_location(self) -> Tuple[Dict[str, float], Dict[str, float]]:
         """Get spawn location at beginning of next segement"""
-        if self.evaluate:
-            segment_idx = self.tracker.current_segment
-            segment_idx = segment_idx % (N_SEGMENTS)
-        else:
-            segment_idx = np.random.randint(
-                0, len(self.racetrack.local_segment_idxs) - 1
-            )
+        segment_idx = self.tracker.current_segment
+        segment_idx = segment_idx % (N_SEGMENTS)
 
         pos = [0] * 4
         pos[0] = self.tracker.segment_coords["first"][segment_idx][0]  # x
         pos[1] = self.tracker.segment_coords["first"][segment_idx][1]  # y
         pos[2] = LEVEL_Z_DICT[self.active_level]  #
-        pos[3] = self.racetrack.race_yaw[self.local_segment_idxs[segment_idx]]
+        pos[3] = self.racetrack.race_yaw[self.racetrack.local_segment_idxs[segment_idx]]
 
         coords = {"x": pos[0], "y": pos[1], "z": pos[2]}
         rot = {"yaw": pos[3], "pitch": 0.0, "roll": 0.0}
 
         self.tracker.current_segment += 1
 
-        print(
-            "[Env] Spawning to {loc} segment start location".format(
-                loc="next" if self.evaluate else "random"
-            )
-        )
+        print("[Env] Spawning to next segment start location")
         print(f"[Env] Current segment: {self.tracker.current_segment}")
         print(
             "[Env] Respawns: {n_spawns}; infractions: {n_infr}".format(
@@ -321,3 +449,12 @@ class RacingEnv(gym.Env):
         print(f"[Env] Rot: {rot}")
 
         return coords, rot
+
+    def _waypoints(self, goal="center", ct=3, step=8):
+        """Return position of goal"""
+        num = len(self.centerline_arr)
+        idxs = [self.nearest_idx + i * step for i in range(ct)]
+        if goal == "center":
+            return np.asarray([self.centerline_arr[idx % num] for idx in idxs])
+        else:
+            raise NotImplementedError

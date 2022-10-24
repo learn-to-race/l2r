@@ -6,6 +6,8 @@ import struct
 OBS_DELAY = 0.1
 MEDIUM_DELAY = 3
 TIMEOUT_DELAY = 30
+SHORT_DELAY = 0.05
+POLL_DELAY = 0.5
 LAUNCHING_DELAY = 15
 
 ##############################################################################
@@ -53,6 +55,12 @@ MAX_OBS_ARR = [
 
 VELOCITY_IDX_LOW = 3
 VELOCITY_IDX_HIGH = 6
+NORTH_IDX = 15
+EAST_IDX = 16
+
+LEVEL_Z_DICT = {"Thruxton": 63.0, "VegasNorthRoad": 0.4, "AngleseyNational": 14.0}
+
+COORD_MULTIPLIER = {"Thruxton": -1, "VegasNorthRoad": -1}
 
 ##############################################################################
 # Environment specific
@@ -77,14 +85,21 @@ GEAR_REQ_RANGE = 4
 ##############################################################################
 # Acceleration request boundaries
 ##############################################################################
-MIN_ACC_REQ = -16.
-MAX_ACC_REQ = 6.
+MIN_ACC_REQ = -16.0
+MAX_ACC_REQ = 6.0
 
 ##############################################################################
 # Acceleration request boundaries
 ##############################################################################
-MIN_STEER_REQ = -1.
-MAX_STEER_REQ = 1.
+MIN_STEER_REQ = -1.0
+MAX_STEER_REQ = 1.0
+
+# Racetrack IDs
+RACETRACKS = {
+    "VegasNorthRoad": 0,
+    "Thruxton": 1,
+    "AngleseyNational": 2,
+}
 
 ##############################################################################
 # Image Type Declarations
