@@ -20,26 +20,25 @@ from std_msgs.msg import ByteMultiArray
 
 from .connection import ArrivalActionConnection
 
-OUT_MSG_HEADER_FMT = '=ffb'
+OUT_MSG_HEADER_FMT = "=ffb"
 OUT_MSG_HEADER_LENGTH = struct.calcsize(OUT_MSG_HEADER_FMT)
 
-class ActionSubscriber(Node):
 
+class ActionSubscriber(Node):
     def __init__(self):
-        super().__init__('action_subscriber')
+        super().__init__("action_subscriber")
         self.subscription = self.create_subscription(
-            ByteMultiArray,
-            'action',
-            self.listener_callback,
-            10)
+            ByteMultiArray, "action", self.listener_callback, 10
+        )
         self.subscription  # prevent unused variable warning
         self.arrival_action_conn = ArrivalActionConnection()
 
     def listener_callback(self, msg: ByteMultiArray):
-        action = b''.join(msg.data)
-        self.get_logger().info(f'Action recved: {struct.unpack(OUT_MSG_HEADER_FMT, action)}')
+        action = b"".join(msg.data)
+        self.get_logger().info(
+            f"Action recved: {struct.unpack(OUT_MSG_HEADER_FMT, action)}"
+        )
         self.arrival_action_conn.send(action)
-
 
 
 def main(args=None):
@@ -56,5 +55,5 @@ def main(args=None):
     rclpy.shutdown()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

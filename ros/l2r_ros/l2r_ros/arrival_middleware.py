@@ -1,5 +1,6 @@
 from .middleware import ArrivalMiddleware
 
+
 def main():
     mid = ArrivalMiddleware()
 

@@ -1,5 +1,4 @@
 import logging
-import socket
 from l2r import build_env
 from l2r import RacingEnv
 

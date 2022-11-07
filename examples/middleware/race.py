@@ -1,5 +1,4 @@
 import logging
-import socket
 from l2r import build_env
 from l2r import RacingEnv
 
@@ -10,7 +9,7 @@ ARRIVAL_SIM_HOST = "0.0.0.0"
 def race(env: RacingEnv):
     """Complete an episode in the environment"""
 
-    logging.info(f"Start racing")
+    logging.info("Start racing")
 
     obs = env.reset()
     total_reward = 0
@@ -19,7 +18,7 @@ def race(env: RacingEnv):
         obs, reward, done, info = env.step(action=[0.00, 1.00])
         total_reward += reward
         if done:
-            logging.info(f"End condition met: stop the car")
+            logging.info("End condition met: stop the car")
             break
 
 

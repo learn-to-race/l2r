@@ -20,11 +20,11 @@ import threading
 from std_msgs.msg import ByteMultiArray
 from .connection import ArrivalCamConnection
 
-class ImgPublisher(Node):
 
+class ImgPublisher(Node):
     def __init__(self):
-        super().__init__('img_publisher')
-        self.publisher_ = self.create_publisher(ByteMultiArray, 'image', 10)
+        super().__init__("img_publisher")
+        self.publisher_ = self.create_publisher(ByteMultiArray, "image", 10)
         timer_period = 0.5  # seconds
         self.timer = self.create_timer(timer_period, self.timer_callback)
         self.i = 0
@@ -39,10 +39,10 @@ class ImgPublisher(Node):
             self.get_logger().info("Waiting for img from sim")
             return
         msg.data = [bytes([i]) for i in list(self.img)]
-        self.get_logger().info(f'Pub topic=image, len={len(msg.data)}')
+        self.get_logger().info(f"Pub topic=image, len={len(msg.data)}")
         self.publisher_.publish(msg)
         self.i += 1
-    
+
     def _recv_img(self):
         while True:
             self.img = self.arrival_cam_connection.recv()
@@ -62,5 +62,5 @@ def main(args=None):
     rclpy.shutdown()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
