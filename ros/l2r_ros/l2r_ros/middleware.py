@@ -1,14 +1,10 @@
 import rclpy
 from rclpy.node import Node
 import rclpy.executors
-import struct
 
 from . import connection
 import threading
 from std_msgs.msg import ByteMultiArray
-
-IN_MSG_HEADER_FMT = "=fbbffffffffffffdddffffffffffff"
-IN_MSG_HEADER_LENGTH = struct.calcsize(IN_MSG_HEADER_FMT)
 
 
 class L2RMiddleware:

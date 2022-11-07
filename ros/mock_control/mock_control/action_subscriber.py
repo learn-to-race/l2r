@@ -18,10 +18,9 @@ import struct
 
 from std_msgs.msg import ByteMultiArray
 
-from .connection import ArrivalActionConnection
+from l2r.constants import OUT_MSG_HEADER_FMT
 
-OUT_MSG_HEADER_FMT = "=ffb"
-OUT_MSG_HEADER_LENGTH = struct.calcsize(OUT_MSG_HEADER_FMT)
+from .connection import ArrivalActionConnection
 
 
 class ActionSubscriber(Node):

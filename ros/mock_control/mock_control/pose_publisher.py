@@ -20,7 +20,7 @@ import threading
 from std_msgs.msg import ByteMultiArray
 from .connection import ArrivalPoseConnection
 
-IN_MSG_HEADER_FMT = "=fbbffffffffffffdddffffffffffff"
+from l2r.constants import IN_MSG_HEADER_FMT
 
 
 class PosePublisher(Node):

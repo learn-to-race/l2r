@@ -3,8 +3,7 @@ import zmq
 import socket
 from rclpy.node import Node
 
-# Socket receive size
-BUFFER = 1024
+from l2r.constants import BUFFER_SIZE
 
 
 class Connection:
@@ -46,7 +45,7 @@ class L2RActionConnection(Connection):
         self.sock.bind(self.ip_port)
 
     def recv(self):
-        bytes, _ = self.sock.recvfrom(BUFFER)
+        bytes, _ = self.sock.recvfrom(BUFFER_SIZE)
         return bytes
 
 
@@ -58,7 +57,7 @@ class ArrivalPoseConnection(Connection):
         self.sock.bind(self.ip_port)
 
     def recv(self):
-        bytes, _ = self.sock.recvfrom(BUFFER)
+        bytes, _ = self.sock.recvfrom(BUFFER_SIZE)
         return bytes
 
 
