@@ -21,7 +21,7 @@ colcon build
 Replace `.bash` to the shell in use (e.g. `install/setup.zsh`).
 
 ### Launch Mock Nodes
-Launch the Arrival Simulator before running the following commands. Each command won't stop until explicitly killed. Run in different shells or append `&` to run in background.
+Launch the Arrival Simulator before running the following commands. Each command won't stop until explicitly killed. Run in different shells or append `&` to run in background. Make sure `l2r` is installed and included in the `$PYTHONPATH`.
 ```
 ros2 run mock_control img_pub
 ros2 run mock_control pose_pub
