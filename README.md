@@ -74,7 +74,9 @@ Please visit our documentation for more information about sensor customization.
 
 Due to the container GPU access requirement, this installation assumes a Linux operating system. If you do not have a Linux OS, we recommend running Learn-to-Race on a public cloud instance that has a sufficient GPU.
 
-1. Request access to the Racing simulator. We recommmend running the simulator as a Python subprocess which simply requires that you specify the path of the simulator in the ```env_kwargs.controller_kwargs.sim_path``` of your configuration file. Alternatively, you can run the simulator as a Docker container by setting ```env_kwargs.controller_kwargs.start_container``` to True. If you prefer the latter, you can load the docker image as follows:
+1. Request access to the Racing simulator: https://www.aicrowd.com/challenges/learn-to-race-autonomous-racing-virtual-challenge
+
+We recommmend running the simulator as a Python subprocess which simply requires that you specify the path of the simulator in the ```env_kwargs.controller_kwargs.sim_path``` of your configuration file. Alternatively, you can run the simulator as a Docker container by setting ```env_kwargs.controller_kwargs.start_container``` to True. If you prefer the latter, you can load the docker image as follows:
 
 ```bash
 $ docker load < arrival-sim-image.tar.gz
@@ -83,23 +85,32 @@ $ docker load < arrival-sim-image.tar.gz
 2. Download the source code from this repository and install the package requirements. We recommend using a virtual environment:
 
 ```bash
-$ pip install virtualenv
-$ virtualenv venv                           # create new virtual environment
-$ source venv/bin/activate                  # activate the environment
-(venv) $ pip install -r requirements.txt 
+$ conda create -n l2r python=3.6
+$ conda activate                  # activate the environment
+(l2r) $ pip3 install git+https://github.com/learn-to-race/l2r.git@aicrowd-environment
 ```
 
 ## Research
 
 Please cite this work if you use L2R as a part of your research.
 
+Main:
 ```
-@misc{herman2021learntorace,
-      title={Learn-to-Race: A Multimodal Control Environment for Autonomous Racing}, 
-      author={James Herman and Jonathan Francis and Siddha Ganju and Bingqing Chen and Anirudh Koul and Abhinav Gupta and Alexey Skabelkin and Ivan Zhukov and Andrey Gostev and Max Kumskoy and Eric Nyberg},
-      year={2021},
-      eprint={2103.11575},
-      archivePrefix={arXiv},
-      primaryClass={cs.RO}
+@inproceedings{herman2021learn,
+  title={Learn-to-race: A multimodal control environment for autonomous racing},
+  author={Herman, James and Francis, Jonathan and Ganju, Siddha and Chen, Bingqing and Koul, Anirudh and Gupta, Abhinav and Skabelkin, Alexey and Zhukov, Ivan and Kumskoy, Max and Nyberg, Eric},
+  booktitle={Proceedings of the IEEE/CVF International Conference on Computer Vision},
+  pages={9793--9802},
+  year={2021}
+}
+```
+
+L2R Task 2 Benchmark:
+```
+@article{francis2022learn,
+  title={Learn-to-race challenge 2022: Benchmarking safe learning and cross-domain generalisation in autonomous racing},
+  author={Francis, Jonathan and Chen, Bingqing and Ganju, Siddha and Kathpal, Sidharth and Poonganam, Jyotish and Shivani, Ayush and Genc, Sahika and Zhukov, Ivan and Kumskoy, Max and Koul, Anirudh and others},
+  journal={arXiv preprint arXiv:2205.02953},
+  year={2022}
 }
 ``` 
