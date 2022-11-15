@@ -62,7 +62,7 @@ Please visit our documentation for more information about sensor customization.
 
 ## Requirements
 
-**Python:** We use Learn-to-Race with Python 3.6 or 3.7.
+**Python:** We use Learn-to-Race with Python 3.8+.
 
 **Graphics Hardware:** An Nvidia graphics card & associated drives is required. An Nvidia 970 GTX graphics card is minimally sufficient to simply run the simulator, but a better card is recommended.
 
