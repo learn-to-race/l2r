@@ -75,12 +75,7 @@ class RacingEnv(gym.Env):
         print("[Env] Evaluate", self.evaluate)
 
         # global config mappings
-        self.n_eval_laps = env_kwargs["n_eval_laps"]
-        self.max_timesteps = env_kwargs["max_timesteps"]
-        self.not_moving_timeout = env_kwargs["not_moving_timeout"]
-        self.observation_delay = env_kwargs["obs_delay"]
         self.reward_pol = env_kwargs["reward_pol"]
-
         self.vehicle_params = env_kwargs["vehicle_params"]
         self.sensors = env_kwargs["active_sensors"]
 
@@ -269,8 +264,8 @@ class RacingEnv(gym.Env):
         if self.vehicle_params:
             self.controller.set_vehicle_params(self.vehicle_params)
 
-        for sensor in self.sensors:
-            self.controller.enable_sensor(sensor)
+        '''for sensor in self.sensors:
+            self.controller.enable_sensor(sensor)'''
 
         for camera in self.camera_interfaces:
             camera.reset()
@@ -280,9 +275,6 @@ class RacingEnv(gym.Env):
 
         observation = self._observe()
         self.tracker.reset(start_idx=self.nearest_idx, segmentwise=segment_pos)
-
-        # Evaluation mode
-        # self.evaluate = evaluate
 
         return observation
 
