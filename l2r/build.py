@@ -13,6 +13,7 @@ from l2r.core import CameraInterface
 from l2r.core import PoseInterface
 from l2r.env import SimulatorController
 from l2r.env import RacingEnv
+from l2r.env import RacingEnvCarla
 
 
 def build_env(
@@ -22,6 +23,7 @@ def build_env(
     action_cfg: Optional[Dict[str, Any]] = dict(),
     pose_cfg: Optional[Dict[str, Any]] = dict(),
     env_ip: Optional[str] = "0.0.0.0",
+    carla: bool = True,
 ) -> RacingEnv:
     """Build a l2r environment
 
@@ -44,13 +46,17 @@ def build_env(
     action_interface = ActionInterface(**action_cfg)
 
     # create environment
-    env = RacingEnv(
-        controller=controller,
-        action_interface=action_interface,
-        camera_interfaces=camera_interfaces,
-        pose_interface=pose_interface,
-        env_ip=env_ip,
-    )
+    if carla:
+        env = RacingEnvCarla()
+        return env.make()
+    else:
+        env = RacingEnv(
+            controller=controller,
+            action_interface=action_interface,
+            camera_interfaces=camera_interfaces,
+            pose_interface=pose_interface,
+            env_ip=env_ip,
+        )
 
     return env.make(levels=levels)
 
